@@ -315,6 +315,32 @@
         padding:8px 24px;
         letter-spacing:.14em;
       }
+      .reel-charts{
+        gap:8px;
+        justify-content:flex-start;
+        padding:0 4px;
+      }
+      .pie-chart{
+        width:50px;
+        height:50px;
+      }
+      .pie-chart-inner{
+        width:36px;
+        height:36px;
+        font-size:9px;
+      }
+      .reel-chart-label{
+        font-size:9px;
+      }
+      .ticket-btn{
+        width:20px;
+        height:20px;
+        font-size:12px;
+      }
+      .ticket-count{
+        font-size:10px;
+        min-width:24px;
+      }
     }
     .slot-panel,.side-panel{
       background:radial-gradient(circle at top,var(--panel) 0,var(--bg) 50%,#000 100%);
@@ -939,7 +965,8 @@
       gap:12px;
       justify-content:space-around;
       margin:12px 0;
-      flex-wrap:wrap;
+      flex-wrap:nowrap;
+      overflow-x:auto;
     }
     .reel-chart{
       display:flex;
@@ -1320,11 +1347,12 @@
         <div class="help-section-title">Tickets & Pity</div>
         <p>
           On a winning spin, the winner is selected. Players who appeared but did not win spend 1
-          ticket on the reels they showed up on. Everyone else doubles their tickets on all reels,
-          up to a cap of 500 per reel. Any overflow above 500 converts into pity tokens. Overflow
-          always grants at least one pity token, and each additional full 500 overflow awards
-          another token (up to 7 tokens). At 7 pity tokens, that player will be auto-picked
-          before the next normal spin.
+          ticket on the reels they showed up on. Players who did not appear double their tickets on
+          all reels, up to a cap of 500 per reel. Any overflow above 500 converts into pity tokens.
+          Overflow always grants at least one pity token, and each additional full 500 overflow awards
+          another token (up to 12 tokens). At 12 pity tokens, that player will be auto-picked
+          before the next normal spin. When a regular winner re-enters the queue, all other players
+          double their tickets (patience reward). Pity winners do not trigger this doubling.
         </p>
         <div class="help-section-title">Dead Spins</div>
         <p>
@@ -2378,7 +2406,12 @@
     const pityPick = findPityAutoPick(evt);
     if(pityPick){
       log(`Auto-pick from pity: ${pityPick.name}`);
-      handleWinnerBanner(pityPick,'pity',3,false);
+      // Start bulb celebration for pity pick
+      startBulbsAnimation(false);
+      setTimeout(()=>{
+        stopBulbsAnimation();
+        handleWinnerBanner(pityPick,'pity',3,false);
+      },1200);
       renderLeaderboard();
       saveAll();
       return;
@@ -2407,20 +2440,25 @@
       let hits=3;
       let isLunaWin=false;
       if(isCarlo){
-        evt.carloHits++;
-        winnerOverlay.classList.add('show');
-        winnerHeading.textContent='CARLO!';
-        winnerNameEl.textContent='CARLO';
-        winnerMetaEl.textContent='Streamer plays their own deck this round.';
-        winnerLunaSticker.style.display='none';
-        pendingWinner=null;
-        currentWinnerMeta={reason:'carlo',hits:0};
-        evt.spinCount++;
-        evt.deadSpinStreak=0;
-        renderLeaderboard();
-        saveAll();
-        spinBtn.disabled=false;
-        smallStatus.textContent="Ready.";
+        // CARLO: Start celebratory bulb animation, wait, then show banner
+        startBulbsAnimation(false);
+        setTimeout(()=>{
+          stopBulbsAnimation();
+          evt.carloHits++;
+          winnerOverlay.classList.add('show');
+          winnerHeading.textContent='CARLO!';
+          winnerNameEl.textContent='CARLO';
+          winnerMetaEl.textContent='Streamer plays their own deck this round.';
+          winnerLunaSticker.style.display='none';
+          pendingWinner=null;
+          currentWinnerMeta={reason:'carlo',hits:0};
+          evt.spinCount++;
+          evt.deadSpinStreak=0;
+          renderLeaderboard();
+          saveAll();
+          spinBtn.disabled=false;
+          smallStatus.textContent="Ready.";
+        },1200);
         return;
       }
       const lunaPick = detectLunaWinner(evt,symbols);
@@ -2439,19 +2477,28 @@
         }
       }
       if(winner){
+        // Winner found: Start celebratory bulb animation (Luna colors if Luna win)
+        startBulbsAnimation(isLunaWin);
         handleWinTickets(evt,winner,symbols,reelPlayers);
         log(`${winner.name} wins the slot (${reason}, hits=${hits}).`);
-        handleWinnerBanner(winner,reason,hits,isLunaWin);
+        // Wait for bulb celebration before showing winner banner
+        setTimeout(()=>{
+          stopBulbsAnimation();
+          handleWinnerBanner(winner,reason,hits,isLunaWin);
+          spinBtn.disabled=false;
+          smallStatus.textContent="Ready.";
+        },1200);
       }else{
+        // Dead spin: No bulb celebration
         evt.deadSpinStreak++;
         log(`Dead spin (#${evt.deadSpinStreak}).`);
         handleDeadSpinTickets(evt,symbols,reelPlayers);
+        spinBtn.disabled=false;
+        smallStatus.textContent="Ready.";
       }
       evt.spinCount++;
       renderLeaderboard();
       saveAll();
-      spinBtn.disabled=false;
-      smallStatus.textContent="Ready.";
     },800);
   }
 
