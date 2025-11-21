@@ -1653,12 +1653,42 @@
       r.classList.add('spinning');
       r.classList.remove('glow-win','glow-carlo','glow-luna');
     });
-    startBulbsAnimation(false);
+    // Don't start bulbs here - will be started in performSpin for proper timing
   }
   function spinAnimationStop(){
     const reelEls = reelsEl.querySelectorAll('.reel');
     reelEls.forEach(r=>r.classList.remove('spinning'));
     stopBulbsAnimation();
+  }
+
+  // Cascade reel stops over 660ms with random timing
+  // Last reel stops ~1000-1100ms (aligns near end of 1200ms bulb animation)
+  function spinAnimationStopCascade(callback){
+    const reelEls = reelsEl.querySelectorAll('.reel');
+    const TAPER_DURATION = 660; // 0.66 seconds
+    const BASE_START = 340; // First reel starts stopping at ~340ms
+    const RANDOM_VARIANCE = 40; // ±40ms random variation per reel
+
+    // Generate random delays for each reel
+    const delays = [];
+    for(let i = 0; i < 5; i++){
+      const baseDelay = BASE_START + (i * (TAPER_DURATION / 4)); // Spread over 660ms
+      const randomOffset = (Math.random() - 0.5) * 2 * RANDOM_VARIANCE; // -40 to +40ms
+      delays.push(Math.max(0, baseDelay + randomOffset));
+    }
+
+    // Stop each reel at its calculated time
+    let stoppedCount = 0;
+    delays.forEach((delay, index) => {
+      setTimeout(() => {
+        reelEls[index].classList.remove('spinning');
+        stoppedCount++;
+        if(stoppedCount === 5 && callback){
+          // All reels stopped, invoke callback
+          callback();
+        }
+      }, delay);
+    });
   }
 
   function addPlayer(name){
@@ -2425,23 +2455,33 @@
     leverEl.classList.add('pull');
     spinAnimationStart();
     smallStatus.textContent="Spinning…";
-    setTimeout(()=>{
-      spinAnimationStop();
+
+    // Build spin result immediately (for timing calculation)
+    const symbols = buildSpinResult(evt);
+    const isCarlo = detectCarlo(symbols);
+    let isLunaWin = false;
+    const lunaPick = detectLunaWinner(evt,symbols);
+    if(lunaPick) isLunaWin = true;
+    const hasWinner = isCarlo || lunaPick || detectHitWinner(evt,symbols);
+
+    // Start bulb animation immediately if there's a winner
+    if(hasWinner){
+      startBulbsAnimation(isLunaWin);
+    }
+
+    // Use cascading reel stops with callback when all reels finish
+    spinAnimationStopCascade(() => {
       leverEl.classList.remove('pull');
-      const symbols = buildSpinResult(evt);
       renderSpinResult(symbols);
       const reelPlayers=[];
       symbols.forEach((s,idx)=>{
         if(s.type==='player') reelPlayers.push({index:idx,playerId:s.playerId});
       });
-      const isCarlo = detectCarlo(symbols);
       let winner=null;
       let reason='normal';
       let hits=3;
-      let isLunaWin=false;
       if(isCarlo){
-        // CARLO: Start celebratory bulb animation, wait, then show banner
-        startBulbsAnimation(false);
+        // CARLO: Bulbs already running, wait a bit more then show banner
         setTimeout(()=>{
           stopBulbsAnimation();
           evt.carloHits++;
@@ -2458,10 +2498,9 @@
           saveAll();
           spinBtn.disabled=false;
           smallStatus.textContent="Ready.";
-        },1200);
+        },200); // Short delay after last reel stops
         return;
       }
-      const lunaPick = detectLunaWinner(evt,symbols);
       if(lunaPick){
         winner = lunaPick.player;
         reason='luna';
@@ -2477,17 +2516,16 @@
         }
       }
       if(winner){
-        // Winner found: Start celebratory bulb animation (Luna colors if Luna win)
-        startBulbsAnimation(isLunaWin);
+        // Winner found: Bulbs already running, handle tickets then show banner
         handleWinTickets(evt,winner,symbols,reelPlayers);
         log(`${winner.name} wins the slot (${reason}, hits=${hits}).`);
-        // Wait for bulb celebration before showing winner banner
+        // Short delay after last reel stops before showing winner banner
         setTimeout(()=>{
           stopBulbsAnimation();
           handleWinnerBanner(winner,reason,hits,isLunaWin);
           spinBtn.disabled=false;
           smallStatus.textContent="Ready.";
-        },1200);
+        },200);
       }else{
         // Dead spin: No bulb celebration
         evt.deadSpinStreak++;
@@ -2499,7 +2537,7 @@
       evt.spinCount++;
       renderLeaderboard();
       saveAll();
-    },800);
+    });
   }
 
   spinBtn.addEventListener('click',performSpin);
