@@ -5,6 +5,8 @@
   <title>CARLO Viewer Slot Machine</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&display=swap');
+
     :root{
       --bg:#15100c;
       --panel:#0b0a09;
@@ -100,7 +102,7 @@
       width:100%;
     }
     body{
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      font-family:'Cinzel',serif;
       background:radial-gradient(circle at top,#3b1f0f 0,var(--bg) 45%,#000 100%);
       color:var(--text);
       display:flex;
@@ -121,27 +123,32 @@
       position:relative;
     }
     header{
-      padding:10px 16px;
+      padding:12px 16px;
       border-bottom:2px solid var(--border);
       display:flex;
-      justify-content:space-between;
+      flex-direction:column;
       align-items:center;
-      gap:12px;
+      gap:8px;
       box-shadow:0 2px 12px var(--theme-glow);
+    }
+    .header-top{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:8px;
     }
     .header-left{
       display:flex;
       gap:10px;
       align-items:center;
+      width:100%;
+      justify-content:space-between;
     }
     .logo{
-      width:40px;
-      height:40px;
-      border-radius:999px;
+      width:60px;
+      height:60px;
       overflow:hidden;
-      border:1px solid var(--gold);
-      box-shadow:0 0 12px rgba(250,204,21,.6);
-      background:#000;
+      background:transparent;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -150,41 +157,43 @@
       width:100%;
       height:100%;
       object-fit:contain;
+      filter:drop-shadow(0 0 8px rgba(250,204,21,.4));
     }
     .title-block{
       display:flex;
       flex-direction:column;
-      gap:2px;
+      align-items:center;
+      gap:4px;
     }
     .title{
-      font-size:18px;
-      font-weight:800;
-      letter-spacing:.08em;
+      font-size:20px;
+      font-weight:700;
+      letter-spacing:.1em;
       text-transform:uppercase;
       color:var(--gold);
-      text-shadow:0 0 10px rgba(250,204,21,.55);
+      text-shadow:0 0 12px rgba(250,204,21,.6);
     }
     .subtitle{
-      font-size:11px;
-      color:var(--muted);
-      text-transform:uppercase;
-      letter-spacing:.12em;
+      display:none;
     }
     .header-right{
       display:flex;
       flex-direction:column;
-      align-items:flex-end;
-      gap:4px;
-      font-size:11px;
+      align-items:center;
+      gap:2px;
+      font-size:10px;
     }
     .spin-meta{
-      font-size:11px;
+      font-size:10px;
       color:var(--muted);
+      text-align:center;
     }
     .event-row{
       display:flex;
       align-items:center;
       gap:6px;
+      font-size:11px;
+      color:var(--muted);
     }
     .event-label{
       text-transform:uppercase;
@@ -266,23 +275,30 @@
       }
       header{
         padding:8px 12px;
-        flex-wrap:wrap;
-        gap:8px;
+        gap:6px;
       }
-      .header-left{
-        flex:1;
-        min-width:0;
-      }
-      .header-right{
-        align-items:flex-start;
-        width:100%;
-        flex-direction:row;
-        justify-content:space-between;
-        flex-wrap:wrap;
+      .logo{
+        width:50px;
+        height:50px;
       }
       .title{
         font-size:16px;
-        letter-spacing:.06em;
+      }
+      .header-left{
+        flex-direction:column;
+        gap:6px;
+        align-items:center;
+      }
+      .header-right{
+        align-items:center;
+        gap:2px;
+      }
+      .event-row{
+        width:100%;
+        justify-content:center;
+      }
+      .spin-meta{
+        font-size:9px;
       }
       .subtitle{
         font-size:10px;
@@ -388,7 +404,7 @@
     }
     .reels-shell{
       position:relative;
-      padding:18px 18px 26px;
+      padding:18px 50px 26px 18px;
     }
     .bulb-row{
       position:absolute;
@@ -556,38 +572,36 @@
       z-index:1;
     }
     .status-text{font-size:11px;color:var(--muted);}
-    .lever-area{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin-left:auto;
-    }
     .lever{
-      width:22px;height:90px;
+      width:26px;height:100px;
       border-radius:999px;
       background:linear-gradient(180deg,var(--panel) 0,var(--bg) 100%);
-      border:1px solid var(--theme-color);
-      position:relative;
+      border:2px solid var(--theme-color);
+      position:absolute;
+      right:10px;
+      top:50%;
+      transform:translateY(-50%);
       box-shadow:inset 0 0 8px rgba(0,0,0,.6),0 0 12px var(--theme-glow);
       cursor:pointer;
+      z-index:10;
     }
     .lever-knob{
-      width:26px;height:26px;
+      width:30px;height:30px;
       border-radius:999px;
       background:radial-gradient(circle at 30% 20%,var(--theme-color) 0,var(--theme-color) 50%,var(--bg) 100%);
       border:2px solid var(--theme-color);
       position:absolute;
       left:50%;transform:translateX(-50%);
-      top:-13px;
+      top:-15px;
       box-shadow:0 0 20px var(--theme-glow),0 0 8px var(--theme-glow);
       transition:top .12s ease-out;
     }
-    .lever.pull .lever-knob{top:58px;}
+    .lever.pull .lever-knob{top:70px;}
     .spin-button{
       border-radius:999px;
-      padding:10px 30px;
-      border:2px solid var(--theme-color);
-      font-size:14px;
+      padding:12px 36px;
+      border:3px solid var(--theme-color);
+      font-size:15px;
       font-weight:800;
       letter-spacing:.18em;
       text-transform:uppercase;
@@ -597,7 +611,9 @@
       text-shadow:0 0 6px rgba(255,255,255,.8);
       box-shadow:0 0 24px var(--theme-glow),0 0 12px var(--theme-glow),inset 0 0 8px rgba(255,255,255,.5);
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
-      margin:0 auto;
+      position:absolute;
+      left:50%;
+      transform:translateX(-50%);
     }
     .spin-button:disabled{
       opacity:.45;
@@ -640,15 +656,16 @@
     }
     .add-player-form button{
       border-radius:999px;
-      border:1px solid var(--blue);
-      background:radial-gradient(circle at top,#38bdf8 0,#0ea5e9 40%,#0369a1 100%);
+      border:2px solid var(--theme-color);
+      background:radial-gradient(circle at top,var(--theme-color) 0,var(--theme-color) 50%,var(--bg) 100%);
       font-size:11px;
-      padding:6px 10px;
-      color:#0b1120;
+      padding:6px 12px;
+      color:var(--bg);
+      font-weight:700;
       text-transform:uppercase;
       letter-spacing:.12em;
       cursor:pointer;
-      box-shadow:0 0 12px rgba(56,189,248,.7),inset 0 0 6px rgba(255,255,255,.4);
+      box-shadow:0 0 16px var(--theme-glow),inset 0 0 6px rgba(255,255,255,.4);
     }
     .summary-cards{
       display:grid;
@@ -709,10 +726,14 @@
     .player-row:hover{background:rgba(17,24,39,.9);}
     .time-cell{
       font-size:10px;
-      color:var(--muted);
+      color:#0f0;
+      text-shadow:0 0 8px #0f0;
       white-space:nowrap;
     }
     .pity-count{font-size:10px;color:var(--muted);}
+    .win-rate-good{color:#22c55e;font-weight:600;}
+    .win-rate-medium{color:#fb923c;font-weight:600;}
+    .win-rate-poor{color:#ef4444;font-weight:600;}
     .actions-cell{
       font-size:14px;
       text-align:center;
@@ -1129,28 +1150,29 @@
     .diag-result span.warn{color:var(--danger);}
   </style>
 </head>
-<body class="theme-blue">
+<body class="theme-white">
 <div id="app">
   <header>
-    <div class="header-left">
+    <div class="header-top">
       <div class="logo">
         <img src="https://i.ibb.co/PvbYChDZ/G0-Gsi-Gv-XIAEk-Rf1-removebg-preview.png" alt="CARLO"/>
       </div>
       <div class="title-block">
-        <div class="title">CARLO SLOT</div>
-        <div class="subtitle">Viewer Deck Roulette · 5-Reel · Luna Luck & Carlo Jackpots</div>
-        <div class="event-row">
-          <span class="event-label">Event:</span>
-          <span id="eventChips"></span>
-        </div>
+        <div class="title">CarloMTG - Viewer Roulette</div>
       </div>
     </div>
-    <div class="header-right">
-      <div class="spin-meta">
-        Spins: <span id="spinCount">0</span> · Dead streak: <span id="deadStreak">0</span>
+    <div class="header-left">
+      <div class="event-row">
+        <span class="event-label">Event:</span>
+        <span id="eventChips"></span>
       </div>
-      <div class="spin-meta">
-        Players: <span id="playerCount">0</span> / 50 · Ticket cap: 500 · Pity max: 7 tokens
+      <div class="header-right">
+        <div class="spin-meta">
+          Spins: <span id="spinCount">0</span> · Dead: <span id="deadStreak">0</span> · Players: <span id="playerCount">0</span>/50
+        </div>
+        <div class="spin-meta">
+          Cap: 500 · Pity: 12 max
+        </div>
       </div>
       <div class="theme-toggle">
         Theme:
@@ -1182,15 +1204,13 @@
             </div>
             <div class="reels" id="reels"></div>
           </div>
+          <div class="lever" id="lever">
+            <div class="lever-knob"></div>
+          </div>
         </div>
         <div class="slot-controls">
           <div class="status-text" id="smallStatus">Ready.</div>
-          <div class="lever-area">
-            <button class="spin-button" id="spinBtn">SPIN</button>
-            <div class="lever" id="lever">
-              <div class="lever-knob"></div>
-            </div>
-          </div>
+          <button class="spin-button" id="spinBtn">SPIN</button>
         </div>
       </section>
       <!-- SIDE PANEL -->
@@ -2021,7 +2041,11 @@
       const tdSlotWins = document.createElement('td');
       tdSlotWins.textContent = `${p.slotWins}`;
       const tdWL = document.createElement('td');
-      tdWL.textContent = `${p.overallWins}/${p.overallLosses} (${overallWinRate(p).toFixed(1)}%)`;
+      const winPct = overallWinRate(p);
+      tdWL.textContent = `${p.overallWins}/${p.overallLosses} (${winPct.toFixed(1)}%)`;
+      if(winPct >= 60) tdWL.className = 'win-rate-good';
+      else if(winPct >= 40) tdWL.className = 'win-rate-medium';
+      else tdWL.className = 'win-rate-poor';
       const tdActions = document.createElement('td');
       tdActions.className='actions-cell';
       const cog = document.createElement('button');
@@ -2210,6 +2234,14 @@
   closePlayerCardBtn.addEventListener('click',()=>{
     playerOverlay.classList.remove('show');
     currentPlayerCardId=null;
+  });
+
+  // Close player card when clicking outside
+  playerOverlay.addEventListener('click',(e)=>{
+    if(e.target === playerOverlay){
+      playerOverlay.classList.remove('show');
+      currentPlayerCardId=null;
+    }
   });
 
   function handleWinnerBanner(player, reason, hits, isLuna){
