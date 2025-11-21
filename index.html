@@ -1896,7 +1896,35 @@
       const winRate = total>0 ? (d.wins/total)*100 : 0;
       const tr = document.createElement('tr');
       const tdColor = document.createElement('td');
-      tdColor.textContent = d.color;
+
+      // Render color pips as images instead of text
+      if(d.color){
+        const pipUrls = {
+          'W': 'https://i.ibb.co/sJpHH9VZ/W.png',
+          'U': 'https://i.ibb.co/0bPLHLk/U.png',
+          'B': 'https://i.ibb.co/nM1ZZz3z/B.png',
+          'R': 'https://i.ibb.co/NnjxnmZv/R.png',
+          'G': 'https://i.ibb.co/tM5Mb1Q0/G.png',
+          'C': 'https://i.ibb.co/xt4Lpn0X/C.png'
+        };
+        tdColor.style.display = 'flex';
+        tdColor.style.gap = '2px';
+        tdColor.style.alignItems = 'center';
+        for(const letter of d.color){
+          if(pipUrls[letter]){
+            const img = document.createElement('img');
+            img.src = pipUrls[letter];
+            img.alt = letter;
+            img.style.width = '16px';
+            img.style.height = '16px';
+            img.style.objectFit = 'contain';
+            tdColor.appendChild(img);
+          }
+        }
+      }else{
+        tdColor.textContent = '-';
+      }
+
       const tdMatches = document.createElement('td');
       tdMatches.textContent = total;
       const tdWL = document.createElement('td');
