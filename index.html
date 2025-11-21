@@ -330,6 +330,21 @@
         font-size:12px;
         padding:8px 24px;
         letter-spacing:.14em;
+        border-width:2px;
+      }
+      .lever{
+        width:22px;
+        height:85px;
+        right:6px;
+      }
+      .lever-knob{
+        width:26px;
+        height:26px;
+        top:-13px;
+      }
+      .lever.pull .lever-knob{top:55px;}
+      .reels-shell{
+        padding:12px 36px 20px 12px;
       }
       .reel-charts{
         gap:6px;
@@ -621,7 +636,7 @@
       box-shadow:0 0 6px rgba(0,0,0,.4);
     }
     .spin-button:active:not(:disabled){
-      transform:translateY(1px) scale(.99);
+      transform:translateX(-50%) translateY(1px) scale(.99);
       box-shadow:0 0 16px var(--theme-glow),inset 0 0 6px rgba(0,0,0,.4);
     }
     .side-panel-header{
