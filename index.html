@@ -316,17 +316,21 @@
         letter-spacing:.14em;
       }
       .reel-charts{
-        gap:8px;
+        gap:6px;
         justify-content:flex-start;
-        padding:0 4px;
+        padding:0;
+        margin:8px 0;
+        overflow-x:auto;
+        -webkit-overflow-scrolling:touch;
       }
       .pie-chart{
-        width:50px;
-        height:50px;
+        width:48px;
+        height:48px;
+        flex-shrink:0;
       }
       .pie-chart-inner{
-        width:36px;
-        height:36px;
+        width:34px;
+        height:34px;
         font-size:9px;
       }
       .reel-chart-label{
@@ -340,6 +344,11 @@
       .ticket-count{
         font-size:10px;
         min-width:24px;
+      }
+      .player-card{
+        padding:10px;
+        max-width:100%;
+        overflow:hidden;
       }
     }
     .slot-panel,.side-panel{
@@ -967,6 +976,7 @@
       margin:12px 0;
       flex-wrap:nowrap;
       overflow-x:auto;
+      max-width:100%;
     }
     .reel-chart{
       display:flex;
