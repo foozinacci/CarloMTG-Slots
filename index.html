@@ -671,54 +671,13 @@
       color:var(--muted);
     }
     .player-row{cursor:pointer;}
-    .player-row-main:hover{background:rgba(17,24,39,.9);}
-    .player-row-reels{background:rgba(0,0,0,.3);}
-    .player-row-reels:hover{background:rgba(0,0,0,.4);}
-    .player-row-reels td{
-      padding:8px 6px;
-      border-bottom:2px solid var(--border);
-    }
+    .player-row:hover{background:rgba(17,24,39,.9);}
     .time-cell{
       font-size:10px;
       color:var(--muted);
       white-space:nowrap;
     }
     .pity-count{font-size:10px;color:var(--muted);}
-    .reel-tickets-cell{
-      display:flex;
-      gap:4px;
-      flex-wrap:wrap;
-    }
-    .reel-ticket{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      font-size:9px;
-      background:var(--panel);
-      border-radius:6px;
-      padding:2px 3px;
-      border:1px solid var(--border);
-      min-width:52px;
-    }
-    .reel-ticket-label{
-      font-size:9px;
-      color:var(--muted);
-    }
-    .reel-ticket-value{
-      font-weight:600;
-      font-size:11px;
-      display:flex;
-      align-items:center;
-      gap:2px;
-    }
-    .reel-ticket-value button{
-      border:none;
-      background:transparent;
-      color:var(--muted);
-      cursor:pointer;
-      padding:0 2px;
-      font-size:11px;
-    }
     .actions-cell{
       font-size:14px;
       text-align:center;
@@ -1016,6 +975,39 @@
       font-size:11px;
       font-weight:bold;
       color:var(--theme-color);
+    }
+    .reel-ticket-controls{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      margin-top:4px;
+    }
+    .ticket-btn{
+      width:24px;
+      height:24px;
+      border-radius:4px;
+      border:1px solid var(--border);
+      background:var(--panel);
+      color:var(--theme-color);
+      font-size:14px;
+      font-weight:bold;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:background .15s ease-out;
+    }
+    .ticket-btn:hover{
+      background:var(--theme-color);
+      color:var(--bg);
+      box-shadow:0 0 8px var(--theme-glow);
+    }
+    .ticket-count{
+      font-size:12px;
+      font-weight:bold;
+      color:var(--text);
+      min-width:32px;
+      text-align:center;
     }
     .deck-table{
       width:100%;
@@ -1981,51 +1973,7 @@
       tr1.appendChild(tdWL);
       tr1.appendChild(tdActions);
 
-      // Row 2: Reel tickets
-      const tr2 = document.createElement('tr');
-      tr2.className = 'player-row player-row-reels';
-      const tdReels = document.createElement('td');
-      tdReels.colSpan = 7;
-      tdReels.className = 'reel-tickets-cell';
-      for(let i=0;i<5;i++){
-        const sub = document.createElement('div');
-        sub.className='reel-ticket';
-        const lbl = document.createElement('div');
-        lbl.className='reel-ticket-label';
-        lbl.textContent=`R${i+1}`;
-        const valRow = document.createElement('div');
-        valRow.className='reel-ticket-value';
-        const minus = document.createElement('button');
-        minus.textContent='-';
-        const span = document.createElement('span');
-        span.textContent=p.tickets[i];
-        const plus = document.createElement('button');
-        plus.textContent='+';
-        minus.addEventListener('click',e=>{
-          e.stopPropagation();
-          if(p.tickets[i]>1) p.tickets[i]--;
-          clampPlayer(p);
-          renderLeaderboard();
-          saveAll();
-        });
-        plus.addEventListener('click',e=>{
-          e.stopPropagation();
-          if(p.tickets[i]<TICKET_CAP) p.tickets[i]++;
-          clampPlayer(p);
-          renderLeaderboard();
-          saveAll();
-        });
-        valRow.appendChild(minus);
-        valRow.appendChild(span);
-        valRow.appendChild(plus);
-        sub.appendChild(lbl);
-        sub.appendChild(valRow);
-        tdReels.appendChild(sub);
-      }
-      tr2.appendChild(tdReels);
-
       leaderboardBody.appendChild(tr1);
-      leaderboardBody.appendChild(tr2);
     }
     spinCountEl.textContent = evt.spinCount;
     deadStreakEl.textContent = evt.deadSpinStreak;
@@ -2064,8 +2012,50 @@
       inner.textContent = `${percentage.toFixed(1)}%`;
 
       pieChart.appendChild(inner);
+
+      // Ticket controls below pie chart
+      const ticketControls = document.createElement('div');
+      ticketControls.className = 'reel-ticket-controls';
+
+      const minusBtn = document.createElement('button');
+      minusBtn.textContent = '-';
+      minusBtn.className = 'ticket-btn';
+
+      const ticketDisplay = document.createElement('span');
+      ticketDisplay.className = 'ticket-count';
+      ticketDisplay.textContent = playerTickets;
+
+      const plusBtn = document.createElement('button');
+      plusBtn.textContent = '+';
+      plusBtn.className = 'ticket-btn';
+
+      minusBtn.addEventListener('click', () => {
+        if(p.tickets[i] > 1) {
+          p.tickets[i]--;
+          clampPlayer(p);
+          openPlayerCard(p.id); // Refresh the card
+          renderLeaderboard();
+          saveAll();
+        }
+      });
+
+      plusBtn.addEventListener('click', () => {
+        if(p.tickets[i] < TICKET_CAP) {
+          p.tickets[i]++;
+          clampPlayer(p);
+          openPlayerCard(p.id); // Refresh the card
+          renderLeaderboard();
+          saveAll();
+        }
+      });
+
+      ticketControls.appendChild(minusBtn);
+      ticketControls.appendChild(ticketDisplay);
+      ticketControls.appendChild(plusBtn);
+
       chartDiv.appendChild(label);
       chartDiv.appendChild(pieChart);
+      chartDiv.appendChild(ticketControls);
       reelChartsEl.appendChild(chartDiv);
     }
 
