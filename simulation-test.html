@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CarloMTG Slot Machine - Aggressive Simulation</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+      background: #0a0e1c;
+      color: #f9fafb;
+    }
+    .scenario {
+      margin: 20px 0;
+      padding: 15px;
+      border: 2px solid #3f2f19;
+      background: #15100c;
+      border-radius: 8px;
+    }
+    .scenario h2 {
+      color: #facc15;
+      margin-top: 0;
+    }
+    .metric {
+      padding: 5px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+    .metric-label { color: #d1bfa1; }
+    .metric-value { color: #4ade80; font-weight: bold; }
+    .warning { color: #fb4b4b; }
+    .good { color: #22c55e; }
+    .neutral { color: #facc15; }
+    button {
+      background: #3f2f19;
+      color: #facc15;
+      border: 1px solid #facc15;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 4px;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #facc15;
+      color: #0a0e1c;
+    }
+    .comparison {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎰 CarloMTG Slot Machine - Aggressive Simulation</h1>
+  <p>Testing 300 spins with varying player counts (3, 5, 10 players) across different configurations</p>
+  <p><strong>NEW:</strong> Adaptive pity cap scenarios that scale with player count!</p>
+
+  <button onclick="runAllSimulations()">RUN ALL SIMULATIONS</button>
+  <button onclick="clearResults()">CLEAR RESULTS</button>
+
+  <div id="results"></div>
+
+  <script>
+  const TICKET_CAP = 500;
+  const LUNA_ODDS = 1/30;
+  const CARLO_LETTER_ODDS = 1/75;
+
+  // Scenario Configurations
+  const scenarios = [
+    {
+      name: "CURRENT SYSTEM",
+      pityMax: 7,
+      deadSpinBehavior: "double",
+      winSpinBehavior: "double",
+      reentryBehavior: "double",
+      pityReentryBehavior: "double",
+      overflowDivisor: 500
+    },
+    {
+      name: "PITY 10 + NO PITY RE-ENTRY DOUBLE",
+      pityMax: 10,
+      deadSpinBehavior: "double",
+      winSpinBehavior: "double",
+      reentryBehavior: "double",
+      pityReentryBehavior: "none",
+      overflowDivisor: 500
+    },
+    {
+      name: "PITY 12 + NO PITY RE-ENTRY DOUBLE",
+      pityMax: 12,
+      deadSpinBehavior: "double",
+      winSpinBehavior: "double",
+      reentryBehavior: "double",
+      pityReentryBehavior: "none",
+      overflowDivisor: 500
+    },
+    {
+      name: "PITY 15 + NO PITY RE-ENTRY DOUBLE",
+      pityMax: 15,
+      deadSpinBehavior: "double",
+      winSpinBehavior: "double",
+      reentryBehavior: "double",
+      pityReentryBehavior: "none",
+      overflowDivisor: 500
+    },
+    {
+      name: "HALVE+1 + PITY 10 + NO PITY DOUBLE",
+      pityMax: 10,
+      deadSpinBehavior: "halve",
+      winSpinBehavior: "double",
+      reentryBehavior: "double",
+      pityReentryBehavior: "none",
+      overflowDivisor: 500
+    },
+    {
+      name: "HALVE+1 + PITY 12 + NO PITY DOUBLE",
+      pityMax: 12,
+      deadSpinBehavior: "halve",
+      winSpinBehavior: "double",
+      reentryBehavior: "double",
+      pityReentryBehavior: "none",
+      overflowDivisor: 500
+    },
+    {
+      name: "HALVE+1 + PITY 15 + NO PITY DOUBLE",
+      pityMax: 15,
+      deadSpinBehavior: "halve",
+      winSpinBehavior: "double",
+      reentryBehavior: "double",
+      pityReentryBehavior: "none",
+      overflowDivisor: 500
+    },
+    {
+      name: "CONSERVATIVE: PITY 10 + OVERFLOW 600",
+      pityMax: 10,
+      deadSpinBehavior: "double",
+      winSpinBehavior: "double",
+      reentryBehavior: "double",
+      pityReentryBehavior: "none",
+      overflowDivisor: 600
+    },
+    {
+      name: "AGGRESSIVE: HALVE + PITY 15 + 750",
+      pityMax: 15,
+      deadSpinBehavior: "halve",
+      winSpinBehavior: "double",
+      reentryBehavior: "double",
+      pityReentryBehavior: "none",
+      overflowDivisor: 750
+    },
+    {
+      name: "ADAPTIVE: 5 + playerCount",
+      pityMax: "adaptive_base5",
+      deadSpinBehavior: "double",
+      winSpinBehavior: "double",
+      reentryBehavior: "double",
+      pityReentryBehavior: "none",
+      overflowDivisor: 500
+    },
+    {
+      name: "ADAPTIVE: 7 + floor(playerCount/2)",
+      pityMax: "adaptive_half",
+      deadSpinBehavior: "double",
+      winSpinBehavior: "double",
+      reentryBehavior: "double",
+      pityReentryBehavior: "none",
+      overflowDivisor: 500
+    },
+    {
+      name: "ADAPTIVE: 5 + playerCount + HALVE",
+      pityMax: "adaptive_base5",
+      deadSpinBehavior: "halve",
+      winSpinBehavior: "double",
+      reentryBehavior: "double",
+      pityReentryBehavior: "none",
+      overflowDivisor: 500
+    }
+  ];
+
+  function doubleTickets(player, config, actualPityMax) {
+    for(let i=0; i<5; i++) {
+      const raw = player.tickets[i] * 2;
+      if(raw <= TICKET_CAP) {
+        player.tickets[i] = raw;
+      } else {
+        const overflow = raw - TICKET_CAP;
+        const pityTokens = overflow < config.overflowDivisor ? 1 : Math.floor(overflow / config.overflowDivisor);
+        player.pityTokens = Math.min(actualPityMax, player.pityTokens + pityTokens);
+        let newTickets = overflow % config.overflowDivisor;
+        if(newTickets === 0) newTickets = 1;
+        player.tickets[i] = newTickets;
+      }
+    }
+  }
+
+  function halveTickets(player) {
+    for(let i=0; i<5; i++) {
+      player.tickets[i] = Math.max(1, Math.ceil(player.tickets[i] / 2) + 1);
+    }
+  }
+
+  function totalTickets(player) {
+    return player.tickets.reduce((a,b) => a+b, 0);
+  }
+
+  function calculateAdaptivePityMax(formula, playerCount) {
+    if(formula === "adaptive_base5") {
+      return 5 + playerCount;
+    } else if(formula === "adaptive_half") {
+      return 7 + Math.floor(playerCount / 2);
+    }
+    return formula; // Fixed number
+  }
+
+  function simulateScenario(config, spins = 300, initialPlayerCount = 5) {
+    const players = [];
+    for(let i=0; i<initialPlayerCount; i++) {
+      players.push({
+        name: `Player${i+1}`,
+        tickets: [1,1,1,1,1],
+        pityTokens: 0,
+        wins: 0,
+        createdAt: Date.now() + i
+      });
+    }
+
+    // Calculate actual pity max for this player count
+    const actualPityMax = calculateAdaptivePityMax(config.pityMax, initialPlayerCount);
+
+    let totalWins = 0;
+    let carloHits = 0;
+    let lunaHits = 0;
+    let fourKind = 0;
+    let fiveKind = 0;
+    let pityWins = 0;
+    let deadSpins = 0;
+    let maxDeadStreak = 0;
+    let currentDeadStreak = 0;
+
+    const ticketSnapshots = []; // Track tickets over time
+    const pitySnapshots = [];
+
+    for(let spin=0; spin<spins; spin++) {
+      // Snapshot every 10 spins
+      if(spin % 10 === 0) {
+        const avgTickets = players.reduce((sum, p) => sum + totalTickets(p), 0) / players.length;
+        const avgPity = players.reduce((sum, p) => sum + p.pityTokens, 0) / players.length;
+        const maxPity = Math.max(...players.map(p => p.pityTokens));
+        ticketSnapshots.push(Math.round(avgTickets));
+        pitySnapshots.push({avg: avgPity.toFixed(1), max: maxPity});
+      }
+
+      // Recalculate adaptive pity max based on CURRENT player count
+      // (handles case where players left and cap decreased)
+      const currentPityMax = calculateAdaptivePityMax(config.pityMax, players.length);
+
+      // Check pity auto-pick (using current player count's cap)
+      const pityPick = players.find(p => p.pityTokens >= currentPityMax);
+      if(pityPick) {
+        pityPick.wins++;
+        pityPick.pityTokens = 0;
+        pityPick.tickets = [1,1,1,1,1];
+        totalWins++;
+        pityWins++;
+        currentDeadStreak = 0;
+
+        // Pity re-entry behavior (separate from regular wins)
+        if(config.pityReentryBehavior === "double") {
+          players.forEach(p => {
+            if(p !== pityPick) doubleTickets(p, config, currentPityMax);
+          });
+        }
+        continue;
+      }
+
+      // Build spin
+      const symbols = [];
+      const lunaIndex = Math.random() < LUNA_ODDS ? Math.floor(Math.random()*5) : -1;
+      const letters = ['C','A','R','L','O'];
+
+      for(let i=0; i<5; i++) {
+        if(i === lunaIndex) {
+          symbols.push({type:'luna'});
+        } else if(Math.random() < CARLO_LETTER_ODDS) {
+          symbols.push({type:'letter', letter: letters[i]});
+        } else {
+          // Weighted random selection
+          const total = players.reduce((sum, p) => sum + p.tickets[i], 0);
+          let r = Math.random() * total;
+          let selected = players[0];
+          for(const p of players) {
+            r -= p.tickets[i];
+            if(r <= 0) {
+              selected = p;
+              break;
+            }
+          }
+          symbols.push({type:'player', player: selected});
+        }
+      }
+
+      // Check CARLO
+      if(symbols.every((s,i) => s.type==='letter' && s.letter===letters[i])) {
+        carloHits++;
+        totalWins++;
+        currentDeadStreak = 0;
+        continue;
+      }
+
+      // Check Luna win
+      let lunaWin = false;
+      if(lunaIndex !== -1) {
+        for(let start=-2; start<=0; start++) {
+          const idx = lunaIndex + start;
+          if(idx < 0 || idx+2 >= 5) continue;
+          const triple = symbols.slice(idx, idx+3);
+          const playerSyms = triple.filter(s => s.type==='player');
+          if(playerSyms.length >= 2) {
+            const counts = {};
+            playerSyms.forEach(s => counts[s.player.name] = (counts[s.player.name]||0)+1);
+            const winner = Object.keys(counts).find(name => counts[name] >= 2);
+            if(winner) {
+              const p = players.find(x => x.name === winner);
+              p.wins++;
+              p.pityTokens = 0;
+              p.tickets = [1,1,1,1,1];
+              totalWins++;
+              lunaHits++;
+              lunaWin = true;
+              currentDeadStreak = 0;
+
+              // Re-entry (recalculate cap based on current player count)
+              const updatedPityMax = calculateAdaptivePityMax(config.pityMax, players.length);
+              if(config.reentryBehavior === "double") {
+                players.forEach(other => {
+                  if(other !== p) doubleTickets(other, config, updatedPityMax);
+                });
+              }
+              break;
+            }
+          }
+        }
+      }
+      if(lunaWin) continue;
+
+      // Check regular wins
+      const counts = {};
+      const drawnPlayers = new Set();
+      symbols.forEach(s => {
+        if(s.type === 'player') {
+          counts[s.player.name] = (counts[s.player.name]||0)+1;
+          drawnPlayers.add(s.player);
+        }
+      });
+
+      let winner = null;
+      let hitCount = 0;
+      for(const name in counts) {
+        if(counts[name] >= 3 && counts[name] > hitCount) {
+          winner = players.find(p => p.name === name);
+          hitCount = counts[name];
+        }
+      }
+
+      if(winner) {
+        winner.wins++;
+        winner.pityTokens = 0;
+        winner.tickets = [1,1,1,1,1];
+        totalWins++;
+        currentDeadStreak = 0;
+        if(hitCount === 4) fourKind++;
+        if(hitCount === 5) fiveKind++;
+
+        // Recalculate pity cap based on current player count
+        const updatedPityMax = calculateAdaptivePityMax(config.pityMax, players.length);
+
+        // Win spin adjustments
+        players.forEach(p => {
+          if(p === winner) return;
+          if(drawnPlayers.has(p)) {
+            // Appeared but didn't win: -1 on reels
+            symbols.forEach((s, idx) => {
+              if(s.type === 'player' && s.player === p) {
+                p.tickets[idx] = Math.max(1, p.tickets[idx] - 1);
+              }
+            });
+          } else {
+            // Didn't appear
+            if(config.winSpinBehavior === "double") {
+              doubleTickets(p, config, updatedPityMax);
+            }
+          }
+        });
+
+        // Re-entry
+        if(config.reentryBehavior === "double") {
+          players.forEach(p => {
+            if(p !== winner) doubleTickets(p, config, updatedPityMax);
+          });
+        }
+      } else {
+        // Dead spin
+        deadSpins++;
+        currentDeadStreak++;
+        maxDeadStreak = Math.max(maxDeadStreak, currentDeadStreak);
+
+        // Recalculate pity cap based on current player count
+        const updatedPityMax = calculateAdaptivePityMax(config.pityMax, players.length);
+
+        players.forEach(p => {
+          if(drawnPlayers.has(p)) {
+            // Appeared: -1 on reels
+            symbols.forEach((s, idx) => {
+              if(s.type === 'player' && s.player === p) {
+                p.tickets[idx] = Math.max(1, p.tickets[idx] - 1);
+              }
+            });
+          } else {
+            // Didn't appear
+            if(config.deadSpinBehavior === "double") {
+              doubleTickets(p, config, updatedPityMax);
+            } else if(config.deadSpinBehavior === "halve") {
+              halveTickets(p);
+            }
+          }
+        });
+      }
+    }
+
+    // Final calculations using FINAL player count's adaptive cap
+    const finalPityMax = calculateAdaptivePityMax(config.pityMax, players.length);
+    const finalAvgTickets = players.reduce((sum, p) => sum + totalTickets(p), 0) / players.length;
+    const finalAvgPity = players.reduce((sum, p) => sum + p.pityTokens, 0) / players.length;
+    const playersAtMaxPity = players.filter(p => p.pityTokens >= finalPityMax).length;
+
+    return {
+      totalWins,
+      carloHits,
+      lunaHits,
+      fourKind,
+      fiveKind,
+      pityWins,
+      deadSpins,
+      maxDeadStreak,
+      finalAvgTickets: Math.round(finalAvgTickets),
+      finalAvgPity: finalAvgPity.toFixed(1),
+      playersAtMaxPity,
+      ticketSnapshots,
+      pitySnapshots,
+      winDistribution: players.map(p => p.wins),
+      actualPityMax: finalPityMax,
+      initialPlayerCount: initialPlayerCount,
+      finalPlayerCount: players.length,
+      playerCount: players.length  // For display
+    };
+  }
+
+  function analyzeResult(result, config, spins) {
+    const winRate = (result.totalWins / spins * 100).toFixed(1);
+    const pityRate = (result.pityWins / result.totalWins * 100).toFixed(1);
+    const actualPityMax = result.actualPityMax || config.pityMax;
+
+    let verdict = "";
+    let verdictClass = "";
+
+    if(result.playersAtMaxPity >= 3) {
+      verdict = "⚠️ TOO EASY - Pity pile-up";
+      verdictClass = "warning";
+    } else if(result.pityWins / result.totalWins > 0.4) {
+      verdict = "⚠️ Too many pity wins";
+      verdictClass = "warning";
+    } else if(result.finalAvgPity > actualPityMax * 0.7) {
+      verdict = "⚠️ Trending toward pity cap";
+      verdictClass = "warning";
+    } else if(result.pityWins / result.totalWins < 0.1 && result.finalAvgPity < actualPityMax * 0.3) {
+      verdict = "✓ GOOD BALANCE";
+      verdictClass = "good";
+    } else {
+      verdict = "~ Moderate balance";
+      verdictClass = "neutral";
+    }
+
+    return { winRate, pityRate, verdict, verdictClass };
+  }
+
+  function runAllSimulations() {
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '<h2>Running simulations...</h2>';
+
+    setTimeout(() => {
+      let html = '<div class="comparison">';
+
+      scenarios.forEach(config => {
+        const result = simulateScenario(config, 300);
+        const analysis = analyzeResult(result, config, 300);
+
+        const pityDisplay = result.actualPityMax !== undefined
+          ? `${result.actualPityMax} (${result.finalPlayerCount} players at end)`
+          : config.pityMax;
+
+        const playerCountNote = result.initialPlayerCount !== result.finalPlayerCount
+          ? ` (started with ${result.initialPlayerCount})`
+          : '';
+
+        html += `
+          <div class="scenario">
+            <h2>${config.name}</h2>
+            <div class="metric">
+              <span class="metric-label">Pity Max:</span>
+              <span class="metric-value">${pityDisplay}${playerCountNote}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Dead Spin:</span>
+              <span class="metric-value">${config.deadSpinBehavior}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Win Re-entry:</span>
+              <span class="metric-value">${config.reentryBehavior}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Pity Re-entry:</span>
+              <span class="metric-value">${config.pityReentryBehavior}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Overflow Divisor:</span>
+              <span class="metric-value">${config.overflowDivisor}</span>
+            </div>
+            <hr style="border-color: #3f2f19; margin: 10px 0;">
+            <div class="metric">
+              <span class="metric-label">Total Wins:</span>
+              <span class="metric-value">${result.totalWins} (${analysis.winRate}%)</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Pity Wins:</span>
+              <span class="metric-value">${result.pityWins} (${analysis.pityRate}%)</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">CARLO Hits:</span>
+              <span class="metric-value">${result.carloHits}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Luna Hits:</span>
+              <span class="metric-value">${result.lunaHits}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">4-of-a-kind:</span>
+              <span class="metric-value">${result.fourKind}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">5-of-a-kind:</span>
+              <span class="metric-value">${result.fiveKind}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Dead Spins:</span>
+              <span class="metric-value">${result.deadSpins}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Max Dead Streak:</span>
+              <span class="metric-value">${result.maxDeadStreak}</span>
+            </div>
+            <hr style="border-color: #3f2f19; margin: 10px 0;">
+            <div class="metric">
+              <span class="metric-label">Final Avg Tickets:</span>
+              <span class="metric-value">${result.finalAvgTickets}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Final Avg Pity:</span>
+              <span class="metric-value">${result.finalAvgPity} / ${result.actualPityMax || config.pityMax}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Players at Max Pity:</span>
+              <span class="metric-value">${result.playersAtMaxPity} / 5</span>
+            </div>
+            <hr style="border-color: #3f2f19; margin: 10px 0;">
+            <div class="metric">
+              <span class="metric-label">Ticket Growth:</span>
+              <span class="metric-value">${result.ticketSnapshots.join(' → ')}</span>
+            </div>
+            <hr style="border-color: #3f2f19; margin: 10px 0;">
+            <div style="text-align: center; font-size: 18px; font-weight: bold; margin-top: 10px;" class="${analysis.verdictClass}">
+              ${analysis.verdict}
+            </div>
+          </div>
+        `;
+      });
+
+      html += '</div>';
+      resultsDiv.innerHTML = html;
+    }, 100);
+  }
+
+  function clearResults() {
+    document.getElementById('results').innerHTML = '';
+  }
+  </script>
+</body>
+</html>
