@@ -1256,7 +1256,7 @@
   const MAX_EVENTS = 7;
   const MAX_PLAYERS = 50;
   const TICKET_CAP = 500;
-  const MAX_PITY_TOKENS = 7;
+  const MAX_PITY_TOKENS = 12;
   const LUNA_BASE_ODDS = 1/30;
   const CARLO_LETTER_ODDS = 1/75;
 
@@ -1604,6 +1604,15 @@
     }
   }
 
+  function halveTicketsAllReels(player){
+    // HALVE+1 logic: halve tickets (round up), then add +1, minimum 1
+    for(let i=0;i<5;i++){
+      const halved = Math.ceil(player.tickets[i] / 2);
+      player.tickets[i] = Math.max(1, halved + 1);
+    }
+    clampPlayer(player);
+  }
+
   function handleDeadSpinTickets(evt, symbols, reelPlayers){
     const drawnIds = new Set(reelPlayers.map(r=>r.playerId));
     for(const p of evt.players){
@@ -1617,8 +1626,8 @@
           }
         }
       }else{
-        // Player didn't appear: double all tickets
-        doubleTicketsAllReels(p);
+        // Player didn't appear: halve+1 all tickets (Scenario 6 balance)
+        halveTicketsAllReels(p);
       }
       clampPlayer(p);
     }
@@ -2175,12 +2184,18 @@
       log(`${player.name} re-added to queue with ${baseTickets} ticket(s) per reel.`);
 
       // When winner re-enters, double all other active players' tickets (patience reward)
-      for(const other of evt.players){
-        if(other.id === player.id) continue;
-        if(other.status !== 'active') continue;
-        doubleTicketsAllReels(other);
+      // EXCEPT for pity wins - don't double on pity re-entry to prevent pity party feedback loop
+      const isPityWin = currentWinnerMeta && currentWinnerMeta.reason === 'pity';
+      if(!isPityWin){
+        for(const other of evt.players){
+          if(other.id === player.id) continue;
+          if(other.status !== 'active') continue;
+          doubleTicketsAllReels(other);
+        }
+        log(`All other players' tickets doubled (patience reward for ${player.name} re-entry).`);
+      }else{
+        log(`Pity win re-entry: no doubling for others (prevents pity party feedback loop).`);
       }
-      log(`All other players' tickets doubled (patience reward for ${player.name} re-entry).`);
     }else{
       player.status='afk';
       log(`${player.name} marked as AFK.`);
