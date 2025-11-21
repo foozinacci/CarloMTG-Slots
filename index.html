@@ -671,7 +671,13 @@
       color:var(--muted);
     }
     .player-row{cursor:pointer;}
-    .player-row:hover{background:rgba(17,24,39,.9);}
+    .player-row-main:hover{background:rgba(17,24,39,.9);}
+    .player-row-reels{background:rgba(0,0,0,.3);}
+    .player-row-reels:hover{background:rgba(0,0,0,.4);}
+    .player-row-reels td{
+      padding:8px 6px;
+      border-bottom:2px solid var(--border);
+    }
     .time-cell{
       font-size:10px;
       color:var(--muted);
@@ -969,6 +975,48 @@
       letter-spacing:.1em;
       cursor:pointer;
     }
+    .reel-charts{
+      display:flex;
+      gap:12px;
+      justify-content:space-around;
+      margin:12px 0;
+      flex-wrap:wrap;
+    }
+    .reel-chart{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;
+    }
+    .reel-chart-label{
+      font-size:10px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.1em;
+    }
+    .pie-chart{
+      width:60px;
+      height:60px;
+      border-radius:50%;
+      position:relative;
+      background:conic-gradient(var(--theme-color) 0% var(--percentage), rgba(0,0,0,.3) var(--percentage) 100%);
+      box-shadow:0 0 8px var(--theme-glow),inset 0 0 4px rgba(0,0,0,.5);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .pie-chart-inner{
+      width:44px;
+      height:44px;
+      border-radius:50%;
+      background:var(--bg);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:11px;
+      font-weight:bold;
+      color:var(--theme-color);
+    }
     .deck-table{
       width:100%;
       border-collapse:collapse;
@@ -1145,7 +1193,6 @@
                 <th>Pity</th>
                 <th>Slot W</th>
                 <th>W/L%</th>
-                <th>Reels</th>
                 <th></th>
               </tr>
             </thead>
@@ -1250,6 +1297,8 @@
         <button id="removePlayerBtn">Remove Player</button>
         <button id="closePlayerCardBtn">Close</button>
       </div>
+      <div class="help-section-title">Reel Probabilities</div>
+      <div class="reel-charts" id="reelCharts"></div>
       <div class="help-section-title">Decks (by color identity)</div>
       <table class="deck-table">
         <thead>
@@ -1892,8 +1941,10 @@
     const now = Date.now();
     for(const p of sorted){
       clampPlayer(p);
-      const tr = document.createElement('tr');
-      tr.className = 'player-row';
+
+      // Row 1: Player stats
+      const tr1 = document.createElement('tr');
+      tr1.className = 'player-row player-row-main';
       const tdTime = document.createElement('td');
       tdTime.className = 'time-cell';
       tdTime.textContent = formatTimeInQueue(now - p.createdAt);
@@ -1911,7 +1962,30 @@
       tdSlotWins.textContent = `${p.slotWins}`;
       const tdWL = document.createElement('td');
       tdWL.textContent = `${p.overallWins}/${p.overallLosses} (${overallWinRate(p).toFixed(1)}%)`;
+      const tdActions = document.createElement('td');
+      tdActions.className='actions-cell';
+      const cog = document.createElement('button');
+      cog.textContent='⚙';
+      cog.title='View player card';
+      cog.addEventListener('click',e=>{
+        e.stopPropagation();
+        openPlayerCard(p.id);
+      });
+      tdActions.appendChild(cog);
+
+      tr1.appendChild(tdTime);
+      tr1.appendChild(tdName);
+      tr1.appendChild(tdTotal);
+      tr1.appendChild(tdPity);
+      tr1.appendChild(tdSlotWins);
+      tr1.appendChild(tdWL);
+      tr1.appendChild(tdActions);
+
+      // Row 2: Reel tickets
+      const tr2 = document.createElement('tr');
+      tr2.className = 'player-row player-row-reels';
       const tdReels = document.createElement('td');
+      tdReels.colSpan = 7;
       tdReels.className = 'reel-tickets-cell';
       for(let i=0;i<5;i++){
         const sub = document.createElement('div');
@@ -1948,25 +2022,10 @@
         sub.appendChild(valRow);
         tdReels.appendChild(sub);
       }
-      const tdActions = document.createElement('td');
-      tdActions.className='actions-cell';
-      const cog = document.createElement('button');
-      cog.textContent='⚙';
-      cog.title='View player card';
-      cog.addEventListener('click',e=>{
-        e.stopPropagation();
-        openPlayerCard(p.id);
-      });
-      tdActions.appendChild(cog);
-      tr.appendChild(tdTime);
-      tr.appendChild(tdName);
-      tr.appendChild(tdTotal);
-      tr.appendChild(tdPity);
-      tr.appendChild(tdSlotWins);
-      tr.appendChild(tdWL);
-      tr.appendChild(tdReels);
-      tr.appendChild(tdActions);
-      leaderboardBody.appendChild(tr);
+      tr2.appendChild(tdReels);
+
+      leaderboardBody.appendChild(tr1);
+      leaderboardBody.appendChild(tr2);
     }
     spinCountEl.textContent = evt.spinCount;
     deadStreakEl.textContent = evt.deadSpinStreak;
@@ -1980,6 +2039,36 @@
     currentPlayerCardId = playerId;
     playerCardName.textContent = p.name;
     playerCardStatus.textContent = p.status === 'active' ? 'Active' : 'AFK';
+
+    // Render reel probability pie charts
+    const reelChartsEl = document.getElementById('reelCharts');
+    reelChartsEl.innerHTML = '';
+    for(let i=0; i<5; i++){
+      const totalForReel = evt.players.filter(pl => pl.status === 'active').reduce((sum, pl) => sum + pl.tickets[i], 0);
+      const playerTickets = p.tickets[i];
+      const percentage = totalForReel > 0 ? ((playerTickets / totalForReel) * 100) : 0;
+
+      const chartDiv = document.createElement('div');
+      chartDiv.className = 'reel-chart';
+
+      const label = document.createElement('div');
+      label.className = 'reel-chart-label';
+      label.textContent = `Reel ${i+1}`;
+
+      const pieChart = document.createElement('div');
+      pieChart.className = 'pie-chart';
+      pieChart.style.setProperty('--percentage', `${percentage}%`);
+
+      const inner = document.createElement('div');
+      inner.className = 'pie-chart-inner';
+      inner.textContent = `${percentage.toFixed(1)}%`;
+
+      pieChart.appendChild(inner);
+      chartDiv.appendChild(label);
+      chartDiv.appendChild(pieChart);
+      reelChartsEl.appendChild(chartDiv);
+    }
+
     deckTableBody.innerHTML = '';
     const rows = [];
     p.decks.forEach(d=>{
