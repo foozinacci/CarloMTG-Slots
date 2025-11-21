@@ -1391,7 +1391,7 @@
 
   function clampPlayer(p){
     for(let i=0;i<5;i++){
-      if(p.tickets[i] < 0) p.tickets[i] = 0;
+      if(p.tickets[i] < 1) p.tickets[i] = 1;  // Never allow 0 tickets
       if(p.tickets[i] > TICKET_CAP) p.tickets[i] = TICKET_CAP;
     }
     if(p.pityTokens < 0) p.pityTokens = 0;
@@ -1572,27 +1572,36 @@
   }
 
   function doubleTicketsAllReels(player){
+    const oldTotal = totalTickets(player);
+    const oldPity = player.pityTokens || 0;
     for(let i=0;i<5;i++){
       const raw = player.tickets[i] * 2;
       if(raw <= TICKET_CAP){
+        // No overflow, just set to doubled amount
         player.tickets[i] = raw;
       } else {
+        // Overflow: raw exceeds 500 cap
         const overflow = raw - TICKET_CAP;
-        if(overflow < TICKET_CAP){
-          player.tickets[i] = overflow;
-          applyOverflowToPity(player, overflow);
-        }else{
-          const tokens = Math.floor(overflow / TICKET_CAP);
-          let remainder = overflow - tokens * TICKET_CAP;
-          applyOverflowToPity(player, overflow);
-          if(remainder === 0){
-            remainder = 12;
-          }
-          player.tickets[i] = remainder;
+
+        // Calculate pity tokens from overflow
+        const pityTokens = overflow < TICKET_CAP ? 1 : Math.floor(overflow / TICKET_CAP);
+        player.pityTokens = Math.min(MAX_PITY_TOKENS, (player.pityTokens || 0) + pityTokens);
+
+        // Calculate remaining tickets after overflow
+        let newTickets = overflow % TICKET_CAP;
+        if(newTickets === 0){
+          // If exactly divisible, keep minimum viable tickets
+          newTickets = 1;
         }
+        player.tickets[i] = newTickets;
       }
     }
     clampPlayer(player);
+    const newTotal = totalTickets(player);
+    const newPity = player.pityTokens;
+    if(newPity > oldPity){
+      log(`${player.name}: tickets ${oldTotal}→${newTotal}, pity ${oldPity}→${newPity} (+${newPity-oldPity})`);
+    }
   }
 
   function handleDeadSpinTickets(evt, symbols, reelPlayers){
