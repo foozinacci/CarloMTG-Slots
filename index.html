@@ -2164,6 +2164,58 @@
       </div>
     </div>
   </div>
+  <!-- DECK EDITOR OVERLAY -->
+  <div class="overlay" id="deckEditorOverlay">
+    <div class="finish-card">
+      <div class="finish-title">Edit Deck</div>
+      <div class="finish-sub">Correct deck stats and color identity</div>
+
+      <div class="finish-field">
+        <div class="finish-label">Deck Colors</div>
+        <div class="color-chips" id="deckEditorColorChips">
+          <div class="color-chip" data-color="W">W</div>
+          <div class="color-chip" data-color="U">U</div>
+          <div class="color-chip" data-color="B">B</div>
+          <div class="color-chip" data-color="R">R</div>
+          <div class="color-chip" data-color="G">G</div>
+          <div class="color-chip" data-color="C">C</div>
+        </div>
+      </div>
+
+      <div class="finish-field">
+        <div class="finish-label">Wins</div>
+        <div class="finish-controls">
+          <button id="deckEditorWinsDown" class="finish-btn-inc">−</button>
+          <input type="number" id="deckEditorWins" min="0" value="0" class="finish-input"/>
+          <button id="deckEditorWinsUp" class="finish-btn-inc">+</button>
+        </div>
+      </div>
+
+      <div class="finish-field">
+        <div class="finish-label">Losses</div>
+        <div class="finish-controls">
+          <button id="deckEditorLossesDown" class="finish-btn-inc">−</button>
+          <input type="number" id="deckEditorLosses" min="0" value="0" class="finish-input"/>
+          <button id="deckEditorLossesUp" class="finish-btn-inc">+</button>
+        </div>
+      </div>
+
+      <div class="finish-field">
+        <div class="finish-label">Match Type</div>
+        <select id="deckEditorMatchType" class="finish-select">
+          <option value="BO1">Best of 1</option>
+          <option value="BO3" selected>Best of 3</option>
+          <option value="BO5">Best of 5</option>
+        </select>
+      </div>
+
+      <div class="finish-actions">
+        <button id="deckEditorSaveBtn" class="finish-save-btn">Save Changes</button>
+        <button id="deckEditorDeleteBtn" class="finish-cancel-btn" style="background:var(--danger,#dc2626);">Delete Deck</button>
+        <button id="closeDeckEditorBtn" class="finish-cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
   <!-- HELP OVERLAY -->
   <div class="overlay" id="helpOverlay">
     <div class="help-card">
@@ -2296,6 +2348,18 @@
   const removePlayerBtn = document.getElementById('removePlayerBtn');
   const closePlayerCardBtn = document.getElementById('closePlayerCardBtn');
   const deckTableBody = document.getElementById('deckTableBody');
+  const deckEditorOverlay = document.getElementById('deckEditorOverlay');
+  const deckEditorColorChips = document.getElementById('deckEditorColorChips');
+  const deckEditorWins = document.getElementById('deckEditorWins');
+  const deckEditorLosses = document.getElementById('deckEditorLosses');
+  const deckEditorWinsUp = document.getElementById('deckEditorWinsUp');
+  const deckEditorWinsDown = document.getElementById('deckEditorWinsDown');
+  const deckEditorLossesUp = document.getElementById('deckEditorLossesUp');
+  const deckEditorLossesDown = document.getElementById('deckEditorLossesDown');
+  const deckEditorMatchType = document.getElementById('deckEditorMatchType');
+  const deckEditorSaveBtn = document.getElementById('deckEditorSaveBtn');
+  const deckEditorDeleteBtn = document.getElementById('deckEditorDeleteBtn');
+  const closeDeckEditorBtn = document.getElementById('closeDeckEditorBtn');
   const helpOverlay = document.getElementById('helpOverlay');
   const diagOverlay = document.getElementById('diagOverlay');
   const helpBtn = document.getElementById('helpBtn');
@@ -2317,6 +2381,9 @@
   let selectedColors = new Set(); // Multi-select theme colors (empty = white glow default)
   let selectedColorSet = new Set();
   let opponentColorSet = new Set(); // Track opponent deck colors
+  let deckEditorColorSet = new Set(); // Track deck editor color selections
+  let currentEditingPlayer = null; // Track which player's deck is being edited
+  let currentEditingDeck = null; // Track which deck is being edited
   let queueReaddChoice = 'yes';
   let bonusRewardChoice = 'tickets';
   let pendingWinner = null;
@@ -3327,6 +3394,11 @@
       tr.appendChild(tdWinRate);
       tr.appendChild(tdMatchups);
       tr.appendChild(tdLast);
+
+      // Make deck row clickable to edit
+      tr.style.cursor = 'pointer';
+      tr.addEventListener('click', () => openDeckEditor(p, d));
+
       rows.push({winRate, tr});
     });
     rows.sort((a,b)=>b.winRate-a.winRate);
@@ -3361,6 +3433,167 @@
   closePlayerCardBtn.addEventListener('click',()=>{
     playerOverlay.classList.remove('show');
     currentPlayerCardId=null;
+  });
+
+  // Open deck editor
+  function openDeckEditor(player, deck){
+    currentEditingPlayer = player;
+    currentEditingDeck = deck;
+
+    // Set color chips
+    deckEditorColorSet.clear();
+    Array.from(deckEditorColorChips.children).forEach(ch => ch.classList.remove('active'));
+    if(deck.color){
+      for(const c of deck.color){
+        deckEditorColorSet.add(c);
+        const chip = Array.from(deckEditorColorChips.children).find(ch => ch.dataset.color === c);
+        if(chip) chip.classList.add('active');
+      }
+    }
+
+    // Set wins/losses
+    deckEditorWins.value = deck.wins;
+    deckEditorLosses.value = deck.losses;
+
+    // Set match type
+    if(deck.lastBestOf){
+      deckEditorMatchType.value = deck.lastBestOf;
+    }
+
+    deckEditorOverlay.classList.add('show');
+  }
+
+  // Deck editor color chip toggling
+  deckEditorColorChips.addEventListener('click', e => {
+    const chip = e.target.closest('.color-chip');
+    if(!chip) return;
+    const c = chip.dataset.color;
+    if(deckEditorColorSet.has(c)){
+      deckEditorColorSet.delete(c);
+      chip.classList.remove('active');
+    }else{
+      deckEditorColorSet.add(c);
+      chip.classList.add('active');
+    }
+  });
+
+  // Deck editor +/- buttons
+  deckEditorWinsUp.addEventListener('click', () => {
+    deckEditorWins.value = Math.max(0, parseInt(deckEditorWins.value, 10) || 0) + 1;
+  });
+  deckEditorWinsDown.addEventListener('click', () => {
+    deckEditorWins.value = Math.max(0, (parseInt(deckEditorWins.value, 10) || 0) - 1);
+  });
+  deckEditorLossesUp.addEventListener('click', () => {
+    deckEditorLosses.value = Math.max(0, parseInt(deckEditorLosses.value, 10) || 0) + 1;
+  });
+  deckEditorLossesDown.addEventListener('click', () => {
+    deckEditorLosses.value = Math.max(0, (parseInt(deckEditorLosses.value, 10) || 0) - 1);
+  });
+
+  // Save deck changes
+  deckEditorSaveBtn.addEventListener('click', () => {
+    if(!currentEditingPlayer || !currentEditingDeck) return;
+
+    const newColors = Array.from(deckEditorColorSet).join('');
+    const newWins = Math.max(0, parseInt(deckEditorWins.value, 10) || 0);
+    const newLosses = Math.max(0, parseInt(deckEditorLosses.value, 10) || 0);
+    const newMatchType = deckEditorMatchType.value;
+
+    // Calculate the delta for overall stats
+    const winsDelta = newWins - currentEditingDeck.wins;
+    const lossesDelta = newLosses - currentEditingDeck.losses;
+
+    // Update overall stats
+    currentEditingPlayer.overallWins += winsDelta;
+    currentEditingPlayer.overallLosses += lossesDelta;
+
+    // If colors changed, we need to move the deck
+    if(newColors !== currentEditingDeck.color){
+      // Remove old deck
+      const idx = currentEditingPlayer.decks.indexOf(currentEditingDeck);
+      if(idx >= 0){
+        currentEditingPlayer.decks.splice(idx, 1);
+      }
+
+      // Find or create deck with new colors
+      let targetDeck = currentEditingPlayer.decks.find(d => d.color === newColors);
+      if(!targetDeck){
+        targetDeck = {color: newColors, wins: 0, losses: 0, lastBestOf: null, matchups: {}};
+        currentEditingPlayer.decks.push(targetDeck);
+      }
+      targetDeck.wins += newWins;
+      targetDeck.losses += newLosses;
+      targetDeck.lastBestOf = newMatchType;
+
+      log(`${currentEditingPlayer.name}: Moved deck ${currentEditingDeck.color} → ${newColors} (${newWins}W/${newLosses}L)`);
+    }else{
+      // Just update the existing deck
+      currentEditingDeck.wins = newWins;
+      currentEditingDeck.losses = newLosses;
+      currentEditingDeck.lastBestOf = newMatchType;
+
+      log(`${currentEditingPlayer.name}: Updated deck ${currentEditingDeck.color} to ${newWins}W/${newLosses}L`);
+    }
+
+    deckEditorOverlay.classList.remove('show');
+    currentEditingPlayer = null;
+    currentEditingDeck = null;
+    renderLeaderboard();
+    saveAll();
+
+    // Refresh player card if it's still open
+    if(currentPlayerCardId !== null){
+      const evt = currentEvent();
+      const p = evt.players.find(x => x.id === currentPlayerCardId);
+      if(p) showPlayerCard(p);
+    }
+  });
+
+  // Delete deck
+  deckEditorDeleteBtn.addEventListener('click', () => {
+    if(!currentEditingPlayer || !currentEditingDeck) return;
+    if(!confirm(`Delete ${currentEditingDeck.color} deck (${currentEditingDeck.wins}W/${currentEditingDeck.losses}L)?`)) return;
+
+    // Update overall stats
+    currentEditingPlayer.overallWins -= currentEditingDeck.wins;
+    currentEditingPlayer.overallLosses -= currentEditingDeck.losses;
+
+    // Remove deck
+    const idx = currentEditingPlayer.decks.indexOf(currentEditingDeck);
+    if(idx >= 0){
+      currentEditingPlayer.decks.splice(idx, 1);
+      log(`${currentEditingPlayer.name}: Deleted deck ${currentEditingDeck.color}`);
+    }
+
+    deckEditorOverlay.classList.remove('show');
+    currentEditingPlayer = null;
+    currentEditingDeck = null;
+    renderLeaderboard();
+    saveAll();
+
+    // Refresh player card if it's still open
+    if(currentPlayerCardId !== null){
+      const evt = currentEvent();
+      const p = evt.players.find(x => x.id === currentPlayerCardId);
+      if(p) showPlayerCard(p);
+    }
+  });
+
+  // Close deck editor
+  closeDeckEditorBtn.addEventListener('click', () => {
+    deckEditorOverlay.classList.remove('show');
+    currentEditingPlayer = null;
+    currentEditingDeck = null;
+  });
+
+  // Close deck editor when clicking outside
+  deckEditorOverlay.addEventListener('click', (e) => {
+    if(e.target === deckEditorOverlay){
+      deckEditorOverlay.classList.remove('show');
+      currentEditingPlayer = null;
+      currentEditingDeck = null;
+    }
   });
 
   // Close player card when clicking outside
