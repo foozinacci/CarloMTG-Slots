@@ -1409,7 +1409,7 @@
         </p>
         <p>
           <strong>Patience rewards:</strong> Miss a spin? Your tickets double (up to cap). Appear but don't win?
-          Spend 1 ticket on reels you appeared on. Dead spin? Tickets halved +1.
+          Spend 1 ticket on reels you appeared on. Dead spin? Tickets adjusted based on group size (smaller groups penalized, larger groups rewarded).
         </p>
 
         <div class="help-section-title">Overflow & Pity</div>
@@ -1878,6 +1878,8 @@
 
   function handleDeadSpinTickets(evt, symbols, reelPlayers){
     const drawnIds = new Set(reelPlayers.map(r=>r.playerId));
+    const activePlayerCount = evt.players.filter(p => p.status === 'active').length;
+
     for(const p of evt.players){
       if(p.status !== 'active') continue;
       if(drawnIds.has(p.id)){
@@ -1889,8 +1891,24 @@
           }
         }
       }else{
-        // Player didn't appear: halve+1 all tickets (Scenario 6 balance)
-        halveTicketsAllReels(p);
+        // Player didn't appear: apply scaled penalty based on player count
+        // Small groups get penalty, large groups get small boost (fixes scaling issue)
+        let multiplier;
+        if (activePlayerCount <= 7) {
+          multiplier = 0.55; // Moderate penalty for small groups
+        } else if (activePlayerCount <= 15) {
+          multiplier = 0.73; // Mild penalty for medium groups
+        } else if (activePlayerCount <= 30) {
+          multiplier = 1.005; // Minimal boost for medium-large groups
+        } else if (activePlayerCount <= 50) {
+          multiplier = 1.012; // Small boost for large groups
+        } else {
+          multiplier = 1.018; // Small boost for very large groups
+        }
+
+        for(let i=0; i<5; i++){
+          p.tickets[i] = Math.max(1, Math.ceil(p.tickets[i] * multiplier));
+        }
       }
       clampPlayer(p);
     }
