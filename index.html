@@ -1756,14 +1756,31 @@
       box-shadow:0 0 12px rgba(252,211,77,0.6),0 0 24px rgba(252,211,77,0.4);
     }
     .spark-overflow-bulb.ignition.lit{
-      background:#06d6a0;
-      border-color:#06d6a0;
-      box-shadow:0 0 12px rgba(6,214,160,0.6),0 0 24px rgba(6,214,160,0.4);
-      animation:ignitionPulse 1s ease-in-out infinite;
+      background:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
+      background-size:200% 100%;
+      border:2px solid transparent;
+      background-clip:padding-box;
+      box-shadow:0 0 12px rgba(252,211,77,0.6),0 0 24px rgba(56,189,248,0.4),0 0 12px rgba(239,68,68,0.4);
+      animation:ignitionPulse 1s ease-in-out infinite, rainbowShift 3s linear infinite;
+      position:relative;
+    }
+    .spark-overflow-bulb.ignition.lit::before{
+      content:'';
+      position:absolute;
+      inset:-2px;
+      border-radius:12px;
+      background:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
+      background-size:200% 100%;
+      z-index:-1;
+      animation:rainbowShift 3s linear infinite;
+    }
+    @keyframes rainbowShift{
+      0%{background-position:0% 50%;}
+      100%{background-position:200% 50%;}
     }
     @keyframes ignitionPulse{
-      0%, 100%{box-shadow:0 0 12px rgba(6,214,160,0.6),0 0 24px rgba(6,214,160,0.4);}
-      50%{box-shadow:0 0 20px rgba(6,214,160,0.8),0 0 40px rgba(6,214,160,0.6);}
+      0%, 100%{box-shadow:0 0 12px rgba(252,211,77,0.6),0 0 24px rgba(56,189,248,0.4),0 0 12px rgba(239,68,68,0.4);}
+      50%{box-shadow:0 0 20px rgba(252,211,77,0.8),0 0 40px rgba(56,189,248,0.6),0 0 20px rgba(239,68,68,0.6);}
     }
     .spark-overflow-label{
       font-size:9px;
@@ -3306,7 +3323,7 @@
         const activeCount = evt.players.filter(p=>p.status==='active').length;
         const cooldown = getIgnitionCooldown(activeCount);
         const queueLength = ignitedQueue.length;
-        log(`<span style="color:#06d6a0;font-weight:600;">${ignitedPlayer.name} has been Ignited! (${ignitedPlayer.sparks} sparks, ${queueLength} in queue, cooldown: ${cooldown} spins)</span>`);
+        log(`<span style="color:#fcd34d;font-weight:600;">${ignitedPlayer.name} has been Ignited! (${ignitedPlayer.sparks} sparks, ${queueLength} in queue, cooldown: ${cooldown} spins)</span>`);
         // Start bulb celebration for ignited player
         startBulbsAnimation(false);
         setTimeout(()=>{
