@@ -14,8 +14,39 @@
 const MAX_PLAYERS = 75;
 const TICKET_CAP = 500;
 const MAX_SPARKS = 12;
-const LUNA_BASE_ODDS = 1/30;
-const CARLO_LETTER_ODDS = 1/75;
+const LUNA_BASE_ODDS = 1/30; // Base odds for 1-5 players
+const CARLO_LETTER_ODDS = 1/75; // Base odds for 1-3 players
+
+// DYNAMIC PROBABILITY SCALING - Adjusts game balance based on active player count
+
+// Dynamic CARLO letter odds: Lower odds = MORE player symbols = HIGHER win rates
+function getCarloLetterOdds(activePlayerCount) {
+  if (activePlayerCount <= 3) return 1/75;     // Original odds (1.33% per reel)
+  if (activePlayerCount <= 5) return 1/85;     // Slightly lower (1.18% per reel)
+  if (activePlayerCount <= 10) return 1/95;    // Lower for medium groups (1.05% per reel)
+  if (activePlayerCount <= 20) return 1/110;   // Much lower for large groups (0.91% per reel)
+  if (activePlayerCount <= 35) return 1/130;   // Very low for very large groups (0.77% per reel)
+  return 1/150;                                // Minimal for maximum capacity (0.67% per reel)
+}
+
+// Dynamic Luna spawn odds: Higher frequency at high player counts to compensate for dilution
+function getLunaBaseOdds(activePlayerCount) {
+  if (activePlayerCount <= 5) return 1/30;    // Original odds (~3.33% per spin)
+  if (activePlayerCount <= 10) return 1/25;   // 20% more frequent (~4% per spin)
+  if (activePlayerCount <= 20) return 1/20;   // 50% more frequent (~5% per spin)
+  if (activePlayerCount <= 35) return 1/15;   // 100% more frequent (~6.67% per spin)
+  return 1/12;                                // 150% more frequent for max capacity (~8.33% per spin)
+}
+
+// Pity timer: Force Luna spawn after too many dead spins to prevent frustration
+function getMaxDeadStreakAllowed(activePlayerCount) {
+  if (activePlayerCount <= 3) return 50;      // Very generous for small groups
+  if (activePlayerCount <= 5) return 35;      // Generous for casual play
+  if (activePlayerCount <= 10) return 25;     // Standard for medium groups
+  if (activePlayerCount <= 20) return 20;     // Tighter for large groups
+  if (activePlayerCount <= 35) return 18;     // Very tight for very large groups
+  return 15;                                  // Maximum engagement protection
+}
 
 // Ignition cooldown thresholds
 function getIgnitionCooldown(activePlayerCount) {
@@ -71,6 +102,7 @@ class SimulationEngine {
       ignitionWins: 0,
       deadSpins: 0,
       threeOfKind: 0,
+      pityTimerActivations: 0,
 
       // Dead spin tracking
       maxDeadStreak: 0,
@@ -111,10 +143,17 @@ class SimulationEngine {
     return active[active.length - 1];
   }
 
-  buildSpinResult() {
+  buildSpinResult(forceLuna = false) {
     const symbols = [];
     const letters = ['C', 'A', 'R', 'L', 'O'];
-    const luna = Math.random() < LUNA_BASE_ODDS;
+
+    // Get active player count for dynamic odds
+    const activePlayerCount = this.players.filter(p => p.status === 'active').length;
+    const lunaOdds = getLunaBaseOdds(activePlayerCount);
+    const carloLetterOdds = getCarloLetterOdds(activePlayerCount);
+
+    // Pity timer: Force Luna if requested
+    const luna = forceLuna || Math.random() < lunaOdds;
     const lunaIndex = luna ? Math.floor(Math.random() * 5) : -1;
 
     for (let i = 0; i < 5; i++) {
@@ -124,7 +163,7 @@ class SimulationEngine {
       }
 
       const roll = Math.random();
-      if (roll < CARLO_LETTER_ODDS) {
+      if (roll < carloLetterOdds) {
         symbols.push({ type: 'letter', letter: letters[i] });
       } else {
         const p = this.randomWeightedPlayer(i);
@@ -275,8 +314,16 @@ class SimulationEngine {
       }
     }
 
+    // PITY TIMER: Check if we need to force Luna to prevent excessive dead streaks
+    const activePlayerCount = this.players.filter(p => p.status === 'active').length;
+    const maxDeadStreak = getMaxDeadStreakAllowed(activePlayerCount);
+    const forceLuna = this.deadSpinStreak >= maxDeadStreak;
+    if (forceLuna) {
+      this.stats.pityTimerActivations++;
+    }
+
     // Build spin
-    const symbols = this.buildSpinResult();
+    const symbols = this.buildSpinResult(forceLuna);
     const isCarlo = this.detectCarlo(symbols);
     const lunaWin = this.detectLunaWinner(symbols);
     const hitWin = this.detectHitWinner(symbols);
@@ -381,6 +428,7 @@ class SimulationEngine {
       fourOfKind: this.stats.fourOfKind,
       fiveOfKind: this.stats.fiveOfKind,
       maxDeadStreak: this.stats.maxDeadStreak,
+      pityTimerActivations: this.stats.pityTimerActivations,
       winsByType: this.stats.winsByType
     };
   }
@@ -431,12 +479,13 @@ function runMegaTest(playerCount = 20) {
   const report = engine.getReport();
 
   console.log('═══════════════════════════════════════════════════════════════');
-  console.log(`RESULTS (${elapsed}s elapsed)`);
+  console.log(`RESULTS (${elapsed}s elapsed) - WITH DYNAMIC SCALING`);
   console.log('═══════════════════════════════════════════════════════════════');
   console.log(`Total Spins:        ${report.totalSpins.toLocaleString()}`);
   console.log(`Total Wins:         ${report.totalWins.toLocaleString()} (${report.hitRate})`);
   console.log(`Dead Spins:         ${report.deadSpins.toLocaleString()} (${report.deadRate})`);
   console.log(`Max Dead Streak:    ${report.maxDeadStreak}`);
+  console.log(`Pity Timer:         ${report.pityTimerActivations.toLocaleString()} activations`);
   console.log('───────────────────────────────────────────────────────────────');
   console.log(`CARLO Jackpots:     ${report.carloJackpots.toLocaleString()} (${report.carloRate})`);
   console.log(`Luna Wins:          ${report.lunaWins.toLocaleString()} (${report.lunaRate})`);
