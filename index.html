@@ -938,7 +938,7 @@
       font-size:12px;
       text-align:center;
       position:relative;
-      overflow:hidden;
+      overflow:visible;
     }
     .finish-card::after{
       content:'';
@@ -960,17 +960,19 @@
       font-weight:700;
       margin-bottom:4px;
       position:relative;
-      z-index:1;
+      z-index:10;
     }
     .finish-sub{
       font-size:11px;
       color:var(--muted);
       margin-bottom:10px;
+      position:relative;
+      z-index:10;
     }
     .finish-field{
       margin-bottom:8px;
       position:relative;
-      z-index:1;
+      z-index:10;
     }
     .finish-label{
       font-size:11px;
@@ -1480,8 +1482,8 @@
       <div class="finish-field">
         <div class="finish-label">Adjust Results (Base 0)</div>
         <div class="finish-input-row" style="justify-content:center;">
-          <button class="adjust-btn" id="addWinBtn">+1 Win</button>
-          <button class="adjust-btn" id="addLossBtn">-1 Loss</button>
+          <button type="button" class="adjust-btn" id="addWinBtn" style="pointer-events:auto;">+1 Win</button>
+          <button type="button" class="adjust-btn" id="addLossBtn" style="pointer-events:auto;">-1 Loss</button>
         </div>
         <div style="margin-top:8px;font-size:11px;color:var(--muted);">
           Current: <span id="currentResults">0 wins, 0 losses</span>
@@ -1516,8 +1518,8 @@
         </div>
       </div>
       <div class="finish-actions">
-        <button id="finishCancelBtn">Cancel</button>
-        <button class="primary" id="finishSaveBtn">Save & Re-Queue</button>
+        <button type="button" id="finishCancelBtn" style="pointer-events:auto;">Cancel</button>
+        <button type="button" class="primary" id="finishSaveBtn" style="pointer-events:auto;">Save & Re-Queue</button>
       </div>
     </div>
   </div>
