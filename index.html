@@ -2228,12 +2228,12 @@
 
   // Dead spin guardrail: Guarantee win after too many dead spins
   function getMaxDeadStreakAllowed(activePlayerCount){
-    if(activePlayerCount <= 3) return 20;      // Solo/duo - allow natural variance
-    if(activePlayerCount <= 5) return 18;      // Small groups - still generous
-    if(activePlayerCount <= 10) return 15;     // Medium groups - balanced
-    if(activePlayerCount <= 20) return 12;     // Large groups - reasonable safety
-    if(activePlayerCount <= 35) return 10;     // Very large - moderate safety
-    return 8;                                   // Maximum capacity - tighter but fair
+    if(activePlayerCount <= 3) return 15;      // Solo/duo - moderate variance
+    if(activePlayerCount <= 7) return 12;      // Small groups - balanced
+    if(activePlayerCount <= 15) return 9;      // Medium groups - tighter flow
+    if(activePlayerCount <= 25) return 7;      // Medium-large - quick engagement
+    if(activePlayerCount <= 40) return 6;      // Large groups - very tight
+    return 6;                                   // Maximum capacity - maintain pace
   }
 
   const reelsEl = document.getElementById('reels');
@@ -2737,19 +2737,19 @@
           }
         }
       }else{
-        // Player didn't appear: apply scaled penalty based on player count
-        // Small groups get penalty, large groups get small boost (fixes scaling issue)
+        // Player didn't appear: apply scaled ticket growth based on player count
+        // Larger groups need faster ticket escalation for natural wins before guardrail
         let multiplier;
         if (activePlayerCount <= 7) {
-          multiplier = 0.55; // Moderate penalty for small groups
+          multiplier = 0.60; // Moderate penalty for small groups
         } else if (activePlayerCount <= 15) {
-          multiplier = 0.73; // Mild penalty for medium groups
-        } else if (activePlayerCount <= 30) {
-          multiplier = 1.005; // Minimal boost for medium-large groups
-        } else if (activePlayerCount <= 50) {
-          multiplier = 1.012; // Small boost for large groups
+          multiplier = 0.80; // Mild penalty for medium groups
+        } else if (activePlayerCount <= 25) {
+          multiplier = 1.12; // Healthy growth for medium-large (12% per dead spin)
+        } else if (activePlayerCount <= 40) {
+          multiplier = 1.15; // Faster growth for large groups (15% per dead spin)
         } else {
-          multiplier = 1.018; // Small boost for very large groups
+          multiplier = 1.18; // Fastest growth for very large groups (18% per dead spin)
         }
 
         for(let i=0; i<5; i++){
@@ -3545,7 +3545,23 @@
       player.status='afk';
       log(`${player.name} marked as AFK.`);
     }
-    log(`Reported run for ${player.name}: ${wins}W/${losses}L, colors=${colors||'none'}, type=${matchType}`);
+    // Convert colors to mana symbol icons
+    let colorDisplay = 'none';
+    if(colors){
+      const pipUrls = {
+        'W': 'https://i.ibb.co/sJpHH9VZ/W.png',
+        'U': 'https://i.ibb.co/0bPLHLk/U.png',
+        'B': 'https://i.ibb.co/nM1ZZz3z/B.png',
+        'R': 'https://i.ibb.co/NnjxnmZv/R.png',
+        'G': 'https://i.ibb.co/tM5Mb1Q0/G.png',
+        'C': 'https://i.ibb.co/xt4Lpn0X/C.png'
+      };
+      const colorIcons = colors.split('').map(c =>
+        pipUrls[c] ? `<img src="${pipUrls[c]}" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin:0 1px;" alt="${c}"/>` : c
+      ).join('');
+      colorDisplay = colorIcons;
+    }
+    log(`Reported run for ${player.name}: ${wins}W/${losses}L, ${colorDisplay}, type=${matchType}`);
     evt.currentRun=null;
     finishOverlay.classList.remove('show');
     finishSaveBtn.disabled = false;
@@ -3811,14 +3827,15 @@
     const playerCount = players.length;
     const maxDeadStreak = getMaxDeadStreakAllowed(playerCount);
 
-    // Expected wins: guardrail guarantees ~(300/maxDeadStreak) minimum, natural wins add more
+    // Expected wins: With faster ticket growth, expect more natural wins + guardrail baseline
+    // For 20-25 players: maxDeadStreak=7, so ~42 guardrail wins + natural wins = ~50-60 total
     const minWinsFromGuardrail = Math.floor(300 / maxDeadStreak);
-    const expectedWins = Math.max(25, Math.floor(minWinsFromGuardrail * 1.2)); // 20% buffer for natural wins
+    const expectedWins = Math.max(30, Math.floor(minWinsFromGuardrail * 1.3)); // 30% buffer for natural wins
 
     const expectedCarlos = 0; // CARLO is extremely rare - bonus jackpot, not balance requirement
-    const expectedLuna = Math.max(3, Math.floor(playerCount * 0.25)); // Scale with player count
-    const expectedFourKind = Math.max(1, Math.floor(playerCount * 0.08)); // Higher player count = more 4oak
-    const expectedFiveKind = playerCount <= 10 ? 0 : 1; // Only expect 5oak with larger groups
+    const expectedLuna = Math.max(3, Math.floor(playerCount * 0.2)); // Reduced from 0.25
+    const expectedFourKind = Math.max(1, Math.floor(playerCount * 0.12)); // Increased for better scaling
+    const expectedFiveKind = playerCount <= 15 ? 0 : 1; // Only expect 5oak with larger groups
 
     const passWins = sim.wins >= expectedWins;
     const passCarlo = sim.carlo >= expectedCarlos; // Always pass - CARLO is a bonus jackpot
