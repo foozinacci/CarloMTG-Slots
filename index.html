@@ -425,7 +425,7 @@
       border:3px solid transparent;
       background-clip:padding-box;
       padding:10px;
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       position:relative;
       overflow:hidden;
       display:flex;
@@ -462,7 +462,7 @@
       border:3px solid transparent;
       background-clip:padding-box;
       padding:10px;
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       position:relative;
       overflow:hidden;
     }
@@ -701,20 +701,17 @@
       background-clip:padding-box;
       color:#ffffff;
       text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
       overflow:hidden;
     }
     body.theme-gold .spin-button{
-      background-image:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
-      background-size:200% auto;
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-      -webkit-text-stroke:1px rgba(0,0,0,0.5);
-      animation:gradientShift 4s ease infinite;
-      filter:drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 16px rgba(255,255,255,0.7)) drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+      background:radial-gradient(circle at top,#fef3c7 0,#fde68a 50%,#fcd34d 100%);
+      background-clip:padding-box;
+      color:#78350f;
+      text-shadow:0 0 8px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.3);
+      font-weight:900;
     }
     .spin-button::after{
       content:'';
@@ -790,19 +787,16 @@
       letter-spacing:.12em;
       cursor:pointer;
       text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       position:relative;
       overflow:hidden;
     }
     body.theme-gold .add-player-form button{
-      background-image:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
-      background-size:200% auto;
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-      -webkit-text-stroke:1px rgba(0,0,0,0.5);
-      animation:gradientShift 4s ease infinite;
-      filter:drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 16px rgba(255,255,255,0.7)) drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+      background:radial-gradient(circle at top,#fef3c7 0,#fde68a 50%,#fcd34d 100%);
+      background-clip:padding-box;
+      color:#78350f;
+      text-shadow:0 0 8px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.3);
+      font-weight:900;
     }
     .add-player-form button::after{
       content:'';
@@ -1028,20 +1022,17 @@
       text-transform:uppercase;
       letter-spacing:.12em;
       text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
       overflow:hidden;
     }
     body.theme-gold .winner-actions button{
-      background-image:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
-      background-size:200% auto;
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-      -webkit-text-stroke:1px rgba(0,0,0,0.5);
-      animation:gradientShift 4s ease infinite;
-      filter:drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 16px rgba(255,255,255,0.7)) drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+      background:radial-gradient(circle at top,#fef3c7 0,#fde68a 50%,#fcd34d 100%);
+      background-clip:padding-box;
+      color:#78350f;
+      text-shadow:0 0 8px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.3);
+      font-weight:900;
     }
     .winner-actions button::after{
       content:'';
@@ -1154,21 +1145,18 @@
       text-transform:uppercase;
       letter-spacing:.08em;
       text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
       z-index:10;
       overflow:hidden;
     }
     body.theme-gold .adjust-btn{
-      background-image:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
-      background-size:200% auto;
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-      -webkit-text-stroke:1px rgba(0,0,0,0.5);
-      animation:gradientShift 4s ease infinite;
-      filter:drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 16px rgba(255,255,255,0.7)) drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+      background:radial-gradient(circle at top,#fef3c7 0,#fde68a 50%,#fcd34d 100%);
+      background-clip:padding-box;
+      color:#78350f;
+      text-shadow:0 0 8px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.3);
+      font-weight:900;
     }
     .adjust-btn::after{
       content:'';
@@ -1265,7 +1253,7 @@
       text-transform:uppercase;
       letter-spacing:.1em;
       text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       opacity:.6;
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
@@ -1293,14 +1281,11 @@
       box-shadow:0 0 24px var(--theme-glow),inset 0 0 16px var(--theme-glow);
     }
     body.theme-gold .queue-chip{
-      background-image:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
-      background-size:200% auto;
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-      -webkit-text-stroke:1px rgba(0,0,0,0.5);
-      animation:gradientShift 4s ease infinite;
-      filter:drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 16px rgba(255,255,255,0.7)) drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+      background:radial-gradient(circle at top,#fef3c7 0,#fde68a 50%,#fcd34d 100%);
+      background-clip:padding-box;
+      color:#78350f;
+      text-shadow:0 0 8px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.3);
+      font-weight:900;
     }
     .finish-actions{
       display:flex;
@@ -1325,21 +1310,18 @@
       letter-spacing:.12em;
       cursor:pointer;
       text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
       z-index:10;
       overflow:hidden;
     }
     body.theme-gold .finish-actions button{
-      background-image:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
-      background-size:200% auto;
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-      -webkit-text-stroke:1px rgba(0,0,0,0.5);
-      animation:gradientShift 4s ease infinite;
-      filter:drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 16px rgba(255,255,255,0.7)) drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+      background:radial-gradient(circle at top,#fef3c7 0,#fde68a 50%,#fcd34d 100%);
+      background-clip:padding-box;
+      color:#78350f;
+      text-shadow:0 0 8px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.3);
+      font-weight:900;
     }
     .finish-actions button::after{
       content:'';
@@ -1425,20 +1407,17 @@
       letter-spacing:.1em;
       cursor:pointer;
       text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
       overflow:hidden;
     }
     body.theme-gold .player-card-actions button{
-      background-image:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
-      background-size:200% auto;
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-      -webkit-text-stroke:1px rgba(0,0,0,0.5);
-      animation:gradientShift 4s ease infinite;
-      filter:drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 16px rgba(255,255,255,0.7)) drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+      background:radial-gradient(circle at top,#fef3c7 0,#fde68a 50%,#fcd34d 100%);
+      background-clip:padding-box;
+      color:#78350f;
+      text-shadow:0 0 8px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.3);
+      font-weight:900;
     }
     .player-card-actions button::after{
       content:'';
@@ -1604,20 +1583,17 @@
       letter-spacing:.1em;
       cursor:pointer;
       text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
       overflow:hidden;
     }
     body.theme-gold .footer-buttons button{
-      background-image:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
-      background-size:200% auto;
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-      -webkit-text-stroke:1px rgba(0,0,0,0.5);
-      animation:gradientShift 4s ease infinite;
-      filter:drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 16px rgba(255,255,255,0.7)) drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+      background:radial-gradient(circle at top,#fef3c7 0,#fde68a 50%,#fcd34d 100%);
+      background-clip:padding-box;
+      color:#78350f;
+      text-shadow:0 0 8px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.3);
+      font-weight:900;
     }
     .footer-buttons button::after{
       content:'';
@@ -2170,18 +2146,40 @@
     const bottom = bulbRowBottom.querySelectorAll('.bulb');
     const left = bulbColLeft.querySelectorAll('.bulb');
     const right = bulbColRight.querySelectorAll('.bulb');
-    const all = [...top,...bottom,...left,...right];
+
+    // Arrange bulbs in clockwise rotation order: top-left to top-right, then right-top to right-bottom, then bottom-right to bottom-left, then left-bottom to left-top
+    const topArray = Array.from(top);
+    const rightArray = Array.from(right);
+    const bottomArray = Array.from(bottom).reverse();
+    const leftArray = Array.from(left).reverse();
+    const all = [...topArray, ...rightArray, ...bottomArray, ...leftArray];
+
     let t = 0;
+    const trailLength = 8; // Number of bulbs to light up in the trail
     bulbsTimer = setInterval(()=>{
       const colors = isLuna ? BULB_LUNA_COLORS : BULB_COLORS;
-      all.forEach((b,idx)=>{
-        const c = colors[(idx + t) % colors.length];
-        b.style.color = c;
-        b.style.background = c;
-        b.classList.add('active');
+
+      // Turn off all bulbs first
+      all.forEach(b => {
+        b.classList.remove('active');
+        b.style.background = '#4b5563';
+        b.style.color = '#4b5563';
       });
-      t++;
-    },120);
+
+      // Light up trailing bulbs with gradient effect
+      for(let i = 0; i < trailLength; i++){
+        const idx = (t - i + all.length) % all.length;
+        const bulb = all[idx];
+        const colorIdx = Math.floor(i / 2) % colors.length;
+        const c = colors[colorIdx];
+        const opacity = 1 - (i / trailLength) * 0.7; // Fade trail
+        bulb.style.color = c;
+        bulb.style.background = c;
+        bulb.style.opacity = opacity;
+        bulb.classList.add('active');
+      }
+      t = (t + 1) % all.length;
+    },80);
   }
   function stopBulbsAnimation(){
     if(bulbsTimer) clearInterval(bulbsTimer);
@@ -3083,7 +3081,7 @@
     }
     const pityPick = findPityAutoPick(evt);
     if(pityPick){
-      log(`Auto-pick from pity: ${pityPick.name}`);
+      log(`<span style="color:#22c55e;font-weight:600;">Auto-pick from pity: ${pityPick.name}</span>`);
       // Start bulb celebration for pity pick
       startBulbsAnimation(false);
       setTimeout(()=>{
@@ -3166,7 +3164,9 @@
       if(winner){
         // Winner found: Bulbs already running, handle tickets then show banner
         handleWinTickets(evt,winner,symbols,reelPlayers);
-        log(`${winner.name} wins the slot (${reason}, hits=${hits}).`);
+        // Color code: pink for Luna wins, green for regular wins
+        const winColor = isLunaWin ? '#f973fa' : '#22c55e';
+        log(`<span style="color:${winColor};font-weight:600;">${winner.name} wins the slot (${reason}, hits=${hits}).</span>`);
         // Short delay after last reel stops before showing winner banner
         setTimeout(()=>{
           stopBulbsAnimation();
