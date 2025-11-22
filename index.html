@@ -1548,8 +1548,8 @@
         <div class="side-panel-header">
           <div class="side-panel-section-title">Leaderboard Odds</div>
         </div>
-        <form class="add-player-form" id="addPlayerForm">
-          <input id="playerNameInput" placeholder="Add viewer (name / handle)" />
+        <form class="add-player-form" id="addPlayerForm" autocomplete="off">
+          <input id="playerNameInput" placeholder="Add viewer (name / handle)" autocomplete="off" />
           <button type="submit">Add</button>
         </form>
         <div class="leaderboard-wrapper">
@@ -2993,7 +2993,11 @@
     }
     // Always clear input after submission
     playerNameInput.value='';
-    playerNameInput.focus();
+    // Use setTimeout to ensure clear happens after any browser auto-fill
+    setTimeout(() => {
+      playerNameInput.value='';
+      playerNameInput.focus();
+    }, 0);
   });
   // Event chip switching removed - using single event model
 
