@@ -83,6 +83,7 @@ class SimulationEngine {
     this.players = [];
     this.spinCount = 0;
     this.deadSpinStreak = 0;
+    this.lastSpinWasWinner = false;
     this.ignitedQueue = [];
     this.lastIgnitionSpin = -1;
 
@@ -142,7 +143,7 @@ class SimulationEngine {
     return active[active.length - 1];
   }
 
-  buildSpinResult(guaranteeWin = false) {
+  buildSpinResult(guaranteeWin = false, forceDead = false) {
     const symbols = [];
     const letters = ['C', 'A', 'R', 'L', 'O'];
 
@@ -182,7 +183,19 @@ class SimulationEngine {
 
       if (!isCarlo && !lunaWin && !hitWin) {
         // No winner, try again (recursive)
-        return this.buildSpinResult(true);
+        return this.buildSpinResult(true, false);
+      }
+    }
+
+    // Force dead: If we need to force a dead spin, keep trying until we get one
+    if (forceDead) {
+      const isCarlo = this.detectCarlo(symbols);
+      const lunaWin = this.detectLunaWinner(symbols);
+      const hitWin = this.detectHitWinner(symbols);
+
+      if (isCarlo || lunaWin || hitWin) {
+        // Has winner, try again (recursive)
+        return this.buildSpinResult(false, true);
       }
     }
 
@@ -320,8 +333,18 @@ class SimulationEngine {
         this.stats.ignitionWins++;
         this.stats.winsByType.ignition++;
         this.deadSpinStreak = 0;
+        this.lastSpinWasWinner = true;
         this.spinCount++;
         return { type: 'ignition', player: ignitedPlayer };
+      }
+    }
+
+    // Back-to-back cooldown: Force dead spin after winner (ultra-rare exception: 1/2500)
+    let forceDead = false;
+    if (this.lastSpinWasWinner) {
+      const backToBackChance = 1/2500;
+      if (Math.random() >= backToBackChance) {
+        forceDead = true;
       }
     }
 
@@ -334,7 +357,7 @@ class SimulationEngine {
     }
 
     // Build spin
-    const symbols = this.buildSpinResult(guaranteeWin);
+    const symbols = this.buildSpinResult(guaranteeWin, forceDead);
     const isCarlo = this.detectCarlo(symbols);
     const lunaWin = this.detectLunaWinner(symbols);
     const hitWin = this.detectHitWinner(symbols);
@@ -345,6 +368,7 @@ class SimulationEngine {
       this.stats.carloJackpots++;
       this.stats.winsByType.carlo++;
       this.deadSpinStreak = 0;
+      this.lastSpinWasWinner = true;
       this.spinCount++;
       return { type: 'carlo' };
     }
@@ -354,6 +378,7 @@ class SimulationEngine {
       this.stats.lunaWins++;
       this.stats.winsByType.luna++;
       this.deadSpinStreak = 0;
+      this.lastSpinWasWinner = true;
       this.spinCount++;
 
       // Award spark
@@ -379,6 +404,7 @@ class SimulationEngine {
       }
 
       this.deadSpinStreak = 0;
+      this.lastSpinWasWinner = true;
       this.spinCount++;
 
       // Award spark
@@ -392,6 +418,7 @@ class SimulationEngine {
     // Dead spin
     this.stats.deadSpins++;
     this.deadSpinStreak++;
+    this.lastSpinWasWinner = false;
 
     if (this.deadSpinStreak > this.stats.maxDeadStreak) {
       this.stats.maxDeadStreak = this.deadSpinStreak;

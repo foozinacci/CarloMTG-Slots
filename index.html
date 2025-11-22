@@ -2314,7 +2314,8 @@
         deadSpinStreak: 0,
         currentRun: null,
         carloHits: 0,
-        lunaHits: 0
+        lunaHits: 0,
+        lastSpinWasWinner: false
       };
     }
     return state.events[state.currentEventIndex];
@@ -2349,6 +2350,7 @@
         evt.currentRun = evt.currentRun || null;
         evt.carloHits = evt.carloHits || 0;
         evt.lunaHits = evt.lunaHits || 0;
+        evt.lastSpinWasWinner = evt.lastSpinWasWinner || false;
         for(const p of evt.players){
           p.tickets = p.tickets || [1,1,1,1,1];
           p.sparks = p.sparks || 0;
@@ -2808,7 +2810,7 @@
     return processIgnitionQueue(evt);
   }
 
-  function buildSpinResult(evt, guaranteeWin = false){
+  function buildSpinResult(evt, guaranteeWin = false, forceDead = false){
     const symbols = [];
     const letters = ['C','A','R','L','O'];
 
@@ -2847,7 +2849,19 @@
 
       if(!isCarlo && !lunaWin && !hitWin){
         // No winner, try again (recursive)
-        return buildSpinResult(evt, true);
+        return buildSpinResult(evt, true, false);
+      }
+    }
+
+    // Force dead: If we need to force a dead spin, keep trying until we get one
+    if(forceDead){
+      const isCarlo = detectCarlo(symbols);
+      const lunaWin = detectLunaWinner(evt, symbols);
+      const hitWin = detectHitWinner(evt, symbols);
+
+      if(isCarlo || lunaWin || hitWin){
+        // Has winner, try again (recursive)
+        return buildSpinResult(evt, false, true);
       }
     }
 
@@ -3232,6 +3246,7 @@
   function handleWinnerBanner(player, reason, hits, isLuna){
     const evt = currentEvent();
     evt.deadSpinStreak = 0;
+    evt.lastSpinWasWinner = true;
     updateLunaBalanceMeter();
     evt.spinCount++;
     player.slotGames = (player.slotGames||0) + 1;
@@ -3501,6 +3516,15 @@
       return;
     }
 
+    // Back-to-back cooldown: Force dead spin after winner (ultra-rare exception: 1/2500)
+    let forceDead = false;
+    if(evt.lastSpinWasWinner){
+      const backToBackChance = 1/2500;
+      if(Math.random() >= backToBackChance){
+        forceDead = true;
+      }
+    }
+
     // Dead spin guardrail - guarantee natural-looking win after too many dead spins
     const maxDeadStreak = getMaxDeadStreakAllowed(activePlayers.length);
     const guaranteeWin = evt.deadSpinStreak >= maxDeadStreak;
@@ -3511,7 +3535,7 @@
     smallStatus.textContent="Spinning…";
 
     // Build spin result immediately (for timing calculation)
-    const symbols = buildSpinResult(evt, guaranteeWin);
+    const symbols = buildSpinResult(evt, guaranteeWin, forceDead);
     const isCarlo = detectCarlo(symbols);
     let isLunaWin = false;
     const lunaPick = detectLunaWinner(evt,symbols);
@@ -3556,6 +3580,7 @@
           currentWinnerMeta={reason:'carlo',hits:0};
           evt.spinCount++;
           evt.deadSpinStreak=0;
+          evt.lastSpinWasWinner=true;
           updateLunaBalanceMeter();
           renderLeaderboard();
           saveAll();
@@ -3594,6 +3619,7 @@
       }else{
         // Dead spin: No bulb celebration
         evt.deadSpinStreak++;
+        evt.lastSpinWasWinner = false;
         updateLunaBalanceMeter();
         log(`<span style="color:var(--red);">Dead spin (#${evt.deadSpinStreak}).</span>`);
         handleDeadSpinTickets(evt,symbols,reelPlayers);
