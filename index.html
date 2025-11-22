@@ -214,7 +214,8 @@
     .event-chip{
       border-radius:999px;
       border:1px solid var(--border);
-      padding:3px 8px;
+      padding:6px 14px;
+      font-size:12px;
       cursor:pointer;
       text-transform:uppercase;
       letter-spacing:.08em;
@@ -238,8 +239,8 @@
       letter-spacing:.12em;
     }
     .theme-chip{
-      width:22px;
-      height:22px;
+      width:30px;
+      height:30px;
       border-radius:999px;
       border:1px solid var(--border);
       cursor:pointer;
@@ -332,8 +333,8 @@
         gap:3px;
       }
       .theme-chip{
-        width:20px;
-        height:20px;
+        width:26px;
+        height:26px;
       }
       .slot-layout{
         padding:6px;
@@ -392,16 +393,27 @@
         padding:10px;
         max-width:100%;
         overflow:hidden;
+        word-wrap:break-word;
       }
       .winner-card,.help-card{
         max-width:calc(100vw - 20px);
         margin:0 10px;
         max-height:90vh;
         overflow-y:auto;
+        overflow-x:hidden;
       }
       .help-body{
         max-height:60vh;
         overflow-y:auto;
+        overflow-x:hidden;
+      }
+      .deck-table-wrapper{
+        max-width:100%;
+        overflow-x:auto;
+      }
+      .diag-result{
+        word-wrap:break-word;
+        overflow-wrap:break-word;
       }
     }
     .slot-panel,.side-panel{
@@ -623,12 +635,12 @@
       padding:14px 42px;
       border:3px solid var(--theme-color);
       font-size:20px;
-      font-weight:800;
+      font-weight:900;
       letter-spacing:.12em;
       cursor:pointer;
       background:var(--theme-color);
-      color:var(--bg);
-      text-shadow:0 0 4px rgba(0,0,0,.5);
+      color:#000;
+      text-shadow:0 1px 2px rgba(255,255,255,.8), 0 0 8px rgba(255,255,255,.6);
       box-shadow:0 0 24px var(--theme-glow),0 0 12px var(--theme-glow),inset 0 0 8px rgba(255,255,255,.5);
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:absolute;
@@ -681,11 +693,12 @@
       background:radial-gradient(circle at top,var(--theme-color) 0,var(--theme-color) 50%,var(--bg) 100%);
       font-size:12px;
       padding:6px 12px;
-      color:var(--bg);
+      color:#000;
       font-weight:900;
       text-transform:uppercase;
       letter-spacing:.12em;
       cursor:pointer;
+      text-shadow:0 1px 1px rgba(255,255,255,.7), 0 0 6px rgba(255,255,255,.5);
       box-shadow:0 0 16px var(--theme-glow),inset 0 0 6px rgba(255,255,255,.4);
     }
     .summary-cards{
@@ -754,7 +767,7 @@
     .player-row:hover{background:rgba(17,24,39,.9);}
     .time-cell{
       font-size:10px;
-      color:var(--muted);
+      color:#10b981;
       white-space:nowrap;
     }
     .pity-count{font-size:10px;color:var(--muted);}
@@ -1098,16 +1111,23 @@
       min-width:32px;
       text-align:center;
     }
+    .deck-table-wrapper{
+      width:100%;
+      overflow-x:auto;
+      margin-top:6px;
+      -webkit-overflow-scrolling:touch;
+    }
     .deck-table{
       width:100%;
       border-collapse:collapse;
-      margin-top:6px;
       font-size:11px;
+      min-width:300px;
     }
     .deck-table th,.deck-table td{
       border-bottom:1px solid var(--border);
       padding:3px 4px;
       text-align:left;
+      white-space:nowrap;
     }
     .deck-table th{
       text-transform:uppercase;
@@ -1367,18 +1387,20 @@
       <div class="help-section-title">Reel Probabilities</div>
       <div class="reel-charts" id="reelCharts"></div>
       <div class="help-section-title">Decks (by color identity)</div>
-      <table class="deck-table">
-        <thead>
-          <tr>
-            <th>Colors</th>
-            <th>Matches</th>
-            <th>W/L</th>
-            <th>Win%</th>
-            <th>Last</th>
-          </tr>
-        </thead>
-        <tbody id="deckTableBody"></tbody>
-      </table>
+      <div class="deck-table-wrapper">
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>Colors</th>
+              <th>Matches</th>
+              <th>W/L</th>
+              <th>Win%</th>
+              <th>Last</th>
+            </tr>
+          </thead>
+          <tbody id="deckTableBody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
   <!-- HELP OVERLAY -->
