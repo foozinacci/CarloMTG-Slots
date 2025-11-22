@@ -144,58 +144,102 @@ class SimulationEngine {
   }
 
   buildSpinResult(guaranteeWin = false, forceDead = false) {
-    const symbols = [];
     const letters = ['C', 'A', 'R', 'L', 'O'];
-
-    // Get active player count for dynamic odds
     const activePlayerCount = this.players.filter(p => p.status === 'active').length;
     const lunaOdds = getLunaBaseOdds(activePlayerCount);
     const carloLetterOdds = getCarloLetterOdds(activePlayerCount);
 
-    // Build one spin attempt
-    const luna = Math.random() < lunaOdds;
-    const lunaIndex = luna ? Math.floor(Math.random() * 5) : -1;
+    const maxRetries = 100; // Prevent infinite loops
+    let attempt = 0;
 
-    for (let i = 0; i < 5; i++) {
-      if (i === lunaIndex) {
-        symbols.push({ type: 'luna' });
-        continue;
-      }
+    while (attempt < maxRetries) {
+      attempt++;
+      const symbols = [];
 
-      const roll = Math.random();
-      if (roll < carloLetterOdds) {
-        symbols.push({ type: 'letter', letter: letters[i] });
-      } else {
-        const p = this.randomWeightedPlayer(i);
-        if (p) {
-          symbols.push({ type: 'player', playerId: p.id, name: p.name });
-        } else {
+      // Build one spin attempt
+      const luna = Math.random() < lunaOdds;
+      const lunaIndex = luna ? Math.floor(Math.random() * 5) : -1;
+
+      for (let i = 0; i < 5; i++) {
+        if (i === lunaIndex) {
+          symbols.push({ type: 'luna' });
+          continue;
+        }
+
+        const roll = Math.random();
+        if (roll < carloLetterOdds) {
           symbols.push({ type: 'letter', letter: letters[i] });
+        } else {
+          const p = this.randomWeightedPlayer(i);
+          if (p) {
+            symbols.push({ type: 'player', playerId: p.id, name: p.name });
+          } else {
+            symbols.push({ type: 'letter', letter: letters[i] });
+          }
         }
       }
-    }
 
-    // Guardrail: If we need to guarantee a win, keep trying until we get one
-    if (guaranteeWin) {
+      // Check if this spin meets our requirements
       const isCarlo = this.detectCarlo(symbols);
       const lunaWin = this.detectLunaWinner(symbols);
       const hitWin = this.detectHitWinner(symbols);
+      const hasWinner = isCarlo || lunaWin || hitWin;
 
-      if (!isCarlo && !lunaWin && !hitWin) {
-        // No winner, try again (recursive)
-        return this.buildSpinResult(true, false);
+      // Guardrail: Must have winner
+      if (guaranteeWin && !hasWinner) {
+        continue; // Try again
       }
+
+      // Force dead: Must NOT have winner
+      if (forceDead && hasWinner) {
+        continue; // Try again
+      }
+
+      // Success! Return this result
+      return symbols;
     }
 
-    // Force dead: If we need to force a dead spin, keep trying until we get one
-    if (forceDead) {
-      const isCarlo = this.detectCarlo(symbols);
-      const lunaWin = this.detectLunaWinner(symbols);
-      const hitWin = this.detectHitWinner(symbols);
+    // Fallback: If we hit max retries, manually construct a valid result
+    const symbols = [];
 
-      if (isCarlo || lunaWin || hitWin) {
-        // Has winner, try again (recursive)
-        return this.buildSpinResult(false, true);
+    if (guaranteeWin) {
+      // Force a 3-of-a-kind win: pick first active player and fill 3+ reels
+      const activePlayers = this.players.filter(p => p.status === 'active');
+      if (activePlayers.length > 0) {
+        const winner = activePlayers[0];
+        for (let i = 0; i < 5; i++) {
+          if (i < 3) {
+            symbols.push({ type: 'player', playerId: winner.id, name: winner.name });
+          } else {
+            symbols.push({ type: 'letter', letter: letters[i] });
+          }
+        }
+      }
+    } else if (forceDead) {
+      // Force a dead spin: all CARLO letters (no matches)
+      for (let i = 0; i < 5; i++) {
+        symbols.push({ type: 'letter', letter: letters[i] });
+      }
+    } else {
+      // Normal fallback
+      const luna = Math.random() < lunaOdds;
+      const lunaIndex = luna ? Math.floor(Math.random() * 5) : -1;
+      for (let i = 0; i < 5; i++) {
+        if (i === lunaIndex) {
+          symbols.push({ type: 'luna' });
+          continue;
+        }
+        const roll = Math.random();
+        if (roll < carloLetterOdds) {
+          symbols.push({ type: 'letter', letter: letters[i] });
+        } else {
+          const p = this.randomWeightedPlayer(i);
+          if (p) {
+            symbols.push({ type: 'player', playerId: p.id, name: p.name });
+          } else {
+            symbols.push({ type: 'letter', letter: letters[i] });
+          }
+        }
       }
     }
 
