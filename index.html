@@ -103,7 +103,15 @@
     }
     body{
       font-family:'Cinzel',serif;
-      background:radial-gradient(circle at top,#3b1f0f 0,var(--bg) 45%,#000 100%);
+      background:
+        /* Weathered texture overlay */
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(143,82,57,0.03) 2px, rgba(143,82,57,0.03) 4px),
+        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(143,82,57,0.03) 2px, rgba(143,82,57,0.03) 4px),
+        /* Subtle noise/grain */
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(0,0,0,0.15) 0%, transparent 50%),
+        /* Base gradient with #8f5239 */
+        radial-gradient(circle at top, #8f5239 0%, rgba(143,82,57,0.7) 30%, var(--bg) 60%, #000 100%);
       color:var(--text);
       display:flex;
       justify-content:center;
@@ -145,8 +153,8 @@
       justify-content:space-between;
     }
     .logo{
-      width:60px;
-      height:60px;
+      width:90px;
+      height:90px;
       overflow:hidden;
       background:transparent;
       display:flex;
@@ -157,7 +165,7 @@
       width:100%;
       height:100%;
       object-fit:contain;
-      filter:drop-shadow(0 0 8px rgba(250,204,21,.4));
+      filter:none;
     }
     .title-block{
       display:flex;
@@ -166,15 +174,18 @@
       gap:4px;
     }
     .title{
-      font-size:20px;
+      font-size:22px;
       font-weight:700;
-      letter-spacing:.1em;
-      text-transform:uppercase;
+      letter-spacing:.08em;
       color:var(--gold);
-      text-shadow:0 0 12px rgba(250,204,21,.6);
+      text-shadow:0 0 8px rgba(250,204,21,.4);
     }
     .subtitle{
-      display:none;
+      display:block;
+      font-size:11px;
+      color:var(--muted);
+      letter-spacing:.06em;
+      opacity:0.8;
     }
     .header-right{
       display:flex;
@@ -423,23 +434,23 @@
     }
     .reels-shell{
       position:relative;
-      padding:18px 50px 26px 18px;
+      padding:18px 70px 30px 18px;
     }
     .bulb-row{
       position:absolute;
       left:20px;
-      right:20px;
+      right:60px;
       height:8px;
       display:flex;
       justify-content:space-between;
       pointer-events:none;
     }
     .bulb-row.top{top:4px;}
-    .bulb-row.bottom{bottom:4px;}
+    .bulb-row.bottom{bottom:10px;}
     .bulb-col{
       position:absolute;
       top:18px;
-      bottom:22px;
+      bottom:30px;
       width:8px;
       display:flex;
       flex-direction:column;
@@ -447,7 +458,7 @@
       pointer-events:none;
     }
     .bulb-col.left{left:4px;}
-    .bulb-col.right{right:4px;}
+    .bulb-col.right{right:52px;}
     .bulb{
       width:8px;
       height:8px;
@@ -473,8 +484,7 @@
       margin-bottom:4px;
       font-size:10px;
       color:var(--muted);
-      letter-spacing:.18em;
-      text-transform:uppercase;
+      letter-spacing:.10em;
     }
     .reels{display:flex;gap:6px;justify-content:space-between;}
     .reel{
@@ -499,18 +509,17 @@
       transition:transform .18s ease-out;
     }
     .reel-symbol{
-      font-size:14px;
-      font-weight:800;
-      text-transform:uppercase;
-      padding:4px 6px;
+      font-size:13px;
+      font-weight:700;
+      padding:4px 8px;
       border-radius:8px;
-      min-width:64px;
-      max-width:100%;
+      width:64px;
       text-align:center;
       box-shadow:0 0 10px rgba(15,23,42,.9);
-      white-space:normal;
-      line-height:1.1;
-      word-break:break-word;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      line-height:1.2;
     }
     .reel-symbol.player{
       background:rgba(15,23,42,.95);
@@ -590,7 +599,7 @@
       flex-shrink:0;
     }
     .slot-controls{
-      margin-top:10px;
+      margin-top:24px;
       display:flex;
       justify-content:space-between;
       align-items:center;
@@ -628,10 +637,9 @@
       border-radius:999px;
       padding:12px 36px;
       border:3px solid var(--theme-color);
-      font-size:15px;
-      font-weight:800;
-      letter-spacing:.18em;
-      text-transform:uppercase;
+      font-size:14px;
+      font-weight:700;
+      letter-spacing:.10em;
       cursor:pointer;
       background:radial-gradient(circle at top,var(--theme-color) 0,var(--theme-color) 50%,var(--bg) 100%);
       color:var(--bg);
@@ -811,10 +819,9 @@
       position:relative;
     }
     .winner-heading{
-      font-size:18px;
+      font-size:20px;
       font-weight:900;
-      letter-spacing:.25em;
-      text-transform:uppercase;
+      letter-spacing:.12em;
       color:var(--gold);
       text-shadow:0 0 14px rgba(250,204,21,1);
       margin-bottom:6px;
@@ -1199,7 +1206,8 @@
         <img src="https://i.ibb.co/PvbYChDZ/G0-Gsi-Gv-XIAEk-Rf1-removebg-preview.png" alt="CARLO"/>
       </div>
       <div class="title-block">
-        <div class="title">CarloMTG - Viewer Roulette</div>
+        <div class="title">CarloMTG</div>
+        <div class="subtitle">Viewer Roulette</div>
       </div>
     </div>
     <div class="header-left">
@@ -1744,12 +1752,12 @@
   }
 
   // Cascade reel stops over 660ms with random timing
-  // Last reel stops ~1000-1100ms (aligns near end of 1200ms bulb animation)
+  // Last reel stops ~1500-1700ms (longer, more dramatic spin)
   function spinAnimationStopCascade(callback){
     const reelEls = reelsEl.querySelectorAll('.reel');
-    const TAPER_DURATION = 660; // 0.66 seconds
-    const BASE_START = 340; // First reel starts stopping at ~340ms
-    const RANDOM_VARIANCE = 40; // ±40ms random variation per reel
+    const TAPER_DURATION = 1000; // 1 second cascade
+    const BASE_START = 600; // First reel starts stopping at ~600ms
+    const RANDOM_VARIANCE = 60; // ±60ms random variation per reel
 
     // Generate random delays for each reel
     const delays = [];
