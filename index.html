@@ -1581,11 +1581,11 @@
       border:5px solid transparent;
       background:conic-gradient(var(--theme-color) 0% var(--percentage), rgba(0,0,0,.3) var(--percentage) 100%);
       background-clip:padding-box;
-      box-shadow:0 0 24px var(--theme-glow),0 0 48px var(--theme-glow),0 0 12px var(--theme-glow);
+      box-shadow:0 0 8px var(--theme-glow),0 0 16px var(--theme-glow);
       display:flex;
       align-items:center;
       justify-content:center;
-      filter:brightness(1.4);
+      filter:brightness(1.2);
       overflow:hidden;
       transition:all .15s ease-out;
     }
@@ -1843,12 +1843,20 @@
     .spark-bulb.lit{
       background:var(--theme-color);
       border-color:var(--theme-color);
-      box-shadow:0 0 10px var(--theme-glow),0 0 20px var(--theme-glow),inset 0 0 8px var(--theme-glow);
+      box-shadow:0 0 8px var(--theme-glow),0 0 16px var(--theme-glow),inset 0 0 6px var(--theme-glow);
       animation:sparkPulse 1.5s ease-in-out infinite;
     }
     @keyframes sparkPulse{
-      0%, 100%{opacity:1;transform:scale(1);}
-      50%{opacity:0.7;transform:scale(1.1);}
+      0%, 100%{
+        opacity:1;
+        transform:scale(1);
+        box-shadow:0 0 8px var(--theme-glow),0 0 16px var(--theme-glow),inset 0 0 6px var(--theme-glow);
+      }
+      50%{
+        opacity:0.85;
+        transform:scale(1.08);
+        box-shadow:0 0 12px var(--theme-glow),0 0 24px var(--theme-glow),inset 0 0 10px var(--theme-glow);
+      }
     }
     .spark-overflow-bulb{
       width:60px;
