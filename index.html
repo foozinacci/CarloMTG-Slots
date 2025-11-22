@@ -642,10 +642,10 @@
       font-weight:900;
       letter-spacing:.12em;
       cursor:pointer;
-      background:radial-gradient(circle at top,var(--panel) 0,var(--bg) 50%,#000 100%);
+      background:radial-gradient(circle at top,#fcd34d 0,#f59e0b 50%,#d97706 100%);
       background-clip:padding-box;
       color:var(--gold);
-      text-shadow:0 0 8px rgba(250,204,21,.4);
+      text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
       box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
@@ -711,7 +711,7 @@
     .add-player-form button{
       border-radius:999px;
       border:2px solid transparent;
-      background:radial-gradient(circle at top,var(--panel) 0,var(--bg) 50%,#000 100%);
+      background:radial-gradient(circle at top,#fcd34d 0,#f59e0b 50%,#d97706 100%);
       background-clip:padding-box;
       font-size:12px;
       padding:6px 12px;
@@ -720,7 +720,7 @@
       text-transform:uppercase;
       letter-spacing:.12em;
       cursor:pointer;
-      text-shadow:0 0 8px rgba(250,204,21,.4);
+      text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
       box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
       position:relative;
       overflow:hidden;
@@ -904,14 +904,40 @@
     }
     .winner-actions button{
       border-radius:999px;
-      border:1px solid var(--border);
-      background:#020617;
+      border:3px solid transparent;
+      background:radial-gradient(circle at top,#fcd34d 0,#f59e0b 50%,#d97706 100%);
+      background-clip:padding-box;
+      color:var(--gold);
       font-size:11px;
+      font-weight:700;
       padding:6px 10px;
       cursor:pointer;
-      color:var(--muted);
       text-transform:uppercase;
       letter-spacing:.12em;
+      text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
+      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
+      position:relative;
+      overflow:hidden;
+    }
+    .winner-actions button::after{
+      content:'';
+      position:absolute;
+      inset:0;
+      border-radius:999px;
+      padding:3px;
+      background:var(--gradient-border);
+      background-size:var(--gradient-border-size) var(--gradient-border-size);
+      -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite:xor;
+      mask-composite:exclude;
+      pointer-events:none;
+      animation:gradientShift 4s ease infinite;
+      z-index:-1;
+    }
+    .winner-actions button:hover{
+      transform:scale(1.03);
+      box-shadow:0 0 24px var(--theme-glow),inset 0 0 16px var(--theme-glow);
     }
     .winner-luna-sticker{
       position:absolute;
@@ -941,7 +967,6 @@
       overflow:hidden;
     }
     .finish-card::after{
-      display:none;
       content:'';
       position:absolute;
       inset:0;
@@ -993,22 +1018,41 @@
     }
     .adjust-btn{
       border-radius:999px;
-      border:2px solid var(--theme-color);
-      background:var(--panel);
-      color:var(--theme-color);
+      border:3px solid transparent;
+      background:radial-gradient(circle at top,#fcd34d 0,#f59e0b 50%,#d97706 100%);
+      background-clip:padding-box;
+      color:var(--gold);
       font-size:13px;
       font-weight:700;
       padding:8px 16px;
       cursor:pointer;
       text-transform:uppercase;
       letter-spacing:.08em;
-      transition:all .15s ease-out;
+      text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
+      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
       z-index:10;
+      overflow:hidden;
+    }
+    .adjust-btn::after{
+      content:'';
+      position:absolute;
+      inset:0;
+      border-radius:999px;
+      padding:3px;
+      background:var(--gradient-border);
+      background-size:var(--gradient-border-size) var(--gradient-border-size);
+      -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite:xor;
+      mask-composite:exclude;
+      pointer-events:none;
+      animation:gradientShift 4s ease infinite;
+      z-index:-1;
     }
     .adjust-btn:hover{
-      background:var(--theme-color);
-      color:var(--bg);
+      transform:scale(1.03);
+      box-shadow:0 0 24px var(--theme-glow),inset 0 0 16px var(--theme-glow);
     }
     .finish-input-row input[type="number"]{
       width:80px;
@@ -1101,20 +1145,44 @@
     }
     .finish-actions button{
       border-radius:999px;
-      border:1px solid var(--border);
-      background:#020617;
-      color:var(--muted);
+      border:3px solid transparent;
+      background:radial-gradient(circle at top,#fcd34d 0,#f59e0b 50%,#d97706 100%);
+      background-clip:padding-box;
+      color:var(--gold);
       font-size:11px;
+      font-weight:700;
       padding:6px 10px;
       text-transform:uppercase;
       letter-spacing:.12em;
       cursor:pointer;
+      text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
+      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
       z-index:10;
+      overflow:hidden;
+    }
+    .finish-actions button::after{
+      content:'';
+      position:absolute;
+      inset:0;
+      border-radius:999px;
+      padding:3px;
+      background:var(--gradient-border);
+      background-size:var(--gradient-border-size) var(--gradient-border-size);
+      -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite:xor;
+      mask-composite:exclude;
+      pointer-events:none;
+      animation:gradientShift 4s ease infinite;
+      z-index:-1;
+    }
+    .finish-actions button:hover{
+      transform:scale(1.03);
+      box-shadow:0 0 24px var(--theme-glow),inset 0 0 16px var(--theme-glow);
     }
     .finish-actions button.primary{
-      border-color:var(--gold);
-      color:var(--gold);
+      font-weight:900;
     }
     .player-card{
       width:100%;
@@ -1166,14 +1234,40 @@
     }
     .player-card-actions button{
       border-radius:999px;
-      border:1px solid var(--border);
-      background:#020617;
-      color:var(--muted);
+      border:3px solid transparent;
+      background:radial-gradient(circle at top,#fcd34d 0,#f59e0b 50%,#d97706 100%);
+      background-clip:padding-box;
+      color:var(--gold);
       font-size:11px;
+      font-weight:700;
       padding:4px 8px;
       text-transform:uppercase;
       letter-spacing:.1em;
       cursor:pointer;
+      text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
+      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
+      position:relative;
+      overflow:hidden;
+    }
+    .player-card-actions button::after{
+      content:'';
+      position:absolute;
+      inset:0;
+      border-radius:999px;
+      padding:3px;
+      background:var(--gradient-border);
+      background-size:var(--gradient-border-size) var(--gradient-border-size);
+      -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite:xor;
+      mask-composite:exclude;
+      pointer-events:none;
+      animation:gradientShift 4s ease infinite;
+      z-index:-1;
+    }
+    .player-card-actions button:hover{
+      transform:scale(1.03);
+      box-shadow:0 0 24px var(--theme-glow),inset 0 0 16px var(--theme-glow);
     }
     .reel-charts-wrapper{
       width:100%;
@@ -1309,14 +1403,40 @@
     }
     .footer-buttons button{
       border-radius:999px;
-      border:1px solid var(--border);
-      background:#020617;
-      color:var(--muted);
+      border:3px solid transparent;
+      background:radial-gradient(circle at top,#fcd34d 0,#f59e0b 50%,#d97706 100%);
+      background-clip:padding-box;
+      color:var(--gold);
       font-size:10px;
+      font-weight:700;
       padding:4px 8px;
       text-transform:uppercase;
       letter-spacing:.1em;
       cursor:pointer;
+      text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
+      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
+      position:relative;
+      overflow:hidden;
+    }
+    .footer-buttons button::after{
+      content:'';
+      position:absolute;
+      inset:0;
+      border-radius:999px;
+      padding:3px;
+      background:var(--gradient-border);
+      background-size:var(--gradient-border-size) var(--gradient-border-size);
+      -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite:xor;
+      mask-composite:exclude;
+      pointer-events:none;
+      animation:gradientShift 4s ease infinite;
+      z-index:-1;
+    }
+    .footer-buttons button:hover{
+      transform:scale(1.03);
+      box-shadow:0 0 24px var(--theme-glow),inset 0 0 16px var(--theme-glow);
     }
     .help-card{
       width:100%;
@@ -1520,7 +1640,7 @@
       </div>
       <div class="finish-actions">
         <button type="button" id="finishCancelBtn">Cancel</button>
-        <button type="button" class="primary" id="finishSaveBtn">Save & Re-Queue</button>
+        <button type="button" class="primary" id="finishSaveBtn" style="pointer-events:auto!important;z-index:9999;position:relative;">Save & Re-Queue</button>
       </div>
     </div>
   </div>
@@ -2647,7 +2767,7 @@
     const wins = Math.max(0,parseInt(runWinsInput.value,10)||0);
     const losses = Math.max(0,parseInt(runLossesInput.value,10)||0);
     const colors = Array.from(selectedColorSet).join('');  // Keep input order, don't sort
-    const matchType = matchTypeSelect.value;
+    const matchType = matchTypeSelect ? matchTypeSelect.value : 'BO3';
     player.overallWins += wins;
     player.overallLosses += losses;
     if(colors){
