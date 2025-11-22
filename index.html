@@ -425,7 +425,7 @@
       border:3px solid transparent;
       background-clip:padding-box;
       padding:10px;
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       position:relative;
       overflow:hidden;
       display:flex;
@@ -462,7 +462,7 @@
       border:3px solid transparent;
       background-clip:padding-box;
       padding:10px;
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       position:relative;
       overflow:hidden;
     }
@@ -701,20 +701,17 @@
       background-clip:padding-box;
       color:#ffffff;
       text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
       overflow:hidden;
     }
     body.theme-gold .spin-button{
-      background-image:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
-      background-size:200% auto;
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-      -webkit-text-stroke:1px rgba(0,0,0,0.5);
-      animation:gradientShift 4s ease infinite;
-      filter:drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 16px rgba(255,255,255,0.7)) drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+      background:radial-gradient(circle at top,#fef3c7 0,#fde68a 50%,#fcd34d 100%);
+      background-clip:padding-box;
+      color:#78350f;
+      text-shadow:0 0 8px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.3);
+      font-weight:900;
     }
     .spin-button::after{
       content:'';
@@ -790,19 +787,16 @@
       letter-spacing:.12em;
       cursor:pointer;
       text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       position:relative;
       overflow:hidden;
     }
     body.theme-gold .add-player-form button{
-      background-image:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
-      background-size:200% auto;
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-      -webkit-text-stroke:1px rgba(0,0,0,0.5);
-      animation:gradientShift 4s ease infinite;
-      filter:drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 16px rgba(255,255,255,0.7)) drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+      background:radial-gradient(circle at top,#fef3c7 0,#fde68a 50%,#fcd34d 100%);
+      background-clip:padding-box;
+      color:#78350f;
+      text-shadow:0 0 8px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.3);
+      font-weight:900;
     }
     .add-player-form button::after{
       content:'';
@@ -908,7 +902,7 @@
       white-space:nowrap;
       font-weight:600;
     }
-    .pity-count{font-size:10px;color:var(--muted);}
+    .sparks-count{font-size:10px;color:var(--muted);}
     .win-rate-good{color:var(--text);font-weight:600;}
     .win-rate-medium{color:var(--text);font-weight:600;}
     .win-rate-poor{color:#ef4444;font-weight:600;}
@@ -1028,20 +1022,17 @@
       text-transform:uppercase;
       letter-spacing:.12em;
       text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
       overflow:hidden;
     }
     body.theme-gold .winner-actions button{
-      background-image:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
-      background-size:200% auto;
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-      -webkit-text-stroke:1px rgba(0,0,0,0.5);
-      animation:gradientShift 4s ease infinite;
-      filter:drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 16px rgba(255,255,255,0.7)) drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+      background:radial-gradient(circle at top,#fef3c7 0,#fde68a 50%,#fcd34d 100%);
+      background-clip:padding-box;
+      color:#78350f;
+      text-shadow:0 0 8px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.3);
+      font-weight:900;
     }
     .winner-actions button::after{
       content:'';
@@ -1154,21 +1145,18 @@
       text-transform:uppercase;
       letter-spacing:.08em;
       text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
       z-index:10;
       overflow:hidden;
     }
     body.theme-gold .adjust-btn{
-      background-image:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
-      background-size:200% auto;
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-      -webkit-text-stroke:1px rgba(0,0,0,0.5);
-      animation:gradientShift 4s ease infinite;
-      filter:drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 16px rgba(255,255,255,0.7)) drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+      background:radial-gradient(circle at top,#fef3c7 0,#fde68a 50%,#fcd34d 100%);
+      background-clip:padding-box;
+      color:#78350f;
+      text-shadow:0 0 8px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.3);
+      font-weight:900;
     }
     .adjust-btn::after{
       content:'';
@@ -1265,7 +1253,7 @@
       text-transform:uppercase;
       letter-spacing:.1em;
       text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       opacity:.6;
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
@@ -1293,14 +1281,11 @@
       box-shadow:0 0 24px var(--theme-glow),inset 0 0 16px var(--theme-glow);
     }
     body.theme-gold .queue-chip{
-      background-image:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
-      background-size:200% auto;
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-      -webkit-text-stroke:1px rgba(0,0,0,0.5);
-      animation:gradientShift 4s ease infinite;
-      filter:drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 16px rgba(255,255,255,0.7)) drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+      background:radial-gradient(circle at top,#fef3c7 0,#fde68a 50%,#fcd34d 100%);
+      background-clip:padding-box;
+      color:#78350f;
+      text-shadow:0 0 8px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.3);
+      font-weight:900;
     }
     .finish-actions{
       display:flex;
@@ -1325,21 +1310,18 @@
       letter-spacing:.12em;
       cursor:pointer;
       text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
       z-index:10;
       overflow:hidden;
     }
     body.theme-gold .finish-actions button{
-      background-image:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
-      background-size:200% auto;
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-      -webkit-text-stroke:1px rgba(0,0,0,0.5);
-      animation:gradientShift 4s ease infinite;
-      filter:drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 16px rgba(255,255,255,0.7)) drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+      background:radial-gradient(circle at top,#fef3c7 0,#fde68a 50%,#fcd34d 100%);
+      background-clip:padding-box;
+      color:#78350f;
+      text-shadow:0 0 8px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.3);
+      font-weight:900;
     }
     .finish-actions button::after{
       content:'';
@@ -1425,20 +1407,17 @@
       letter-spacing:.1em;
       cursor:pointer;
       text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
       overflow:hidden;
     }
     body.theme-gold .player-card-actions button{
-      background-image:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
-      background-size:200% auto;
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-      -webkit-text-stroke:1px rgba(0,0,0,0.5);
-      animation:gradientShift 4s ease infinite;
-      filter:drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 16px rgba(255,255,255,0.7)) drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+      background:radial-gradient(circle at top,#fef3c7 0,#fde68a 50%,#fcd34d 100%);
+      background-clip:padding-box;
+      color:#78350f;
+      text-shadow:0 0 8px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.3);
+      font-weight:900;
     }
     .player-card-actions button::after{
       content:'';
@@ -1604,20 +1583,17 @@
       letter-spacing:.1em;
       cursor:pointer;
       text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
-      box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
+      box-shadow:0 0 16px var(--theme-glow);
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
       overflow:hidden;
     }
     body.theme-gold .footer-buttons button{
-      background-image:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
-      background-size:200% auto;
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-      -webkit-text-stroke:1px rgba(0,0,0,0.5);
-      animation:gradientShift 4s ease infinite;
-      filter:drop-shadow(0 0 10px rgba(255,255,255,0.9)) drop-shadow(0 0 16px rgba(255,255,255,0.7)) drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+      background:radial-gradient(circle at top,#fef3c7 0,#fde68a 50%,#fcd34d 100%);
+      background-clip:padding-box;
+      color:#78350f;
+      text-shadow:0 0 8px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.3);
+      font-weight:900;
     }
     .footer-buttons button::after{
       content:'';
@@ -1768,7 +1744,7 @@
                   <th>Total</th>
                   <th>Slot W</th>
                   <th>W/L%</th>
-                  <th>Pity</th>
+                  <th>Sparks</th>
                   <th></th>
                 </tr>
               </thead>
@@ -1909,10 +1885,10 @@
           Spend 1 ticket on reels you appeared on. Dead spin? Tickets adjusted based on group size (smaller groups penalized, larger groups rewarded).
         </p>
 
-        <div class="help-section-title">Overflow & Pity</div>
+        <div class="help-section-title">Overflow & Sparks</div>
         <p>
-          <strong>When tickets exceed 500,</strong> overflow converts to pity tokens. Each 500 overflow = 1 pity token (max 12).
-          <strong>At 12 pity tokens,</strong> you're auto-picked before the next spin. Guaranteed win for waiting.
+          <strong>When tickets exceed 500,</strong> overflow converts to sparks. Each 500 overflow = 1 spark (max 12).
+          <strong>At 12 sparks,</strong> you're auto-picked before the next spin and Ignited. Guaranteed win for waiting.
         </p>
 
         <div class="help-section-title">Luna Luck</div>
@@ -1937,7 +1913,7 @@
     <div class="help-card">
       <div class="help-title">Hypergeometric Diagnostic</div>
       <div class="help-body">
-        <p>Simulates 300 spins with the current player list & weights (no changes to the live event). Checks for balanced win rates, CARLO/Luna frequency, 4oak/5oak occurrences, and pity party rates.</p>
+        <p>Simulates 300 spins with the current player list & weights (no changes to the live event). Checks for balanced win rates, CARLO/Luna frequency, 4oak/5oak occurrences, and Ignition rates.</p>
         <div class="finish-actions">
           <button id="runDiagNowBtn">Run Simulation</button>
           <button id="closeDiagBtn">Close</button>
@@ -1951,9 +1927,9 @@
 (function(){
   "use strict";
   const MAX_EVENTS = 7;
-  const MAX_PLAYERS = 50;
+  const MAX_PLAYERS = 75;
   const TICKET_CAP = 500;
-  const MAX_PITY_TOKENS = 12;
+  const MAX_SPARKS = 12;
   const LUNA_BASE_ODDS = 1/30;
   const CARLO_LETTER_ODDS = 1/75;
 
@@ -2090,9 +2066,9 @@
         evt.lunaHits = evt.lunaHits || 0;
         for(const p of evt.players){
           p.tickets = p.tickets || [1,1,1,1,1];
-          p.pityTokens = p.pityTokens || 0;
+          p.sparks = p.sparks || 0;
           if(p.pityPoints && p.pityPoints > 0){
-            p.pityTokens = Math.min(MAX_PITY_TOKENS, p.pityTokens + 1);
+            p.sparks = Math.min(MAX_SPARKS, p.sparks + 1);
           }
           p.pityPoints = 0;
           p.slotWins = p.slotWins || 0;
@@ -2114,8 +2090,8 @@
       if(p.tickets[i] < 1) p.tickets[i] = 1;  // Never allow 0 tickets
       if(p.tickets[i] > TICKET_CAP) p.tickets[i] = TICKET_CAP;
     }
-    if(p.pityTokens < 0) p.pityTokens = 0;
-    if(p.pityTokens > MAX_PITY_TOKENS) p.pityTokens = MAX_PITY_TOKENS;
+    if(p.sparks < 0) p.sparks = 0;
+    if(p.sparks > MAX_SPARKS) p.sparks = MAX_SPARKS;
   }
 
   function totalTickets(p){
@@ -2136,7 +2112,6 @@
   }
 
   function renderEvents(){
-    // Event system UI removed - events still work in background but no UI for switching
   }
 
   function initBulbs(){
@@ -2170,18 +2145,40 @@
     const bottom = bulbRowBottom.querySelectorAll('.bulb');
     const left = bulbColLeft.querySelectorAll('.bulb');
     const right = bulbColRight.querySelectorAll('.bulb');
-    const all = [...top,...bottom,...left,...right];
+
+    // Arrange bulbs in clockwise rotation order: top-left to top-right, then right-top to right-bottom, then bottom-right to bottom-left, then left-bottom to left-top
+    const topArray = Array.from(top);
+    const rightArray = Array.from(right);
+    const bottomArray = Array.from(bottom).reverse();
+    const leftArray = Array.from(left).reverse();
+    const all = [...topArray, ...rightArray, ...bottomArray, ...leftArray];
+
     let t = 0;
+    const trailLength = 8; // Number of bulbs to light up in the trail
     bulbsTimer = setInterval(()=>{
       const colors = isLuna ? BULB_LUNA_COLORS : BULB_COLORS;
-      all.forEach((b,idx)=>{
-        const c = colors[(idx + t) % colors.length];
-        b.style.color = c;
-        b.style.background = c;
-        b.classList.add('active');
+
+      // Turn off all bulbs first
+      all.forEach(b => {
+        b.classList.remove('active');
+        b.style.background = '#4b5563';
+        b.style.color = '#4b5563';
       });
-      t++;
-    },120);
+
+      // Light up trailing bulbs with gradient effect
+      for(let i = 0; i < trailLength; i++){
+        const idx = (t - i + all.length) % all.length;
+        const bulb = all[idx];
+        const colorIdx = Math.floor(i / 2) % colors.length;
+        const c = colors[colorIdx];
+        const opacity = 1 - (i / trailLength) * 0.7; // Fade trail
+        bulb.style.color = c;
+        bulb.style.background = c;
+        bulb.style.opacity = opacity;
+        bulb.classList.add('active');
+      }
+      t = (t + 1) % all.length;
+    },80);
   }
   function stopBulbsAnimation(){
     if(bulbsTimer) clearInterval(bulbsTimer);
@@ -2320,7 +2317,7 @@
       id: Date.now() + Math.random().toString(16).slice(2),
       name,
       tickets:[1,1,1,1,1],
-      pityTokens:0,
+      sparks:0,
       slotWins:0,
       slotGames:0,
       overallWins:0,
@@ -2353,7 +2350,7 @@
     return candidates[candidates.length-1];
   }
 
-  function applyOverflowToPity(player, overflow){
+  function applyOverflowToSparks(player, overflow){
     if(overflow <= 0) return;
     let tokens;
     if(overflow < TICKET_CAP){
@@ -2361,12 +2358,12 @@
     } else {
       tokens = Math.floor(overflow / TICKET_CAP);
     }
-    player.pityTokens = Math.min(MAX_PITY_TOKENS, (player.pityTokens || 0) + tokens);
+    player.sparks = Math.min(MAX_SPARKS, (player.sparks || 0) + tokens);
   }
 
   function doubleTicketsAllReels(player){
     const oldTotal = totalTickets(player);
-    const oldPity = player.pityTokens || 0;
+    const oldSparks = player.sparks || 0;
     for(let i=0;i<5;i++){
       const raw = player.tickets[i] * 2;
       if(raw <= TICKET_CAP){
@@ -2376,9 +2373,9 @@
         // Overflow: raw exceeds 500 cap
         const overflow = raw - TICKET_CAP;
 
-        // Calculate pity tokens from overflow
-        const pityTokens = overflow < TICKET_CAP ? 1 : Math.floor(overflow / TICKET_CAP);
-        player.pityTokens = Math.min(MAX_PITY_TOKENS, (player.pityTokens || 0) + pityTokens);
+        // Calculate sparks from overflow
+        const sparks = overflow < TICKET_CAP ? 1 : Math.floor(overflow / TICKET_CAP);
+        player.sparks = Math.min(MAX_SPARKS, (player.sparks || 0) + sparksFromOverflow);
 
         // Calculate remaining tickets after overflow
         let newTickets = overflow % TICKET_CAP;
@@ -2391,9 +2388,9 @@
     }
     clampPlayer(player);
     const newTotal = totalTickets(player);
-    const newPity = player.pityTokens;
-    if(newPity > oldPity){
-      log(`${player.name}: tickets ${oldTotal}→${newTotal}, pity ${oldPity}→${newPity} (+${newPity-oldPity})`);
+    const newSparks = player.sparks;
+    if(newSparks > oldSparks){
+      log(`${player.name}: tickets ${oldTotal}→${newTotal}, sparks ${oldSparks}→${newSparks} (+${newSparks-oldSparks})`);
     }
   }
 
@@ -2466,12 +2463,12 @@
     }
   }
 
-  function findPityAutoPick(evt){
-    const candidates = evt.players.filter(p => p.status === 'active' && p.pityTokens >= MAX_PITY_TOKENS);
+  function findIgnitedPlayer(evt){
+    const candidates = evt.players.filter(p => p.status === 'active' && p.sparks >= MAX_SPARKS);
     if(candidates.length === 0) return null;
     candidates.sort((a,b) => {
       if(a.createdAt !== b.createdAt) return a.createdAt - b.createdAt;
-      if(b.pityTokens !== a.pityTokens) return b.pityTokens - a.pityTokens;
+      if(b.sparks !== a.sparks) return b.sparks - a.sparks;
       const totDiff = totalTickets(b) - totalTickets(a);
       if(totDiff !== 0) return totDiff;
       return a.name.localeCompare(b.name);
@@ -2636,9 +2633,9 @@
       tdName.addEventListener('click',()=>openPlayerCard(p.id));
       const tdTotal = document.createElement('td');
       tdTotal.textContent = totalTickets(p);
-      const tdPity = document.createElement('td');
-      const pityText = p.pityTokens > 0 ? `${p.pityTokens} / ${MAX_PITY_TOKENS}` : '';
-      tdPity.innerHTML = `<span class="pity-count">${pityText}</span>`;
+      const tdSparks = document.createElement('td');
+      const sparksText = p.sparks > 0 ? `${p.sparks} / ${MAX_SPARKS}` : '';
+      tdSparks.innerHTML = `<span class="sparks-count">${sparksText}</span>`;
       const tdSlotWins = document.createElement('td');
       tdSlotWins.textContent = `${p.slotWins}`;
       const tdWL = document.createElement('td');
@@ -2665,7 +2662,7 @@
       tr1.appendChild(tdTotal);
       tr1.appendChild(tdSlotWins);
       tr1.appendChild(tdWL);
-      tr1.appendChild(tdPity);
+      tr1.appendChild(tdSparks);
       tr1.appendChild(tdActions);
 
       leaderboardBody.appendChild(tr1);
@@ -2864,9 +2861,9 @@
     if(reason==='luna'){
       winnerHeading.textContent = 'LUNA LUCK!';
       winnerMetaEl.textContent = `${player.name} wins with Luna Luck!`;
-    }else if(reason==='pity'){
-      winnerHeading.textContent = 'FATE PICK';
-      winnerMetaEl.textContent = `${player.name} reached max pity and is chosen automatically.`;
+    }else if(reason==='ignited'){
+      winnerHeading.textContent = 'IGNITED!';
+      winnerMetaEl.textContent = `${player.name} has ${MAX_SPARKS} sparks & has been Ignited.`;
     }else if(reason==='carlo'){
       winnerHeading.textContent = 'CARLO PICK';
       winnerMetaEl.textContent = `CARLO hit – streamer plays their own deck this round.`;
@@ -2983,8 +2980,9 @@
     if(colors){
       let deck = player.decks.find(d=>d.color===colors);
       if(!deck){
-        // Check 15 deck limit
-        if(player.decks.length >= 15){
+        // Check 32 deck limit - supports all MTG color identities:
+        // 5 mono (W,U,B,R,G) + 10 dual + 10 triple + 5 four-color + 1 five-color + 1 colorless
+        if(player.decks.length >= 32){
           // Remove deck with lowest win percentage
           const sorted = player.decks.slice().sort((a,b)=>{
             const winRateA = (a.wins+a.losses)>0 ? a.wins/(a.wins+a.losses) : 0;
@@ -2996,7 +2994,7 @@
           const idx = player.decks.indexOf(toRemove);
           if(idx >= 0){
             player.decks.splice(idx, 1);
-            log(`${player.name} reached 15 deck limit. Removed deck ${toRemove.color} (lowest win rate).`);
+            log(`${player.name} reached 32 deck limit. Removed deck ${toRemove.color} (lowest win rate).`);
           }
         }
         deck = {color:colors,wins:0,losses:0,lastBestOf:null};
@@ -3041,19 +3039,19 @@
         if(newTickets > TICKET_CAP){
           const overflow = newTickets - TICKET_CAP;
           newTickets = TICKET_CAP;
-          applyOverflowToPity(player, overflow);
+          applyOverflowToSparks(player, overflow);
         }
         player.tickets[i] = newTickets;
       }
-      player.pityTokens = 0;
+      player.sparks = 0;
       player.createdAt = Date.now();
       clampPlayer(player);
       log(`${player.name} re-added to queue with ${baseTickets} ticket(s) per reel.`);
 
       // When winner re-enters, double all other active players' tickets (patience reward)
-      // EXCEPT for pity wins - don't double on pity re-entry to prevent pity party feedback loop
-      const isPityWin = currentWinnerMeta && currentWinnerMeta.reason === 'pity';
-      if(!isPityWin){
+      // EXCEPT for ignited wins - don't double on ignited re-entry to prevent feedback loop
+      const isIgnitedWin = currentWinnerMeta && currentWinnerMeta.reason === 'ignited';
+      if(!isIgnitedWin){
         for(const other of evt.players){
           if(other.id === player.id) continue;
           if(other.status !== 'active') continue;
@@ -3061,7 +3059,7 @@
         }
         log(`All other players' tickets doubled (patience reward for ${player.name} re-entry).`);
       }else{
-        log(`Pity win re-entry: no doubling for others (prevents pity party feedback loop).`);
+        log(`Ignited win re-entry: no doubling for others (prevents feedback loop).`);
       }
     }else{
       player.status='afk';
@@ -3081,14 +3079,14 @@
       finishOverlay.classList.add('show');
       return;
     }
-    const pityPick = findPityAutoPick(evt);
-    if(pityPick){
-      log(`Auto-pick from pity: ${pityPick.name}`);
-      // Start bulb celebration for pity pick
+    const ignitedPlayer = findIgnitedPlayer(evt);
+    if(ignitedPlayer){
+      log(`<span style="color:#06d6a0;font-weight:600;">${ignitedPlayer.sparks} sparks & has been Ignited</span>`);
+      // Start bulb celebration for ignited player
       startBulbsAnimation(false);
       setTimeout(()=>{
         stopBulbsAnimation();
-        handleWinnerBanner(pityPick,'pity',3,false);
+        handleWinnerBanner(ignitedPlayer,'ignited',3,false);
       },1200);
       renderLeaderboard();
       saveAll();
@@ -3166,7 +3164,9 @@
       if(winner){
         // Winner found: Bulbs already running, handle tickets then show banner
         handleWinTickets(evt,winner,symbols,reelPlayers);
-        log(`${winner.name} wins the slot (${reason}, hits=${hits}).`);
+        // Color code: pink for Luna wins, green for regular wins
+        const winColor = isLunaWin ? '#f973fa' : '#22c55e';
+        log(`<span style="color:${winColor};font-weight:600;">${winner.name} wins the slot (${reason}, hits=${hits}).</span>`);
         // Short delay after last reel stops before showing winner banner
         setTimeout(()=>{
           stopBulbsAnimation();
@@ -3213,7 +3213,6 @@
 
     return false;
   });
-  // Event chip switching removed - using single event model
 
   helpBtn.addEventListener('click',()=>helpOverlay.classList.add('show'));
   closeHelpBtn.addEventListener('click',()=>helpOverlay.classList.remove('show'));
@@ -3304,9 +3303,9 @@
     const passLuna = sim.luna>=10;
     const passFourKind = sim.fourKind>=2;
     const passFiveKind = sim.fiveKind>=1;
-    const pityRate = (sim.pityWins / 300 * 100).toFixed(1);
-    const passPity = sim.pityWins <= 30; // Less than 10% is good
-    const allPass = passWins && passCarlo && passLuna && passFourKind && passFiveKind && passPity;
+    const ignitedRate = (sim.ignitedWins / 300 * 100).toFixed(1);
+    const passIgnited = sim.ignitedWins <= 30; // Less than 10% is good
+    const allPass = passWins && passCarlo && passLuna && passFourKind && passFiveKind && passIgnited;
     diagResult.innerHTML = `
       <div><strong>Simulated 300 spins (Hypergeometric):</strong></div>
       <div>Total wins: ${sim.wins} ${passWins?'<span class="pass">(≥100 ✓)</span>':'<span class="warn">(Need ≥100)</span>'}</div>
@@ -3314,7 +3313,7 @@
       <div>Luna Luck wins: ${sim.luna} ${passLuna?'<span class="pass">(≥10 ✓)</span>':'<span class="warn">(Need ≥10)</span>'}</div>
       <div>4-of-a-kind: ${sim.fourKind} ${passFourKind?'<span class="pass">(≥2 ✓)</span>':'<span class="warn">(Need ≥2)</span>'}</div>
       <div>5-of-a-kind: ${sim.fiveKind} ${passFiveKind?'<span class="pass">(≥1 ✓)</span>':'<span class="warn">(Need ≥1)</span>'}</div>
-      <div>Pity wins: ${sim.pityWins} (${pityRate}%) ${passPity?'<span class="pass">(≤10% ✓)</span>':'<span class="warn">(>10% - too many)</span>'}</div>
+      <div>Ignited wins: ${sim.ignitedWins} (${ignitedRate}%) ${passIgnited?'<span class="pass">(≤10% ✓)</span>':'<span class="warn">(>10% - too many)</span>'}</div>
       <div style="margin-top:8px;font-weight:700;">${allPass?'<span class="pass">All checks PASSED ✓</span>':'<span class="warn">Some checks FAILED</span>'}</div>
     `;
   });
@@ -3324,7 +3323,7 @@
       return {
         name:p.name,
         tickets:p.tickets.slice(),
-        pityTokens:p.pityTokens,
+        sparks:p.sparks,
         createdAt:p.createdAt
       };
     });
@@ -3346,18 +3345,18 @@
       });
     }
     normTickets();
-    let wins=0, carlo=0, luna=0, fourKind=0, fiveKind=0, pityWins=0;
+    let wins=0, carlo=0, luna=0, fourKind=0, fiveKind=0, ignitedWins=0;
     for(let spin=0;spin<spins;spin++){
-      const candPity = players.filter(p=>p.pityTokens>=MAX_PITY_TOKENS);
-      if(candPity.length>0){
-        candPity.sort((a,b)=>{
+      const candIgnited = players.filter(p=>p.sparks>=MAX_SPARKS);
+      if(candIgnited.length>0){
+        candIgnited.sort((a,b)=>{
           if(a.createdAt !== b.createdAt) return a.createdAt - b.createdAt;
-          if(b.pityTokens !== a.pityTokens) return b.pityTokens - a.pityTokens;
+          if(b.sparks !== a.sparks) return b.sparks - a.sparks;
           const td = totalTickets(b) - totalTickets(a);
           return td !== 0 ? td : a.name.localeCompare(b.name);
         });
-        const p = candPity[0];
-        wins++;pityWins++;p.pityTokens=0;
+        const p = candIgnited[0];
+        wins++;ignitedWins++;p.sparks=0;
         continue;
       }
       const active = players.slice();
@@ -3412,7 +3411,7 @@
         if(hitCount===5) fiveKind++;
       }
     }
-    return {wins, carlo, luna, fourKind, fiveKind, pityWins};
+    return {wins, carlo, luna, fourKind, fiveKind, ignitedWins};
   }
 
   function toggleThemeColor(code){
@@ -3457,37 +3456,89 @@
     localStorage.setItem('carlo_theme_multi', JSON.stringify(Array.from(selectedColors)));
   }
 
+  // MTG Color Identity Mappings - Proper ordering for all combinations
+  const COLOR_HEX = {
+    'W': '#fefce8',
+    'U': '#38bdf8',
+    'B': '#4b5563',
+    'R': '#fb4b4b',
+    'G': '#22c55e'
+  };
+
+  const MTG_COLOR_ORDERS = {
+    // Mono (5)
+    'W': ['W'],
+    'U': ['U'],
+    'B': ['B'],
+    'R': ['R'],
+    'G': ['G'],
+    // Dual (10) - Allied pairs
+    'WU': ['W','U'], // Azorius
+    'UB': ['U','B'], // Dimir
+    'BR': ['B','R'], // Rakdos
+    'RG': ['R','G'], // Gruul
+    'GW': ['G','W'], // Selesnya
+    // Dual - Enemy pairs
+    'WB': ['W','B'], // Orzhov
+    'UR': ['U','R'], // Izzet
+    'BG': ['B','G'], // Golgari
+    'WR': ['W','R'], // Boros
+    'UG': ['U','G'], // Simic
+    // Triple (10) - Shards
+    'GWU': ['G','W','U'], // Bant
+    'WUB': ['W','U','B'], // Esper
+    'UBR': ['U','B','R'], // Grixis
+    'BRG': ['B','R','G'], // Jund
+    'RGW': ['R','G','W'], // Naya
+    // Triple - Wedges
+    'WBG': ['W','B','G'], // Abzan
+    'URW': ['U','R','W'], // Jeskai
+    'BGU': ['B','G','U'], // Sultai
+    'RWB': ['R','W','B'], // Mardu
+    'GUR': ['G','U','R'], // Temur
+    // Four-color (5)
+    'UBRG': ['U','B','R','G'],
+    'BRGW': ['B','R','G','W'],
+    'RGWU': ['R','G','W','U'],
+    'GWUB': ['G','W','U','B'],
+    'WUBR': ['W','U','B','R'],
+    // Five-color (1)
+    'WUBRG': ['W','U','B','R','G']
+  };
+
+  function getColorIdentityKey(colorSet){
+    const sorted = Array.from(colorSet).sort((a,b)=>{
+      const order = ['W','U','B','R','G'];
+      return order.indexOf(a) - order.indexOf(b);
+    });
+    return sorted.join('');
+  }
+
   function applyGradientGlow(){
-    // No colors selected - remove all glows
+    // No colors selected - default to gold
     if(selectedColors.size === 0){
-      document.documentElement.style.setProperty('--gradient-border', 'transparent');
-      document.documentElement.style.setProperty('--gradient-border-size', '100%');
-      document.documentElement.style.setProperty('--logo-ring-gradient', 'transparent');
-      document.documentElement.style.setProperty('--theme-glow', 'rgba(0,0,0,0)');
+      const goldGradient = 'linear-gradient(90deg, #fcd34d, #f59e0b, #d97706, #fcd34d)';
+      document.documentElement.style.setProperty('--gradient-border', goldGradient);
+      document.documentElement.style.setProperty('--gradient-border-size', '200%');
+      document.documentElement.style.setProperty('--logo-ring-gradient', `conic-gradient(from 0deg, #fcd34d 0deg 60deg, transparent 60deg 120deg, #fcd34d 120deg 180deg, transparent 180deg 240deg, #fcd34d 240deg 300deg, transparent 300deg 360deg)`);
+      document.documentElement.style.setProperty('--theme-glow', 'rgba(250,204,21,0.4)');
       return;
     }
 
-    const colors = Array.from(selectedColors).map(code=>{
-      if(code==='W') return '#fefce8';
-      if(code==='U') return '#38bdf8';
-      if(code==='B') return '#4b5563';
-      if(code==='R') return '#fb4b4b';
-      if(code==='G') return '#22c55e';
-      return '#fcd34d';
-    });
+    // Get the proper MTG color order for this combination
+    const identityKey = getColorIdentityKey(selectedColors);
+    const colorOrder = MTG_COLOR_ORDERS[identityKey] || Array.from(selectedColors);
+    const colors = colorOrder.map(code => COLOR_HEX[code]);
 
-    // All 5 selected = gold with all colors cycling
+    // All 5 selected = gold with WUBRG order
     if(selectedColors.size === 5){
-      const allColors = '#fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e';
-      const allColorsArray = ['#fefce8', '#38bdf8', '#4b5563', '#fb4b4b', '#22c55e'];
+      const allColors = colors.join(', ');
       document.documentElement.style.setProperty('--multi-theme-gradient', '#fcd34d');
       document.documentElement.style.setProperty('--gradient-border', `linear-gradient(90deg, ${allColors}, ${allColors})`);
       document.documentElement.style.setProperty('--gradient-border-size', '200%');
-      // Gold mode: rainbow gradient text for buttons
       document.documentElement.style.setProperty('--button-text-color', `linear-gradient(90deg, ${allColors})`);
       document.documentElement.style.setProperty('--button-text-is-gradient', '1');
-      // Create conic gradient segments for logo ring
-      const segments = allColorsArray.map((c, i) => {
+      const segments = colors.map((c, i) => {
         const start = i * 72;
         const end = start + 36;
         return `${c} ${start}deg ${end}deg, transparent ${end}deg ${(i + 1) * 72}deg`;
@@ -3500,22 +3551,20 @@
     document.documentElement.style.setProperty('--button-text-color', '#ffffff');
     document.documentElement.style.setProperty('--button-text-is-gradient', '0');
 
-    // Create animated gradient for borders/glows
+    // Create animated gradient with proper MTG color order
     if(colors.length > 1){
-      // Multi-color gradient
       const gradient = `linear-gradient(90deg, ${colors.join(', ')}, ${colors.join(', ')})`;
       document.documentElement.style.setProperty('--multi-theme-gradient', gradient);
       document.documentElement.style.setProperty('--gradient-border', gradient);
       document.documentElement.style.setProperty('--gradient-border-size', '200%');
     } else {
-      // Single color - create gradient with same color repeated for animation
       const singleColorGradient = `linear-gradient(90deg, ${colors[0]}, ${colors[0]}, ${colors[0]})`;
       document.documentElement.style.setProperty('--multi-theme-gradient', singleColorGradient);
       document.documentElement.style.setProperty('--gradient-border', singleColorGradient);
       document.documentElement.style.setProperty('--gradient-border-size', '200%');
     }
 
-    // Create conic gradient for logo ring based on selected colors
+    // Create conic gradient for logo ring
     if(colors.length > 1){
       const segments = colors.map((c, i) => {
         const degreesPerColor = 360 / colors.length;
@@ -3525,7 +3574,6 @@
       }).join(', ');
       document.documentElement.style.setProperty('--logo-ring-gradient', `conic-gradient(from 0deg, ${segments})`);
     } else {
-      // Single color - use solid segments
       document.documentElement.style.setProperty('--logo-ring-gradient', `conic-gradient(from 0deg,
         ${colors[0]} 0deg 60deg,
         transparent 60deg 120deg,
