@@ -902,7 +902,7 @@
       white-space:nowrap;
       font-weight:600;
     }
-    .pity-count{font-size:10px;color:var(--muted);}
+    .sparks-count{font-size:10px;color:var(--muted);}
     .win-rate-good{color:var(--text);font-weight:600;}
     .win-rate-medium{color:var(--text);font-weight:600;}
     .win-rate-poor{color:#ef4444;font-weight:600;}
@@ -1744,7 +1744,7 @@
                   <th>Total</th>
                   <th>Slot W</th>
                   <th>W/L%</th>
-                  <th>Pity</th>
+                  <th>Sparks</th>
                   <th></th>
                 </tr>
               </thead>
@@ -1885,10 +1885,10 @@
           Spend 1 ticket on reels you appeared on. Dead spin? Tickets adjusted based on group size (smaller groups penalized, larger groups rewarded).
         </p>
 
-        <div class="help-section-title">Overflow & Pity</div>
+        <div class="help-section-title">Overflow & Sparks</div>
         <p>
-          <strong>When tickets exceed 500,</strong> overflow converts to pity tokens. Each 500 overflow = 1 pity token (max 12).
-          <strong>At 12 pity tokens,</strong> you're auto-picked before the next spin. Guaranteed win for waiting.
+          <strong>When tickets exceed 500,</strong> overflow converts to sparks. Each 500 overflow = 1 spark (max 12).
+          <strong>At 12 sparks,</strong> you're auto-picked before the next spin and Ignited. Guaranteed win for waiting.
         </p>
 
         <div class="help-section-title">Luna Luck</div>
@@ -1913,7 +1913,7 @@
     <div class="help-card">
       <div class="help-title">Hypergeometric Diagnostic</div>
       <div class="help-body">
-        <p>Simulates 300 spins with the current player list & weights (no changes to the live event). Checks for balanced win rates, CARLO/Luna frequency, 4oak/5oak occurrences, and pity party rates.</p>
+        <p>Simulates 300 spins with the current player list & weights (no changes to the live event). Checks for balanced win rates, CARLO/Luna frequency, 4oak/5oak occurrences, and Ignition rates.</p>
         <div class="finish-actions">
           <button id="runDiagNowBtn">Run Simulation</button>
           <button id="closeDiagBtn">Close</button>
@@ -1929,7 +1929,7 @@
   const MAX_EVENTS = 7;
   const MAX_PLAYERS = 50;
   const TICKET_CAP = 500;
-  const MAX_PITY_TOKENS = 12;
+  const MAX_SPARKS = 12;
   const LUNA_BASE_ODDS = 1/30;
   const CARLO_LETTER_ODDS = 1/75;
 
@@ -2066,9 +2066,9 @@
         evt.lunaHits = evt.lunaHits || 0;
         for(const p of evt.players){
           p.tickets = p.tickets || [1,1,1,1,1];
-          p.pityTokens = p.pityTokens || 0;
+          p.sparks = p.sparks || 0;
           if(p.pityPoints && p.pityPoints > 0){
-            p.pityTokens = Math.min(MAX_PITY_TOKENS, p.pityTokens + 1);
+            p.sparks = Math.min(MAX_SPARKS, p.sparks + 1);
           }
           p.pityPoints = 0;
           p.slotWins = p.slotWins || 0;
@@ -2090,8 +2090,8 @@
       if(p.tickets[i] < 1) p.tickets[i] = 1;  // Never allow 0 tickets
       if(p.tickets[i] > TICKET_CAP) p.tickets[i] = TICKET_CAP;
     }
-    if(p.pityTokens < 0) p.pityTokens = 0;
-    if(p.pityTokens > MAX_PITY_TOKENS) p.pityTokens = MAX_PITY_TOKENS;
+    if(p.sparks < 0) p.sparks = 0;
+    if(p.sparks > MAX_SPARKS) p.sparks = MAX_SPARKS;
   }
 
   function totalTickets(p){
@@ -2112,7 +2112,6 @@
   }
 
   function renderEvents(){
-    // Event system UI removed - events still work in background but no UI for switching
   }
 
   function initBulbs(){
@@ -2318,7 +2317,7 @@
       id: Date.now() + Math.random().toString(16).slice(2),
       name,
       tickets:[1,1,1,1,1],
-      pityTokens:0,
+      sparks:0,
       slotWins:0,
       slotGames:0,
       overallWins:0,
@@ -2351,7 +2350,7 @@
     return candidates[candidates.length-1];
   }
 
-  function applyOverflowToPity(player, overflow){
+  function applyOverflowToSparks(player, overflow){
     if(overflow <= 0) return;
     let tokens;
     if(overflow < TICKET_CAP){
@@ -2359,12 +2358,12 @@
     } else {
       tokens = Math.floor(overflow / TICKET_CAP);
     }
-    player.pityTokens = Math.min(MAX_PITY_TOKENS, (player.pityTokens || 0) + tokens);
+    player.sparks = Math.min(MAX_SPARKS, (player.sparks || 0) + tokens);
   }
 
   function doubleTicketsAllReels(player){
     const oldTotal = totalTickets(player);
-    const oldPity = player.pityTokens || 0;
+    const oldSparks = player.sparks || 0;
     for(let i=0;i<5;i++){
       const raw = player.tickets[i] * 2;
       if(raw <= TICKET_CAP){
@@ -2374,9 +2373,9 @@
         // Overflow: raw exceeds 500 cap
         const overflow = raw - TICKET_CAP;
 
-        // Calculate pity tokens from overflow
-        const pityTokens = overflow < TICKET_CAP ? 1 : Math.floor(overflow / TICKET_CAP);
-        player.pityTokens = Math.min(MAX_PITY_TOKENS, (player.pityTokens || 0) + pityTokens);
+        // Calculate sparks from overflow
+        const sparks = overflow < TICKET_CAP ? 1 : Math.floor(overflow / TICKET_CAP);
+        player.sparks = Math.min(MAX_SPARKS, (player.sparks || 0) + sparksFromOverflow);
 
         // Calculate remaining tickets after overflow
         let newTickets = overflow % TICKET_CAP;
@@ -2389,9 +2388,9 @@
     }
     clampPlayer(player);
     const newTotal = totalTickets(player);
-    const newPity = player.pityTokens;
-    if(newPity > oldPity){
-      log(`${player.name}: tickets ${oldTotal}→${newTotal}, pity ${oldPity}→${newPity} (+${newPity-oldPity})`);
+    const newSparks = player.sparks;
+    if(newSparks > oldSparks){
+      log(`${player.name}: tickets ${oldTotal}→${newTotal}, sparks ${oldSparks}→${newSparks} (+${newSparks-oldSparks})`);
     }
   }
 
@@ -2464,12 +2463,12 @@
     }
   }
 
-  function findPityAutoPick(evt){
-    const candidates = evt.players.filter(p => p.status === 'active' && p.pityTokens >= MAX_PITY_TOKENS);
+  function findIgnitedPlayer(evt){
+    const candidates = evt.players.filter(p => p.status === 'active' && p.sparks >= MAX_SPARKS);
     if(candidates.length === 0) return null;
     candidates.sort((a,b) => {
       if(a.createdAt !== b.createdAt) return a.createdAt - b.createdAt;
-      if(b.pityTokens !== a.pityTokens) return b.pityTokens - a.pityTokens;
+      if(b.sparks !== a.sparks) return b.sparks - a.sparks;
       const totDiff = totalTickets(b) - totalTickets(a);
       if(totDiff !== 0) return totDiff;
       return a.name.localeCompare(b.name);
@@ -2634,9 +2633,9 @@
       tdName.addEventListener('click',()=>openPlayerCard(p.id));
       const tdTotal = document.createElement('td');
       tdTotal.textContent = totalTickets(p);
-      const tdPity = document.createElement('td');
-      const pityText = p.pityTokens > 0 ? `${p.pityTokens} / ${MAX_PITY_TOKENS}` : '';
-      tdPity.innerHTML = `<span class="pity-count">${pityText}</span>`;
+      const tdSparks = document.createElement('td');
+      const sparksText = p.sparks > 0 ? `${p.sparks} / ${MAX_SPARKS}` : '';
+      tdSparks.innerHTML = `<span class="sparks-count">${sparksText}</span>`;
       const tdSlotWins = document.createElement('td');
       tdSlotWins.textContent = `${p.slotWins}`;
       const tdWL = document.createElement('td');
@@ -2663,7 +2662,7 @@
       tr1.appendChild(tdTotal);
       tr1.appendChild(tdSlotWins);
       tr1.appendChild(tdWL);
-      tr1.appendChild(tdPity);
+      tr1.appendChild(tdSparks);
       tr1.appendChild(tdActions);
 
       leaderboardBody.appendChild(tr1);
@@ -2862,9 +2861,9 @@
     if(reason==='luna'){
       winnerHeading.textContent = 'LUNA LUCK!';
       winnerMetaEl.textContent = `${player.name} wins with Luna Luck!`;
-    }else if(reason==='pity'){
-      winnerHeading.textContent = 'FATE PICK';
-      winnerMetaEl.textContent = `${player.name} reached max pity and is chosen automatically.`;
+    }else if(reason==='ignited'){
+      winnerHeading.textContent = 'IGNITED!';
+      winnerMetaEl.textContent = `${player.name} has ${MAX_SPARKS} sparks & has been Ignited.`;
     }else if(reason==='carlo'){
       winnerHeading.textContent = 'CARLO PICK';
       winnerMetaEl.textContent = `CARLO hit – streamer plays their own deck this round.`;
@@ -3039,19 +3038,19 @@
         if(newTickets > TICKET_CAP){
           const overflow = newTickets - TICKET_CAP;
           newTickets = TICKET_CAP;
-          applyOverflowToPity(player, overflow);
+          applyOverflowToSparks(player, overflow);
         }
         player.tickets[i] = newTickets;
       }
-      player.pityTokens = 0;
+      player.sparks = 0;
       player.createdAt = Date.now();
       clampPlayer(player);
       log(`${player.name} re-added to queue with ${baseTickets} ticket(s) per reel.`);
 
       // When winner re-enters, double all other active players' tickets (patience reward)
-      // EXCEPT for pity wins - don't double on pity re-entry to prevent pity party feedback loop
-      const isPityWin = currentWinnerMeta && currentWinnerMeta.reason === 'pity';
-      if(!isPityWin){
+      // EXCEPT for ignited wins - don't double on ignited re-entry to prevent feedback loop
+      const isIgnitedWin = currentWinnerMeta && currentWinnerMeta.reason === 'ignited';
+      if(!isIgnitedWin){
         for(const other of evt.players){
           if(other.id === player.id) continue;
           if(other.status !== 'active') continue;
@@ -3059,7 +3058,7 @@
         }
         log(`All other players' tickets doubled (patience reward for ${player.name} re-entry).`);
       }else{
-        log(`Pity win re-entry: no doubling for others (prevents pity party feedback loop).`);
+        log(`Ignited win re-entry: no doubling for others (prevents feedback loop).`);
       }
     }else{
       player.status='afk';
@@ -3079,14 +3078,14 @@
       finishOverlay.classList.add('show');
       return;
     }
-    const pityPick = findPityAutoPick(evt);
-    if(pityPick){
-      log(`<span style="color:#22c55e;font-weight:600;">Auto-pick from pity: ${pityPick.name}</span>`);
-      // Start bulb celebration for pity pick
+    const ignitedPlayer = findIgnitedPlayer(evt);
+    if(ignitedPlayer){
+      log(`<span style="color:#06d6a0;font-weight:600;">${ignitedPlayer.sparks} sparks & has been Ignited</span>`);
+      // Start bulb celebration for ignited player
       startBulbsAnimation(false);
       setTimeout(()=>{
         stopBulbsAnimation();
-        handleWinnerBanner(pityPick,'pity',3,false);
+        handleWinnerBanner(ignitedPlayer,'ignited',3,false);
       },1200);
       renderLeaderboard();
       saveAll();
@@ -3213,7 +3212,6 @@
 
     return false;
   });
-  // Event chip switching removed - using single event model
 
   helpBtn.addEventListener('click',()=>helpOverlay.classList.add('show'));
   closeHelpBtn.addEventListener('click',()=>helpOverlay.classList.remove('show'));
@@ -3304,9 +3302,9 @@
     const passLuna = sim.luna>=10;
     const passFourKind = sim.fourKind>=2;
     const passFiveKind = sim.fiveKind>=1;
-    const pityRate = (sim.pityWins / 300 * 100).toFixed(1);
-    const passPity = sim.pityWins <= 30; // Less than 10% is good
-    const allPass = passWins && passCarlo && passLuna && passFourKind && passFiveKind && passPity;
+    const ignitedRate = (sim.ignitedWins / 300 * 100).toFixed(1);
+    const passIgnited = sim.ignitedWins <= 30; // Less than 10% is good
+    const allPass = passWins && passCarlo && passLuna && passFourKind && passFiveKind && passIgnited;
     diagResult.innerHTML = `
       <div><strong>Simulated 300 spins (Hypergeometric):</strong></div>
       <div>Total wins: ${sim.wins} ${passWins?'<span class="pass">(≥100 ✓)</span>':'<span class="warn">(Need ≥100)</span>'}</div>
@@ -3314,7 +3312,7 @@
       <div>Luna Luck wins: ${sim.luna} ${passLuna?'<span class="pass">(≥10 ✓)</span>':'<span class="warn">(Need ≥10)</span>'}</div>
       <div>4-of-a-kind: ${sim.fourKind} ${passFourKind?'<span class="pass">(≥2 ✓)</span>':'<span class="warn">(Need ≥2)</span>'}</div>
       <div>5-of-a-kind: ${sim.fiveKind} ${passFiveKind?'<span class="pass">(≥1 ✓)</span>':'<span class="warn">(Need ≥1)</span>'}</div>
-      <div>Pity wins: ${sim.pityWins} (${pityRate}%) ${passPity?'<span class="pass">(≤10% ✓)</span>':'<span class="warn">(>10% - too many)</span>'}</div>
+      <div>Ignited wins: ${sim.ignitedWins} (${ignitedRate}%) ${passIgnited?'<span class="pass">(≤10% ✓)</span>':'<span class="warn">(>10% - too many)</span>'}</div>
       <div style="margin-top:8px;font-weight:700;">${allPass?'<span class="pass">All checks PASSED ✓</span>':'<span class="warn">Some checks FAILED</span>'}</div>
     `;
   });
@@ -3324,7 +3322,7 @@
       return {
         name:p.name,
         tickets:p.tickets.slice(),
-        pityTokens:p.pityTokens,
+        sparks:p.sparks,
         createdAt:p.createdAt
       };
     });
@@ -3346,18 +3344,18 @@
       });
     }
     normTickets();
-    let wins=0, carlo=0, luna=0, fourKind=0, fiveKind=0, pityWins=0;
+    let wins=0, carlo=0, luna=0, fourKind=0, fiveKind=0, ignitedWins=0;
     for(let spin=0;spin<spins;spin++){
-      const candPity = players.filter(p=>p.pityTokens>=MAX_PITY_TOKENS);
-      if(candPity.length>0){
-        candPity.sort((a,b)=>{
+      const candIgnited = players.filter(p=>p.sparks>=MAX_SPARKS);
+      if(candIgnited.length>0){
+        candIgnited.sort((a,b)=>{
           if(a.createdAt !== b.createdAt) return a.createdAt - b.createdAt;
-          if(b.pityTokens !== a.pityTokens) return b.pityTokens - a.pityTokens;
+          if(b.sparks !== a.sparks) return b.sparks - a.sparks;
           const td = totalTickets(b) - totalTickets(a);
           return td !== 0 ? td : a.name.localeCompare(b.name);
         });
-        const p = candPity[0];
-        wins++;pityWins++;p.pityTokens=0;
+        const p = candIgnited[0];
+        wins++;ignitedWins++;p.sparks=0;
         continue;
       }
       const active = players.slice();
@@ -3412,7 +3410,7 @@
         if(hitCount===5) fiveKind++;
       }
     }
-    return {wins, carlo, luna, fourKind, fiveKind, pityWins};
+    return {wins, carlo, luna, fourKind, fiveKind, ignitedWins};
   }
 
   function toggleThemeColor(code){
@@ -3458,12 +3456,13 @@
   }
 
   function applyGradientGlow(){
-    // No colors selected - remove all glows
+    // No colors selected - default to gold
     if(selectedColors.size === 0){
-      document.documentElement.style.setProperty('--gradient-border', 'transparent');
-      document.documentElement.style.setProperty('--gradient-border-size', '100%');
-      document.documentElement.style.setProperty('--logo-ring-gradient', 'transparent');
-      document.documentElement.style.setProperty('--theme-glow', 'rgba(0,0,0,0)');
+      const goldGradient = 'linear-gradient(90deg, #fcd34d, #f59e0b, #d97706, #fcd34d)';
+      document.documentElement.style.setProperty('--gradient-border', goldGradient);
+      document.documentElement.style.setProperty('--gradient-border-size', '200%');
+      document.documentElement.style.setProperty('--logo-ring-gradient', `conic-gradient(from 0deg, #fcd34d 0deg 60deg, transparent 60deg 120deg, #fcd34d 120deg 180deg, transparent 180deg 240deg, #fcd34d 240deg 300deg, transparent 300deg 360deg)`);
+      document.documentElement.style.setProperty('--theme-glow', 'rgba(250,204,21,0.4)');
       return;
     }
 
