@@ -1606,7 +1606,7 @@
       <button id="diagBtn">Hypergeometric Diagnostic</button>
       <button id="exportBtn">Export Session</button>
       <button id="importBtn">Import Session</button>
-      <button id="resetEventBtn">Factory Reset Event</button>
+      <button id="resetEventBtn">Factory Reset Session</button>
     </div>
   </div>
   <input type="file" id="importFileInput" accept=".json" style="display:none;"/>
@@ -3095,7 +3095,7 @@
   });
 
   resetEventBtn.addEventListener('click',()=>{
-    if(!confirm("Factory reset this event? All players and stats for this event will be lost."))return;
+    if(!confirm("Factory reset this session? All players and stats will be lost."))return;
     state.events[state.currentEventIndex]={
       players:[],
       spinCount:0,
@@ -3104,7 +3104,7 @@
       carloHits:0,
       lunaHits:0
     };
-    log(`Event #${state.currentEventIndex} reset.`);
+    log('Session reset.');
     renderLeaderboard();
     saveAll();
   });
