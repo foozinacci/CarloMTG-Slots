@@ -3489,12 +3489,9 @@
       return;
     }
 
-    // Luna's Balance: Dead spin guardrail
+    // Dead spin guardrail
     const maxDeadStreak = getMaxDeadStreakAllowed(activePlayers.length);
     const forceLuna = evt.deadSpinStreak >= maxDeadStreak;
-    if(forceLuna){
-      log(`<span style="color:#fcd34d;font-weight:600;">🐱 Luna's Balance</span>`);
-    }
 
     spinBtn.disabled=true;
     leverEl.classList.add('pull');
