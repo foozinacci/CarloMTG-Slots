@@ -1703,6 +1703,78 @@
       margin-top:8px;
       margin-bottom:2px;
     }
+    .spark-progression{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:8px;
+      margin:12px 0;
+      padding:12px;
+      background:rgba(0,0,0,0.3);
+      border-radius:8px;
+      border:1px solid rgba(148,116,72,.3);
+    }
+    .spark-bulbs-row{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+    }
+    .spark-bulb{
+      width:16px;
+      height:16px;
+      border-radius:50%;
+      background:rgba(0,0,0,0.5);
+      border:2px solid rgba(148,116,72,.5);
+      transition:all .3s ease;
+      position:relative;
+    }
+    .spark-bulb.lit{
+      background:var(--theme-color);
+      border-color:var(--theme-color);
+      box-shadow:0 0 10px var(--theme-glow),0 0 20px var(--theme-glow),inset 0 0 8px var(--theme-glow);
+      animation:sparkPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes sparkPulse{
+      0%, 100%{opacity:1;transform:scale(1);}
+      50%{opacity:0.7;transform:scale(1.1);}
+    }
+    .spark-overflow-bulb{
+      width:80px;
+      height:24px;
+      border-radius:12px;
+      background:rgba(0,0,0,0.5);
+      border:2px solid rgba(148,116,72,.5);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all .3s ease;
+      position:relative;
+    }
+    .spark-overflow-bulb.ready.lit{
+      background:#fcd34d;
+      border-color:#fcd34d;
+      box-shadow:0 0 12px rgba(252,211,77,0.6),0 0 24px rgba(252,211,77,0.4);
+    }
+    .spark-overflow-bulb.ignition.lit{
+      background:#06d6a0;
+      border-color:#06d6a0;
+      box-shadow:0 0 12px rgba(6,214,160,0.6),0 0 24px rgba(6,214,160,0.4);
+      animation:ignitionPulse 1s ease-in-out infinite;
+    }
+    @keyframes ignitionPulse{
+      0%, 100%{box-shadow:0 0 12px rgba(6,214,160,0.6),0 0 24px rgba(6,214,160,0.4);}
+      50%{box-shadow:0 0 20px rgba(6,214,160,0.8),0 0 40px rgba(6,214,160,0.6);}
+    }
+    .spark-overflow-label{
+      font-size:9px;
+      font-weight:800;
+      letter-spacing:.1em;
+      color:rgba(255,255,255,0.4);
+      text-transform:uppercase;
+    }
+    .spark-overflow-bulb.lit .spark-overflow-label{
+      color:#000;
+    }
     .help-body{
       font-size:11px;
       color:var(--muted);
@@ -1892,6 +1964,29 @@
       <div class="reel-charts-wrapper">
         <div class="reel-charts" id="reelCharts"></div>
       </div>
+      <div class="help-section-title">Spark Progression (<span id="playerSparkCount">0</span>/12)</div>
+      <div class="spark-progression">
+        <div class="spark-bulbs-row">
+          <div class="spark-bulb" data-spark="1"></div>
+          <div class="spark-bulb" data-spark="2"></div>
+          <div class="spark-bulb" data-spark="3"></div>
+          <div class="spark-bulb" data-spark="4"></div>
+          <div class="spark-bulb" data-spark="5"></div>
+        </div>
+        <div class="spark-overflow-bulb ready" data-spark="6">
+          <div class="spark-overflow-label">READY</div>
+        </div>
+        <div class="spark-bulbs-row">
+          <div class="spark-bulb" data-spark="7"></div>
+          <div class="spark-bulb" data-spark="8"></div>
+          <div class="spark-bulb" data-spark="9"></div>
+          <div class="spark-bulb" data-spark="10"></div>
+          <div class="spark-bulb" data-spark="11"></div>
+        </div>
+        <div class="spark-overflow-bulb ignition" data-spark="12">
+          <div class="spark-overflow-label">IGNITED</div>
+        </div>
+      </div>
       <div class="help-section-title">Decks (by color identity)</div>
       <div class="deck-table-wrapper">
         <table class="deck-table">
@@ -1921,7 +2016,7 @@
         <p><strong>Tickets = weight per reel.</strong> Start: 1/reel. Cap: 500/reel. <strong>Miss spin:</strong> tickets double (to cap). <strong>Appear, don't win:</strong> -1 ticket on reels shown. <strong>Dead spin:</strong> small groups penalized, large groups rewarded.</p>
 
         <div class="help-section-title">Sparks & Ignition</div>
-        <p><strong>Overflow past 500 → sparks.</strong> 500 overflow = 1 spark (max 12). <strong>12 sparks = Ignited:</strong> auto-pick next spin, guaranteed win.</p>
+        <p><strong>Overflow past 500 → sparks.</strong> 500 overflow = 1 spark (max 12). <strong>12 sparks = Ignited:</strong> queued for guaranteed win. <strong>Cooldown:</strong> 1 ignition per 0-4 spins (scales with player count). Multiple players queue in FIFO order.</p>
 
         <div class="help-section-title">Luna & CARLO</div>
         <p><strong>Luna:</strong> rare wild (1/spin max), completes 3-in-a-row. <strong>CARLO:</strong> all 5 letters at once = jackpot, streamer plays their deck.</p>
@@ -2024,6 +2119,19 @@
   let bulbsTimer = null;
   let timeTimer = null;
   let currentPlayerCardId = null;
+
+  // Ignition Queue System - FIFO with scaling cooldowns
+  let ignitedQueue = []; // Array of player IDs ready for ignition
+  let lastIgnitionSpin = -1; // Spin count when last ignition occurred
+
+  // Ignition cooldown configuration (spins between ignitions)
+  function getIgnitionCooldown(activePlayerCount){
+    if(activePlayerCount <= 3) return 0; // No cooldown with few players
+    if(activePlayerCount <= 5) return 1; // 1 spin cooldown
+    if(activePlayerCount <= 10) return 2; // 2 spin cooldown
+    if(activePlayerCount <= 20) return 3; // 3 spin cooldown
+    return 4; // 4 spin cooldown for large queues
+  }
 
   // Handle +1 Win and -1 Loss buttons
   function updateResultsDisplay(){
@@ -2500,6 +2608,52 @@
     return candidates[0];
   }
 
+  // Update ignition queue with all players at 12 sparks
+  function updateIgnitionQueue(evt){
+    const readyPlayers = evt.players.filter(p => p.status === 'active' && p.sparks >= MAX_SPARKS);
+
+    // Add new ignited players to queue (FIFO order)
+    for(const p of readyPlayers){
+      if(!ignitedQueue.includes(p.id)){
+        ignitedQueue.push(p.id);
+        log(`<span style="color:#fcd34d;font-weight:600;">${p.name} has reached 12 sparks and is queued for ignition!</span>`);
+      }
+    }
+
+    // Remove players who are no longer eligible (left queue, lost sparks, etc.)
+    ignitedQueue = ignitedQueue.filter(id => {
+      const p = evt.players.find(pl => pl.id === id);
+      return p && p.status === 'active' && p.sparks >= MAX_SPARKS;
+    });
+  }
+
+  // Check if ignition can trigger this spin (cooldown check)
+  function canTriggerIgnition(evt){
+    const activePlayerCount = evt.players.filter(p => p.status === 'active').length;
+    const cooldown = getIgnitionCooldown(activePlayerCount);
+    const spinsSinceLastIgnition = evt.spinCount - lastIgnitionSpin;
+
+    return ignitedQueue.length > 0 && spinsSinceLastIgnition >= cooldown;
+  }
+
+  // Get next ignited player from queue
+  function processIgnitionQueue(evt){
+    if(ignitedQueue.length === 0) return null;
+
+    const playerId = ignitedQueue[0]; // FIFO: take first in queue
+    const player = evt.players.find(p => p.id === playerId);
+
+    if(player && player.status === 'active' && player.sparks >= MAX_SPARKS){
+      ignitedQueue.shift(); // Remove from queue
+      lastIgnitionSpin = evt.spinCount; // Update last ignition spin
+      return player;
+    }
+
+    // Player no longer valid, remove and try next
+    ignitedQueue.shift();
+    return processIgnitionQueue(evt);
+  }
+
   function buildSpinResult(evt){
     const symbols = [];
     const letters = ['C','A','R','L','O'];
@@ -2776,6 +2930,35 @@
       chartDiv.appendChild(pieChart);
       chartDiv.appendChild(ticketControls);
       reelChartsEl.appendChild(chartDiv);
+    }
+
+    // Render spark progression bulbs
+    const playerSparks = p.sparks || 0;
+    document.getElementById('playerSparkCount').textContent = playerSparks;
+
+    // Light up bulbs based on spark count
+    const sparkBulbs = document.querySelectorAll('.spark-bulb');
+    sparkBulbs.forEach(bulb => {
+      const sparkNum = parseInt(bulb.dataset.spark);
+      if(playerSparks >= sparkNum){
+        bulb.classList.add('lit');
+      } else {
+        bulb.classList.remove('lit');
+      }
+    });
+
+    // Light up overflow bulbs
+    const readyBulb = document.querySelector('.spark-overflow-bulb.ready');
+    const ignitionBulb = document.querySelector('.spark-overflow-bulb.ignition');
+    if(playerSparks >= 6){
+      readyBulb.classList.add('lit');
+    } else {
+      readyBulb.classList.remove('lit');
+    }
+    if(playerSparks >= 12){
+      ignitionBulb.classList.add('lit');
+    } else {
+      ignitionBulb.classList.remove('lit');
     }
 
     deckTableBody.innerHTML = '';
@@ -3112,19 +3295,30 @@
       finishOverlay.classList.add('show');
       return;
     }
-    const ignitedPlayer = findIgnitedPlayer(evt);
-    if(ignitedPlayer){
-      log(`<span style="color:#06d6a0;font-weight:600;">${ignitedPlayer.sparks} sparks & has been Ignited</span>`);
-      // Start bulb celebration for ignited player
-      startBulbsAnimation(false);
-      setTimeout(()=>{
-        stopBulbsAnimation();
-        handleWinnerBanner(ignitedPlayer,'ignited',3,false);
-      },1200);
-      renderLeaderboard();
-      saveAll();
-      return;
+
+    // Update ignition queue with any players at 12 sparks
+    updateIgnitionQueue(evt);
+
+    // Check if we can process an ignition this spin (cooldown check)
+    if(canTriggerIgnition(evt)){
+      const ignitedPlayer = processIgnitionQueue(evt);
+      if(ignitedPlayer){
+        const activeCount = evt.players.filter(p=>p.status==='active').length;
+        const cooldown = getIgnitionCooldown(activeCount);
+        const queueLength = ignitedQueue.length;
+        log(`<span style="color:#06d6a0;font-weight:600;">${ignitedPlayer.name} has been Ignited! (${ignitedPlayer.sparks} sparks, ${queueLength} in queue, cooldown: ${cooldown} spins)</span>`);
+        // Start bulb celebration for ignited player
+        startBulbsAnimation(false);
+        setTimeout(()=>{
+          stopBulbsAnimation();
+          handleWinnerBanner(ignitedPlayer,'ignited',3,false);
+        },1200);
+        renderLeaderboard();
+        saveAll();
+        return;
+      }
     }
+
     const activePlayers = evt.players.filter(p=>p.status==='active');
     if(activePlayers.length===0){
       smallStatus.textContent="No active players. Add someone first.";
