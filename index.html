@@ -1392,13 +1392,16 @@
     }
     .player-card-header{
       display:flex;
-      justify-content:space-between;
+      flex-direction:column;
+      justify-content:center;
       align-items:center;
       margin-bottom:6px;
+      gap:4px;
     }
     .player-card-name{
       font-weight:700;
       font-size:14px;
+      text-align:center;
     }
     .player-card-status{
       font-size:11px;
@@ -1406,6 +1409,7 @@
     }
     .player-card-actions{
       display:flex;
+      justify-content:center;
       gap:6px;
       margin:6px 0;
       flex-wrap:wrap;
@@ -1868,7 +1872,7 @@
       </div>
       <div class="finish-actions">
         <button type="button" id="finishCancelBtn">Cancel</button>
-        <button type="button" class="primary" id="finishSaveBtn" style="pointer-events:auto!important;z-index:9999;position:relative;">Save & Re-Queue</button>
+        <button type="button" class="primary" id="finishSaveBtn" style="pointer-events:auto!important;z-index:9999;position:relative;">Save Results</button>
       </div>
     </div>
   </div>
@@ -2922,6 +2926,7 @@
       ch.classList.toggle('active', ch.dataset.choice === 'tickets');
     });
     bonusChoiceField.style.display = showBonusChoice ? 'block' : 'none';
+    finishSaveBtn.disabled = false;
     finishOverlay.classList.add('show');
   }
 
@@ -2984,11 +2989,17 @@
   finishSaveBtn.addEventListener('click',()=>{
     const evt = currentEvent();
     if(!evt.currentRun) return;
+
+    // Prevent double-click by disabling button immediately
+    if(finishSaveBtn.disabled) return;
+    finishSaveBtn.disabled = true;
+
     const run = evt.currentRun;
     const player = evt.players.find(p=>p.id===run.playerId);
     if(!player){
       evt.currentRun=null;
       finishOverlay.classList.remove('show');
+      finishSaveBtn.disabled = false;
       return;
     }
     const wins = Math.max(0,parseInt(runWinsInput.value,10)||0);
@@ -3040,6 +3051,7 @@
         log(`${player.name} finished game. ${player.extraGamesRemaining} extra game(s) remaining.`);
         evt.currentRun=null;
         finishOverlay.classList.remove('show');
+        finishSaveBtn.disabled = false;
         // Show them in the finish prompt again for next game
         setTimeout(()=> finishRunPrompt(player), 100);
         renderLeaderboard();
@@ -3088,6 +3100,7 @@
     log(`Reported run for ${player.name}: ${wins}W/${losses}L, colors=${colors||'none'}, type=${matchType}`);
     evt.currentRun=null;
     finishOverlay.classList.remove('show');
+    finishSaveBtn.disabled = false;
     renderLeaderboard();
     saveAll();
   });
