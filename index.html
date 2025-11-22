@@ -116,6 +116,11 @@
       100%{background-position:0% 50%;}
     }
 
+    @keyframes rotate{
+      0%{transform:rotate(0deg);}
+      100%{transform:rotate(360deg);}
+    }
+
     *{box-sizing:border-box;}
     html,body{
       margin:0;
@@ -173,20 +178,45 @@
     .logo{
       width:110px;
       height:110px;
-      overflow:hidden;
+      overflow:visible;
       background:radial-gradient(circle, rgba(250,204,21,0.15) 0%, rgba(250,204,21,0.05) 70%, transparent 100%);
-      border:2px solid rgba(250,204,21,0.3);
+      background-clip:padding-box;
+      border:3px solid transparent;
       border-radius:50%;
       display:flex;
       align-items:center;
       justify-content:center;
       box-shadow:0 0 20px rgba(250,204,21,0.2), inset 0 0 20px rgba(250,204,21,0.1);
+      position:relative;
+    }
+    .logo::after{
+      content:'';
+      position:absolute;
+      inset:-3px;
+      border-radius:50%;
+      padding:3px;
+      background:conic-gradient(from 0deg, var(--gradient-border), var(--gradient-border));
+      -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #fff calc(100% - 3px));
+      mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #fff calc(100% - 3px));
+      pointer-events:none;
+      animation:rotate 4s linear infinite;
+      z-index:1;
+    }
+    .logo::before{
+      content:'';
+      position:absolute;
+      inset:0;
+      border-radius:50%;
+      background:var(--bg);
+      z-index:-1;
     }
     .logo img{
       width:80%;
       height:80%;
       object-fit:contain;
       filter:none;
+      position:relative;
+      z-index:2;
     }
     .title-block{
       display:flex;
@@ -601,16 +631,34 @@
     .spin-button{
       border-radius:999px;
       padding:14px 42px;
-      border:3px solid var(--theme-color);
+      border:3px solid transparent;
       font-size:20px;
       font-weight:900;
       letter-spacing:.12em;
       cursor:pointer;
       background:radial-gradient(circle at top,var(--theme-color) 0,var(--theme-color) 50%,var(--bg) 100%);
+      background-clip:padding-box;
       color:#fefce8;
       text-shadow:0 1px 2px rgba(0,0,0,.8), 0 0 8px rgba(0,0,0,.6);
       box-shadow:0 0 24px var(--theme-glow),0 0 12px var(--theme-glow),inset 0 0 8px rgba(255,255,255,.5);
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
+      position:relative;
+      overflow:hidden;
+    }
+    .spin-button::after{
+      content:'';
+      position:absolute;
+      inset:0;
+      border-radius:999px;
+      padding:3px;
+      background:var(--gradient-border);
+      background-size:var(--gradient-border-size) var(--gradient-border-size);
+      -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite:xor;
+      mask-composite:exclude;
+      pointer-events:none;
+      animation:gradientShift 4s ease infinite;
+      z-index:0;
     }
     .spin-button:disabled{
       opacity:.45;
@@ -656,8 +704,9 @@
     }
     .add-player-form button{
       border-radius:999px;
-      border:2px solid var(--theme-color);
+      border:2px solid transparent;
       background:radial-gradient(circle at top,var(--theme-color) 0,var(--theme-color) 50%,var(--bg) 100%);
+      background-clip:padding-box;
       font-size:12px;
       padding:6px 12px;
       color:#fefce8;
@@ -667,6 +716,23 @@
       cursor:pointer;
       text-shadow:0 1px 1px rgba(0,0,0,.7), 0 0 6px rgba(0,0,0,.5);
       box-shadow:0 0 16px var(--theme-glow),inset 0 0 6px rgba(255,255,255,.4);
+      position:relative;
+      overflow:hidden;
+    }
+    .add-player-form button::after{
+      content:'';
+      position:absolute;
+      inset:0;
+      border-radius:999px;
+      padding:2px;
+      background:var(--gradient-border);
+      background-size:var(--gradient-border-size) var(--gradient-border-size);
+      -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite:xor;
+      mask-composite:exclude;
+      pointer-events:none;
+      animation:gradientShift 4s ease infinite;
+      z-index:0;
     }
     .summary-cards{
       display:grid;
@@ -3028,10 +3094,11 @@
       return '#fcd34d';
     });
 
-    // All 5 selected = gold
+    // All 5 selected = gold with all colors cycling
     if(selectedColors.size === 5){
+      const allColors = '#fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e';
       document.documentElement.style.setProperty('--multi-theme-gradient', '#fcd34d');
-      document.documentElement.style.setProperty('--gradient-border', 'linear-gradient(90deg, #fcd34d, #fcd34d)');
+      document.documentElement.style.setProperty('--gradient-border', `linear-gradient(90deg, ${allColors})`);
       return;
     }
 
