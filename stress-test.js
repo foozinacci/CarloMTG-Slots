@@ -194,16 +194,30 @@ function simulateStressTest(playerCount, spins = 300) {
       players.forEach(p => {
         const appeared = reelPlayers.some(rp => rp.name === p.name);
         if (appeared) {
-          // Spend 1 ticket
+          // Player appeared in dead spin - spend 1 ticket per reel
           reelPlayers.forEach(rp => {
             if (rp.name === p.name) {
               p.tickets[rp.index] = Math.max(1, p.tickets[rp.index] - 1);
             }
           });
         } else {
-          // Halve +1
+          // Player didn't appear - apply carefully tuned penalty based on player count
+          // Balanced to provide ~30-40% win rate while minimizing pity dependence
+          let multiplier;
+          if (playerCount <= 7) {
+            multiplier = 0.55; // Moderate penalty for small groups (targets ~35-40% win rate)
+          } else if (playerCount <= 15) {
+            multiplier = 0.73; // Mild penalty for medium groups (targets ~25-35% win rate)
+          } else if (playerCount <= 30) {
+            multiplier = 1.005; // Minimal boost for medium-large groups
+          } else if (playerCount <= 50) {
+            multiplier = 1.012; // Small boost for large groups
+          } else {
+            multiplier = 1.018; // Small boost for very large groups
+          }
+
           for (let i = 0; i < 5; i++) {
-            let newVal = Math.ceil(p.tickets[i] / 2) + 1;
+            let newVal = Math.max(1, Math.ceil(p.tickets[i] * multiplier));
             if (newVal > TICKET_CAP) {
               const overflow = newVal - TICKET_CAP;
               p.tickets[i] = TICKET_CAP;
