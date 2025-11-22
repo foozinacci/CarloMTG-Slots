@@ -638,7 +638,11 @@
       justify-content:center;
       overflow:hidden;
       position:relative;
-      box-shadow:inset 0 0 18px rgba(15,23,42,.9),0 0 18px rgba(0,0,0,.9);
+      box-shadow:inset 0 0 18px rgba(15,23,42,.9),0 0 18px rgba(0,0,0,.9),0 0 24px var(--theme-glow);
+    }
+    body.theme-black .reel{
+      background:radial-gradient(circle at top,rgba(192,132,252,0.15) 0,#1a0a2e 70%);
+      box-shadow:inset 0 0 18px rgba(192,132,252,.2),0 0 18px rgba(192,132,252,.4),0 0 32px var(--theme-glow);
     }
     .reel-inner{
       display:flex;
@@ -1941,22 +1945,18 @@
       flex-direction:row;
       align-items:center;
       justify-content:center;
-      gap:4px;
+      gap:6px;
       margin:12px 0;
-      padding:8px 12px;
-      background:rgba(0,0,0,0.3);
-      border-radius:8px;
-      border:1px solid rgba(148,116,72,.3);
       flex-wrap:wrap;
     }
     .spark-bulbs-row{
       display:flex;
-      gap:4px;
+      gap:6px;
       justify-content:center;
     }
     .spark-bulb{
-      width:16px;
-      height:16px;
+      width:24px;
+      height:24px;
       border-radius:50%;
       background:rgba(0,0,0,0.5);
       border:2px solid rgba(148,116,72,.5);
@@ -2231,11 +2231,6 @@
         <div class="player-card-name" id="playerCardName"></div>
         <div class="player-card-status" id="playerCardStatus"></div>
       </div>
-      <div class="player-card-actions">
-        <button id="toggleAfkBtn">Toggle AFK</button>
-        <button id="removePlayerBtn">Remove Player</button>
-        <button id="closePlayerCardBtn">Close</button>
-      </div>
       <div class="help-section-title">Reel Probabilities</div>
       <div class="reel-charts-wrapper">
         <div class="reel-charts" id="reelCharts"></div>
@@ -2280,6 +2275,11 @@
           </thead>
           <tbody id="deckTableBody"></tbody>
         </table>
+      </div>
+      <div class="player-card-actions" style="margin-top:12px;">
+        <button id="toggleAfkBtn">Toggle AFK</button>
+        <button id="removePlayerBtn">Remove Player</button>
+        <button id="closePlayerCardBtn">Close</button>
       </div>
     </div>
   </div>
@@ -2361,8 +2361,8 @@
           <div class="help-box-text">Jackpot! All 5 reels show C-A-R-L-O letters. Streamer plays their deck.</div>
         </div>
         <div class="help-box">
-          <div class="help-box-title">Reporting</div>
-          <div class="help-box-text">Report your match results with deck colors and opponent info. Win = back in queue!</div>
+          <div class="help-box-title">Meta-Tracking</div>
+          <div class="help-box-text">Track deck performance and matchup data. View detailed analytics in Player Diagnostics.</div>
         </div>
       </div>
       <div class="finish-actions">
@@ -2631,6 +2631,52 @@
     const total = p.overallWins + p.overallLosses;
     if(total === 0) return 0;
     return (p.overallWins / total) * 100;
+  }
+  function getColorThemeName(colors){
+    if(!colors) return '';
+    const sorted = colors.split('').sort().join(''); // Normalize order
+    const themeMap = {
+      // Colorless
+      'C': 'Colorless',
+      // Mono-color
+      'W': 'White',
+      'U': 'Blue',
+      'B': 'Black',
+      'R': 'Red',
+      'G': 'Green',
+      // 2-color (Guilds)
+      'UW': 'Azorius',
+      'BU': 'Dimir',
+      'BR': 'Rakdos',
+      'GR': 'Gruul',
+      'GW': 'Selesnya',
+      'BW': 'Orzhov',
+      'RU': 'Izzet',
+      'BG': 'Golgari',
+      'RW': 'Boros',
+      'GU': 'Simic',
+      // 3-color (Shards)
+      'BUW': 'Esper',
+      'BRU': 'Grixis',
+      'BGR': 'Jund',
+      'GRW': 'Naya',
+      'GUW': 'Bant',
+      // 3-color (Wedges)
+      'BGW': 'Abzan',
+      'RUW': 'Jeskai',
+      'BGU': 'Sultai',
+      'BRW': 'Mardu',
+      'GRU': 'Temur',
+      // 4-color (Nephilim)
+      'BGRU': 'Glint-Eye',
+      'BGRW': 'Dune-Brood',
+      'GRUW': 'Ink-Treader',
+      'BGUW': 'Witch-Maw',
+      'BRUW': 'Yore-Tiller',
+      // 5-color
+      'BGRUW': 'Prismatic'
+    };
+    return themeMap[sorted] || colors;
   }
   function formatTimeInQueue(ms){
     const s = Math.floor(ms/1000);
@@ -4103,7 +4149,9 @@
       ).join('');
       opponentDisplay = ` vs. ${oppColorIcons}`;
     }
-    log(`Reported run for ${player.name}: ${wins}W/${losses}L, ${colorDisplay}${opponentDisplay}, type=${matchType}`);
+    const themeName = colors ? getColorThemeName(colors) : '';
+    const themeDisplay = themeName ? ` (Theme ${themeName})` : '';
+    log(`Reported run for ${player.name}: ${wins}W/${losses}L, ${colorDisplay}${themeDisplay}${opponentDisplay}, type=${matchType}`);
     evt.currentRun=null;
     finishOverlay.classList.remove('show');
     finishSaveBtn.disabled = false;
@@ -4186,8 +4234,7 @@
       // Log Luna appearances (regardless of win/loss)
       const lunaCount = symbols.filter(s => s.type === 'luna').length;
       if(lunaCount > 0){
-        const appearanceText = lunaCount === 1 ? 'appearance' : 'appearances';
-        log(`<span style="color:#f973fa;font-weight:600;">Luna made ${lunaCount} ${appearanceText}</span>`);
+        log(`<span style="color:#f973fa;font-weight:600;">Luna has appeared</span>`);
       }
 
       const reelPlayers=[];
