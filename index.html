@@ -644,12 +644,16 @@
       cursor:pointer;
       background:radial-gradient(circle at top,#fcd34d 0,#f59e0b 50%,#d97706 100%);
       background-clip:padding-box;
-      color:var(--theme-color);
+      color:#ffffff;
       text-shadow:0 0 12px var(--theme-glow),0 0 20px var(--theme-glow),0 1px 2px rgba(0,0,0,.8);
       box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
       overflow:hidden;
+    }
+    body.theme-gold .spin-button{
+      color:var(--gold);
+      text-shadow:0 0 12px rgba(250,204,21,.6),0 0 20px rgba(250,204,21,.4),0 1px 2px rgba(0,0,0,.8);
     }
     .spin-button::after{
       content:'';
@@ -715,7 +719,7 @@
       background-clip:padding-box;
       font-size:12px;
       padding:6px 12px;
-      color:var(--theme-color);
+      color:#ffffff;
       font-weight:900;
       text-transform:uppercase;
       letter-spacing:.12em;
@@ -724,6 +728,10 @@
       box-shadow:0 0 16px var(--theme-glow),inset 0 0 12px var(--theme-glow);
       position:relative;
       overflow:hidden;
+    }
+    body.theme-gold .add-player-form button{
+      color:var(--gold);
+      text-shadow:0 0 12px rgba(250,204,21,.6),0 0 20px rgba(250,204,21,.4),0 1px 2px rgba(0,0,0,.8);
     }
     .add-player-form button::after{
       content:'';
@@ -907,7 +915,7 @@
       border:3px solid transparent;
       background:radial-gradient(circle at top,#fcd34d 0,#f59e0b 50%,#d97706 100%);
       background-clip:padding-box;
-      color:var(--theme-color);
+      color:#ffffff;
       font-size:11px;
       font-weight:700;
       padding:6px 10px;
@@ -919,6 +927,10 @@
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
       overflow:hidden;
+    }
+    body.theme-gold .winner-actions button{
+      color:var(--gold);
+      text-shadow:0 0 12px rgba(250,204,21,.6),0 0 20px rgba(250,204,21,.4),0 1px 2px rgba(0,0,0,.8);
     }
     .winner-actions button::after{
       content:'';
@@ -1021,7 +1033,7 @@
       border:3px solid transparent;
       background:radial-gradient(circle at top,#fcd34d 0,#f59e0b 50%,#d97706 100%);
       background-clip:padding-box;
-      color:var(--theme-color);
+      color:#ffffff;
       font-size:13px;
       font-weight:700;
       padding:8px 16px;
@@ -1034,6 +1046,10 @@
       position:relative;
       z-index:10;
       overflow:hidden;
+    }
+    body.theme-gold .adjust-btn{
+      color:var(--gold);
+      text-shadow:0 0 12px rgba(250,204,21,.6),0 0 20px rgba(250,204,21,.4),0 1px 2px rgba(0,0,0,.8);
     }
     .adjust-btn::after{
       content:'';
@@ -1148,7 +1164,7 @@
       border:3px solid transparent;
       background:radial-gradient(circle at top,#fcd34d 0,#f59e0b 50%,#d97706 100%);
       background-clip:padding-box;
-      color:var(--theme-color);
+      color:#ffffff;
       font-size:11px;
       font-weight:700;
       padding:6px 10px;
@@ -1161,6 +1177,10 @@
       position:relative;
       z-index:10;
       overflow:hidden;
+    }
+    body.theme-gold .finish-actions button{
+      color:var(--gold);
+      text-shadow:0 0 12px rgba(250,204,21,.6),0 0 20px rgba(250,204,21,.4),0 1px 2px rgba(0,0,0,.8);
     }
     .finish-actions button::after{
       content:'';
@@ -1237,7 +1257,7 @@
       border:3px solid transparent;
       background:radial-gradient(circle at top,#fcd34d 0,#f59e0b 50%,#d97706 100%);
       background-clip:padding-box;
-      color:var(--theme-color);
+      color:#ffffff;
       font-size:11px;
       font-weight:700;
       padding:4px 8px;
@@ -1249,6 +1269,10 @@
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
       overflow:hidden;
+    }
+    body.theme-gold .player-card-actions button{
+      color:var(--gold);
+      text-shadow:0 0 12px rgba(250,204,21,.6),0 0 20px rgba(250,204,21,.4),0 1px 2px rgba(0,0,0,.8);
     }
     .player-card-actions button::after{
       content:'';
@@ -1280,8 +1304,8 @@
     .reel-charts{
       display:flex;
       gap:12px;
-      justify-content:flex-start;
-      flex-wrap:nowrap;
+      justify-content:center;
+      flex-wrap:wrap;
       min-width:min-content;
     }
     .reel-chart{
@@ -1406,7 +1430,7 @@
       border:3px solid transparent;
       background:radial-gradient(circle at top,#fcd34d 0,#f59e0b 50%,#d97706 100%);
       background-clip:padding-box;
-      color:var(--theme-color);
+      color:#ffffff;
       font-size:10px;
       font-weight:700;
       padding:4px 8px;
@@ -1418,6 +1442,10 @@
       transition:transform .1s ease-out,box-shadow .1s ease-out,opacity .1s ease-out;
       position:relative;
       overflow:hidden;
+    }
+    body.theme-gold .footer-buttons button{
+      color:var(--gold);
+      text-shadow:0 0 12px rgba(250,204,21,.6),0 0 20px rgba(250,204,21,.4),0 1px 2px rgba(0,0,0,.8);
     }
     .footer-buttons button::after{
       content:'';
@@ -2987,17 +3015,21 @@
 
   addPlayerForm.addEventListener('submit',e=>{
     e.preventDefault();
+    e.stopPropagation();
     const nameToAdd = playerNameInput.value.trim();
+    // Clear immediately
+    playerNameInput.value='';
     if(nameToAdd){
       addPlayer(nameToAdd);
     }
-    // Always clear input after submission
-    playerNameInput.value='';
-    // Use setTimeout to ensure clear happens after any browser auto-fill
-    setTimeout(() => {
+    // Double-check clear and refocus
+    requestAnimationFrame(() => {
       playerNameInput.value='';
-      playerNameInput.focus();
-    }, 0);
+      playerNameInput.blur();
+      requestAnimationFrame(() => {
+        playerNameInput.focus();
+      });
+    });
   });
   // Event chip switching removed - using single event model
 
@@ -3261,7 +3293,11 @@
       const allColors = '#fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e';
       const allColorsArray = ['#fefce8', '#38bdf8', '#4b5563', '#fb4b4b', '#22c55e'];
       document.documentElement.style.setProperty('--multi-theme-gradient', '#fcd34d');
-      document.documentElement.style.setProperty('--gradient-border', `linear-gradient(90deg, ${allColors})`);
+      document.documentElement.style.setProperty('--gradient-border', `linear-gradient(90deg, ${allColors}, ${allColors})`);
+      document.documentElement.style.setProperty('--gradient-border-size', '200%');
+      // Gold mode: rainbow gradient text for buttons
+      document.documentElement.style.setProperty('--button-text-color', `linear-gradient(90deg, ${allColors})`);
+      document.documentElement.style.setProperty('--button-text-is-gradient', '1');
       // Create conic gradient segments for logo ring
       const segments = allColorsArray.map((c, i) => {
         const start = i * 72;
@@ -3272,13 +3308,24 @@
       return;
     }
 
-    // Create animated gradient for borders/glows
-    const gradient = colors.length > 1
-      ? `linear-gradient(90deg, ${colors.join(', ')})`
-      : colors[0];
+    // Non-gold mode: white text for buttons
+    document.documentElement.style.setProperty('--button-text-color', '#ffffff');
+    document.documentElement.style.setProperty('--button-text-is-gradient', '0');
 
-    document.documentElement.style.setProperty('--multi-theme-gradient', gradient);
-    document.documentElement.style.setProperty('--gradient-border', gradient);
+    // Create animated gradient for borders/glows
+    if(colors.length > 1){
+      // Multi-color gradient
+      const gradient = `linear-gradient(90deg, ${colors.join(', ')}, ${colors.join(', ')})`;
+      document.documentElement.style.setProperty('--multi-theme-gradient', gradient);
+      document.documentElement.style.setProperty('--gradient-border', gradient);
+      document.documentElement.style.setProperty('--gradient-border-size', '200%');
+    } else {
+      // Single color - create gradient with same color repeated for animation
+      const singleColorGradient = `linear-gradient(90deg, ${colors[0]}, ${colors[0]}, ${colors[0]})`;
+      document.documentElement.style.setProperty('--multi-theme-gradient', singleColorGradient);
+      document.documentElement.style.setProperty('--gradient-border', singleColorGradient);
+      document.documentElement.style.setProperty('--gradient-border-size', '200%');
+    }
 
     // Create conic gradient for logo ring based on selected colors
     if(colors.length > 1){
