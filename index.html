@@ -2243,17 +2243,7 @@
         <input type="hidden" id="runWins" value="0"/>
         <input type="hidden" id="runLosses" value="0"/>
       </div>
-      <div class="finish-field">
-        <div class="finish-label">Deck Color Identity</div>
-        <div class="color-chips" id="colorChips">
-          <div class="color-chip" data-color="W">W</div>
-          <div class="color-chip" data-color="U">U</div>
-          <div class="color-chip" data-color="B">B</div>
-          <div class="color-chip" data-color="R">R</div>
-          <div class="color-chip" data-color="G">G</div>
-          <div class="color-chip" data-color="C">C</div>
-        </div>
-      </div>
+      <!-- Deck Color Identity removed - now stored with player during import -->
       <div class="finish-field">
         <div class="finish-label">Match Format</div>
         <div class="queue-choice" id="matchTypeChoice">
@@ -5045,18 +5035,11 @@
     runLossesInput.value = "0";
     updateResultsDisplay();
 
-    // Auto-detect deck colors from imported deck list
+    // Use stored color identity from player
     selectedColorSet = new Set();
-    Array.from(colorChips.children).forEach(ch=>ch.classList.remove('active'));
-    if(hasValidDeckList(player)){
-      const parsed = parseDeckList(player.deckList);
-      if(parsed.colors){
-        for(const c of parsed.colors){
-          selectedColorSet.add(c);
-          const chip = Array.from(colorChips.children).find(ch => ch.dataset.color === c);
-          if(chip) chip.classList.add('active');
-        }
-        log(`Auto-detected deck colors for ${player.name}: ${parsed.colors}`);
+    if(player.colorIdentity){
+      for(const c of player.colorIdentity){
+        selectedColorSet.add(c);
       }
     }
 
@@ -5090,7 +5073,14 @@
 
   winnerExportBtn.addEventListener('click',()=>{
     if(!pendingWinner) return;
-    exportDeckToClipboard(pendingWinner, winnerExportBtn);
+    const p = pendingWinner;
+    exportDeckToClipboard(p, winnerExportBtn);
+    // Also trigger report dialog
+    pendingWinner = null;
+    winnerOverlay.classList.remove('show');
+    hasUnreportedGame = true;
+    unreportedGamePlayer = p;
+    finishRunPrompt(p);
   });
 
   winnerSkipBtn.addEventListener('click',()=>{
@@ -5108,18 +5098,7 @@
     saveAll();
   });
 
-  colorChips.addEventListener('click',e=>{
-    const chip = e.target.closest('.color-chip');
-    if(!chip) return;
-    const c = chip.dataset.color;
-    if(selectedColorSet.has(c)){
-      selectedColorSet.delete(c);
-      chip.classList.remove('active');
-    }else{
-      selectedColorSet.add(c);
-      chip.classList.add('active');
-    }
-  });
+  // Color chip selection removed - color identity now stored with player during import
 
   // Event delegation for dynamically generated opponent color chips
   opponentColorsContainer.addEventListener('click',e=>{
