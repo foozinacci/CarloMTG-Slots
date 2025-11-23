@@ -2343,6 +2343,7 @@
         </table>
       </div>
       <div class="player-card-actions" style="margin-top:12px;">
+        <button id="exportPlayerDeckBtn" style="display:none;">📋 Export Deck</button>
         <button id="toggleAfkBtn">Toggle AFK</button>
         <button id="removePlayerBtn">Remove Player</button>
         <button id="closePlayerCardBtn">Close</button>
@@ -2554,6 +2555,7 @@
   const toggleAfkBtn = document.getElementById('toggleAfkBtn');
   const removePlayerBtn = document.getElementById('removePlayerBtn');
   const closePlayerCardBtn = document.getElementById('closePlayerCardBtn');
+  const exportPlayerDeckBtn = document.getElementById('exportPlayerDeckBtn');
   const deckTableBody = document.getElementById('deckTableBody');
   const deckTableWrapper = document.getElementById('deckTableWrapper');
   const deckSectionHeader = document.getElementById('deckSectionHeader');
@@ -2988,7 +2990,7 @@
 
   // Parse MTG Arena deck list and detect color identity
   function parseDeckList(deckText){
-    const lines = deckText.split('\n').filter(l => l.trim());
+    const lines = deckText.split('\n');
     const cards = [];
     const colorSet = new Set();
 
@@ -3010,9 +3012,60 @@
       'Forest': 'G'
     };
 
+    // Dual/Tri lands and other color indicators
+    const landColorMap = {
+      // Shock lands
+      'Temple Garden': 'GW', 'Hallowed Fountain': 'WU', 'Watery Grave': 'UB',
+      'Blood Crypt': 'BR', 'Stomping Ground': 'RG', 'Godless Shrine': 'WB',
+      'Steam Vents': 'UR', 'Overgrown Tomb': 'BG', 'Sacred Foundry': 'RW',
+      'Breeding Pool': 'UG',
+      // Fast lands
+      'Seachrome Coast': 'WU', 'Darkslick Shores': 'UB', 'Blackcleave Cliffs': 'BR',
+      'Copperline Gorge': 'RG', 'Razorverge Thicket': 'GW', 'Concealed Courtyard': 'WB',
+      'Spirebluff Canal': 'UR', 'Blooming Marsh': 'BG', 'Inspiring Vantage': 'RW',
+      'Botanical Sanctum': 'UG',
+      // Pain lands
+      'Adarkar Wastes': 'WU', 'Underground River': 'UB', 'Sulfurous Springs': 'BR',
+      'Karplusan Forest': 'RG', 'Brushland': 'GW', 'Caves of Koilos': 'WB',
+      'Shivan Reef': 'UR', 'Llanowar Wastes': 'BG', 'Battlefield Forge': 'RW',
+      'Yavimaya Coast': 'UG',
+      // Creature lands
+      'Celestial Colonnade': 'WU', 'Creeping Tar Pit': 'UB', 'Lavaclaw Reaches': 'BR',
+      'Raging Ravine': 'RG', 'Stirring Wildwood': 'GW', 'Shambling Vent': 'WB',
+      'Wandering Fumarole': 'UR', 'Hissing Quagmire': 'BG', 'Needle Spires': 'RW',
+      'Lumbering Falls': 'UG',
+      // Survey lands
+      'Sunlit Marsh': 'WB', 'Shadowy Backstreet': 'UB', 'Raucous Theater': 'BR',
+      'Commercial District': 'RW', 'Lush Portico': 'GW', 'Elegant Parlor': 'WU',
+      'Undercity Sewers': 'BG', 'Thundering Falls': 'UR', 'Hedge Maze': 'GW',
+      'Underground Mortuary': 'BG',
+      // Other common duals
+      'Fabled Passage': '', 'Evolving Wilds': '', 'Terramorphic Expanse': '',
+      'Wastewood Verge': 'BG', 'Starting Town': ''
+    };
+
+    let inSideboard = false;
     for(const line of lines){
+      const trimmed = line.trim();
+
+      // Skip empty lines
+      if(!trimmed) continue;
+
+      // Check for Sideboard section and skip it
+      if(trimmed.toLowerCase() === 'sideboard'){
+        inSideboard = true;
+        continue;
+      }
+      if(trimmed.toLowerCase() === 'deck'){
+        inSideboard = false;
+        continue;
+      }
+
+      // Skip sideboard cards
+      if(inSideboard) continue;
+
       // Match format: "4 Lightning Bolt (DOM) 111" or "4x Lightning Bolt"
-      const match = line.match(/^(\d+)x?\s+(.+?)(?:\s+\([\w\d]+\)\s*\d*)?$/i);
+      const match = trimmed.match(/^(\d+)x?\s+(.+?)(?:\s+\([\w\d]+\)\s*\d*)?$/i);
       if(match){
         const count = parseInt(match[1], 10);
         const cardName = match[2].trim();
@@ -3022,6 +3075,15 @@
         for(const [land, color] of Object.entries(basicLands)){
           if(cardName.includes(land)){
             colorSet.add(color);
+          }
+        }
+
+        // Check dual/tri lands
+        for(const [landName, colors] of Object.entries(landColorMap)){
+          if(cardName.includes(landName)){
+            for(const c of colors){
+              colorSet.add(c);
+            }
           }
         }
 
@@ -3042,6 +3104,30 @@
       }).join(''),
       rawText: deckText
     };
+  }
+
+  // Helper: Check if player has valid deck list
+  function hasValidDeckList(player){
+    return player && player.deckList && player.deckList.trim();
+  }
+
+  // Helper: Export deck to clipboard with visual feedback
+  function exportDeckToClipboard(player, buttonElement){
+    if(!hasValidDeckList(player)){
+      alert('No deck list found for this player.');
+      return;
+    }
+    navigator.clipboard.writeText(player.deckList).then(()=>{
+      log(`Deck exported to clipboard for ${player.name}`);
+      const originalText = buttonElement.textContent;
+      buttonElement.textContent = '✅ Copied!';
+      setTimeout(()=>{
+        buttonElement.textContent = originalText;
+      }, 2000);
+    }).catch(err=>{
+      console.error('Failed to copy:', err);
+      alert('Failed to copy deck to clipboard. Please try again.');
+    });
   }
 
   // Show deck import dialog for a player
@@ -4199,6 +4285,9 @@
       }
     });
 
+    // Show/hide export deck button based on whether player has a deck list
+    exportPlayerDeckBtn.style.display = hasValidDeckList(p) ? 'inline-block' : 'none';
+
     playerOverlay.classList.add('show');
   }
 
@@ -4445,6 +4534,14 @@
     btnRow.appendChild(cancelBtn);
     matchDiv.appendChild(btnRow);
   }
+
+  exportPlayerDeckBtn.addEventListener('click',()=>{
+    if(currentPlayerCardId===null) return;
+    const evt = currentEvent();
+    const p = evt.players.find(x=>x.id===currentPlayerCardId);
+    if(!p) return;
+    exportDeckToClipboard(p, exportPlayerDeckBtn);
+  });
 
   toggleAfkBtn.addEventListener('click',()=>{
     if(currentPlayerCardId===null) return;
@@ -4790,11 +4887,7 @@
     winnerLunaSticker.style.display = isLuna ? 'block' : 'none';
 
     // Show export button if player has a deck list
-    if(player.deckList && player.deckList.trim()){
-      winnerExportBtn.style.display = 'inline-block';
-    }else{
-      winnerExportBtn.style.display = 'none';
-    }
+    winnerExportBtn.style.display = hasValidDeckList(player) ? 'inline-block' : 'none';
 
     winnerNameEl.textContent = player.name;
     if(reason==='luna'){
@@ -4917,8 +5010,22 @@
     runWinsInput.value = "0";
     runLossesInput.value = "0";
     updateResultsDisplay();
+
+    // Auto-detect deck colors from imported deck list
     selectedColorSet = new Set();
     Array.from(colorChips.children).forEach(ch=>ch.classList.remove('active'));
+    if(hasValidDeckList(player)){
+      const parsed = parseDeckList(player.deckList);
+      if(parsed.colors){
+        for(const c of parsed.colors){
+          selectedColorSet.add(c);
+          const chip = Array.from(colorChips.children).find(ch => ch.dataset.color === c);
+          if(chip) chip.classList.add('active');
+        }
+        log(`Auto-detected deck colors for ${player.name}: ${parsed.colors}`);
+      }
+    }
+
     // Reset match type to BO3
     Array.from(matchTypeChoice.children).forEach(ch=>{
       ch.classList.toggle('active', ch.dataset.matchType === 'BO3');
@@ -4949,21 +5056,7 @@
 
   winnerExportBtn.addEventListener('click',()=>{
     if(!pendingWinner) return;
-    if(!pendingWinner.deckList || !pendingWinner.deckList.trim()){
-      alert('No deck list found for this player.');
-      return;
-    }
-    // Copy to clipboard
-    navigator.clipboard.writeText(pendingWinner.deckList).then(()=>{
-      log(`Deck exported to clipboard for ${pendingWinner.name}`);
-      winnerExportBtn.textContent = '✅ Copied!';
-      setTimeout(()=>{
-        winnerExportBtn.textContent = '📋 Export to Arena';
-      }, 2000);
-    }).catch(err=>{
-      console.error('Failed to copy:', err);
-      alert('Failed to copy deck to clipboard. Please try again.');
-    });
+    exportDeckToClipboard(pendingWinner, winnerExportBtn);
   });
 
   winnerSkipBtn.addEventListener('click',()=>{
