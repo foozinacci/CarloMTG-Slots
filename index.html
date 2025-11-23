@@ -2640,6 +2640,7 @@
   function saveAll(){
     try{
       localStorage.setItem('carlo_slot_events', JSON.stringify(state));
+      console.log('[SAVE] Progress saved:', state.events.length, 'events');
 
       // Animate bulbs to show save confirmation
       const allBulbs = document.querySelectorAll('.bulb');
@@ -2657,17 +2658,24 @@
         });
       }, 600);
     }catch(e){
-      console.warn("Save failed", e);
+      console.error("❌ [SAVE ERROR]", e);
     }
   }
   function loadAll(){
     try{
       const raw = localStorage.getItem('carlo_slot_events');
-      if(!raw) return;
+      if(!raw){
+        console.log('[LOAD] No saved data found');
+        return;
+      }
       const parsed = JSON.parse(raw);
-      if(!parsed || typeof parsed !== 'object') return;
+      if(!parsed || typeof parsed !== 'object'){
+        console.warn('[LOAD] Invalid saved data');
+        return;
+      }
       if(parsed.events) state.events = parsed.events;
       if(parsed.currentEventIndex) state.currentEventIndex = parsed.currentEventIndex;
+      console.log('[LOAD] Progress loaded:', state.events.length, 'events');
       for(const evt of state.events){
         if(!evt) continue;
         evt.players = evt.players || [];
@@ -5415,18 +5423,27 @@
 
   // Save state when page is about to unload (refresh, close, navigate away)
   window.addEventListener('beforeunload', (e) => {
+    console.log('[EVENT] beforeunload - saving...');
+    saveAll();
+  });
+
+  // pagehide is more reliable on mobile (especially iOS)
+  window.addEventListener('pagehide', (e) => {
+    console.log('[EVENT] pagehide - saving...');
     saveAll();
   });
 
   // Additional save on visibility change (mobile backgrounding)
   document.addEventListener('visibilitychange', () => {
     if(document.hidden){
+      console.log('[EVENT] visibilitychange (hidden) - saving...');
       saveAll();
     }
   });
 
   // Auto-save every 5 seconds as a safety net
   setInterval(() => {
+    console.log('[EVENT] Auto-save timer - saving...');
     saveAll();
   }, 5000);
 })();
