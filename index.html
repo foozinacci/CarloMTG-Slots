@@ -39,6 +39,8 @@
       --theme-color:#fefce8;
       --theme-glow:rgba(254,252,232,0.6);
       --border:#fefce8;
+      --gradient-border:linear-gradient(90deg, #fefce8, #e5e7eb, #9ca3af, #1f2937, #000000, #1f2937, #9ca3af, #e5e7eb, #fefce8);
+      --gradient-shadow:linear-gradient(90deg, rgba(0,0,0,0.9), rgba(0,0,0,0.7), rgba(0,0,0,0.5), rgba(0,0,0,0.3), rgba(0,0,0,0.5), rgba(0,0,0,0.7), rgba(0,0,0,0.9));
     }
     body.theme-blue{
       --bg:#020617;
@@ -53,6 +55,8 @@
       --theme-color:#93c5fd;
       --theme-glow:rgba(147,197,253,0.7);
       --border:#93c5fd;
+      --gradient-border:linear-gradient(90deg, #93c5fd, #60a5fa, #3b82f6, #1e40af, #000000, #1e40af, #3b82f6, #60a5fa, #93c5fd);
+      --gradient-shadow:linear-gradient(90deg, rgba(0,0,0,0.9), rgba(0,0,0,0.7), rgba(0,0,0,0.5), rgba(0,0,0,0.3), rgba(0,0,0,0.5), rgba(0,0,0,0.7), rgba(0,0,0,0.9));
     }
     body.theme-black{
       --bg:#1e1b29;
@@ -67,6 +71,8 @@
       --theme-color:#c084fc;
       --theme-glow:rgba(192,132,252,0.7);
       --border:#c084fc;
+      --gradient-border:linear-gradient(90deg, #c084fc, #a855f7, #9333ea, #6b21a8, #000000, #6b21a8, #9333ea, #a855f7, #c084fc);
+      --gradient-shadow:linear-gradient(90deg, rgba(0,0,0,0.9), rgba(0,0,0,0.7), rgba(0,0,0,0.5), rgba(0,0,0,0.3), rgba(0,0,0,0.5), rgba(0,0,0,0.7), rgba(0,0,0,0.9));
     }
     body.theme-red{
       --bg:#3f0f12;
@@ -81,6 +87,8 @@
       --theme-color:#ef4444;
       --theme-glow:rgba(239,68,68,0.6);
       --border:#ef4444;
+      --gradient-border:linear-gradient(90deg, #ef4444, #dc2626, #b91c1c, #7f1d1d, #000000, #7f1d1d, #b91c1c, #dc2626, #ef4444);
+      --gradient-shadow:linear-gradient(90deg, rgba(0,0,0,0.9), rgba(0,0,0,0.7), rgba(0,0,0,0.5), rgba(0,0,0,0.3), rgba(0,0,0,0.5), rgba(0,0,0,0.7), rgba(0,0,0,0.9));
     }
     body.theme-green{
       --bg:#022c22;
@@ -95,6 +103,8 @@
       --theme-color:#22c55e;
       --theme-glow:rgba(34,197,94,0.6);
       --border:#22c55e;
+      --gradient-border:linear-gradient(90deg, #22c55e, #16a34a, #15803d, #14532d, #000000, #14532d, #15803d, #16a34a, #22c55e);
+      --gradient-shadow:linear-gradient(90deg, rgba(0,0,0,0.9), rgba(0,0,0,0.7), rgba(0,0,0,0.5), rgba(0,0,0,0.3), rgba(0,0,0,0.5), rgba(0,0,0,0.7), rgba(0,0,0,0.9));
     }
     body.theme-gold{
       --bg:#1e1814;
@@ -109,6 +119,8 @@
       --theme-color:#fcd34d;
       --theme-glow:rgba(252,211,77,0.8);
       --border:#fcd34d;
+      --gradient-border:linear-gradient(90deg, #fcd34d, #facc15, #eab308, #a16207, #000000, #a16207, #eab308, #facc15, #fcd34d);
+      --gradient-shadow:linear-gradient(90deg, rgba(0,0,0,0.9), rgba(0,0,0,0.7), rgba(0,0,0,0.5), rgba(0,0,0,0.3), rgba(0,0,0,0.5), rgba(0,0,0,0.7), rgba(0,0,0,0.9));
     }
 
     @keyframes gradientShift{
@@ -639,6 +651,12 @@
       overflow:hidden;
       position:relative;
       box-shadow:inset 0 0 18px rgba(15,23,42,.9),0 0 18px rgba(0,0,0,.9),0 0 24px var(--theme-glow);
+    }
+    /* Middle reel always has purple glow */
+    .reel:nth-child(2){
+      background:radial-gradient(circle at top,rgba(192,132,252,0.15) 0,#1a0a2e 70%);
+      box-shadow:inset 0 0 18px rgba(192,132,252,.2),0 0 18px rgba(192,132,252,.4),0 0 32px #c084fc;
+      border-color:rgba(192,132,252,.3);
     }
     body.theme-black .reel{
       background:radial-gradient(circle at top,rgba(192,132,252,0.15) 0,#1a0a2e 70%);
@@ -1261,6 +1279,7 @@
       letter-spacing:.12em;
       color:var(--muted);
       margin-bottom:4px;
+      text-align:center;
     }
     .finish-input-row{
       display:flex;
@@ -2198,12 +2217,12 @@
       </div>
       <div class="finish-field">
         <div class="finish-label">Match Format</div>
-        <select id="matchType" class="finish-select">
-          <option value="BO1">Best of 1</option>
-          <option value="BO3" selected>Best of 3</option>
-          <option value="BO5">Best of 5</option>
-        </select>
-        <div style="margin-top:6px;font-size:10px;color:var(--muted);">
+        <div class="queue-choice" id="matchTypeChoice">
+          <div class="queue-chip" data-match-type="BO1">BO1</div>
+          <div class="queue-chip active" data-match-type="BO3">BO3</div>
+          <div class="queue-chip" data-match-type="BO5">BO5</div>
+        </div>
+        <div style="margin-top:6px;font-size:10px;color:var(--muted);text-align:center;">
           BO1 = One opponent per game | BO3/BO5 = One opponent per match
         </div>
       </div>
@@ -2278,6 +2297,7 @@
               <th class="sortable-header" data-deck-sort="winRate">Win% <span class="sort-indicator"></span></th>
               <th style="cursor:default;">Matchups</th>
               <th class="sortable-header" data-deck-sort="last">Last <span class="sort-indicator"></span></th>
+              <th style="cursor:default;text-align:center;">Actions</th>
             </tr>
           </thead>
           <tbody id="deckTableBody"></tbody>
@@ -2460,7 +2480,7 @@
   const finishOverlay = document.getElementById('finishOverlay');
   const runWinsInput = document.getElementById('runWins');
   const runLossesInput = document.getElementById('runLosses');
-  const matchTypeSelect = document.getElementById('matchType');
+  const matchTypeChoice = document.getElementById('matchTypeChoice');
   const colorChips = document.getElementById('colorChips');
   const opponentColorsContainer = document.getElementById('opponentColorsContainer');
   const queueChoice = document.getElementById('queueChoice');
@@ -2559,7 +2579,12 @@
     regenerateOpponentColorSelectors();
   });
 
-  matchTypeSelect.addEventListener('change',()=>{
+  matchTypeChoice.addEventListener('click',e=>{
+    const chip = e.target.closest('.queue-chip');
+    if(!chip) return;
+    Array.from(matchTypeChoice.children).forEach(ch=>{
+      ch.classList.toggle('active', ch===chip);
+    });
     regenerateOpponentColorSelectors();
   });
 
@@ -3766,16 +3791,29 @@
 
       const tdLast = document.createElement('td');
       tdLast.textContent = d.lastBestOf || '-';
+
+      // Actions column with cog icon for editing
+      const tdActions = document.createElement('td');
+      tdActions.style.textAlign = 'center';
+      const editBtn = document.createElement('button');
+      editBtn.innerHTML = '⚙️';
+      editBtn.title = 'Edit deck';
+      editBtn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:16px;padding:4px 8px;opacity:0.7;transition:opacity 0.2s;';
+      editBtn.onmouseover = () => editBtn.style.opacity = '1';
+      editBtn.onmouseout = () => editBtn.style.opacity = '0.7';
+      editBtn.onclick = (e) => {
+        e.stopPropagation();
+        openDeckEditor(p, d);
+      };
+      tdActions.appendChild(editBtn);
+
       tr.appendChild(tdColor);
       tr.appendChild(tdMatches);
       tr.appendChild(tdWL);
       tr.appendChild(tdWinRate);
       tr.appendChild(tdMatchups);
       tr.appendChild(tdLast);
-
-      // Make deck row clickable to edit
-      tr.style.cursor = 'pointer';
-      tr.addEventListener('click', () => openDeckEditor(p, d));
+      tr.appendChild(tdActions);
 
       rows.push({
         deck: d,
@@ -4305,7 +4343,8 @@
   function regenerateOpponentColorSelectors(){
     const wins = Math.max(0, parseInt(runWinsInput.value, 10) || 0);
     const losses = Math.max(0, parseInt(runLossesInput.value, 10) || 0);
-    const matchType = matchTypeSelect.value;
+    const activeMatchType = matchTypeChoice.querySelector('.queue-chip.active');
+    const matchType = activeMatchType ? activeMatchType.dataset.matchType : 'BO3';
     const totalGames = wins + losses;
 
     // Clear existing content
@@ -4348,7 +4387,7 @@
         const chipsDiv = document.createElement('div');
         chipsDiv.className = 'opponent-color-chips';
         chipsDiv.dataset.gameIndex = i;
-        chipsDiv.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;';
+        chipsDiv.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;justify-content:center;';
 
         // Create color chips
         ['W', 'U', 'B', 'R', 'G', 'C'].forEach(color => {
@@ -4372,7 +4411,7 @@
       const chipsDiv = document.createElement('div');
       chipsDiv.className = 'opponent-color-chips';
       chipsDiv.dataset.gameIndex = 'match'; // Special marker for match-level
-      chipsDiv.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;';
+      chipsDiv.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;justify-content:center;';
 
       // Create color chips
       ['W', 'U', 'B', 'R', 'G', 'C'].forEach(color => {
@@ -4400,7 +4439,10 @@
     updateResultsDisplay();
     selectedColorSet = new Set();
     Array.from(colorChips.children).forEach(ch=>ch.classList.remove('active'));
-    matchTypeSelect.value = 'BO3'; // Reset to default
+    // Reset match type to BO3
+    Array.from(matchTypeChoice.children).forEach(ch=>{
+      ch.classList.toggle('active', ch.dataset.matchType === 'BO3');
+    });
     regenerateOpponentColorSelectors(); // Generate initial opponent selectors
     queueReaddChoice = 'yes';
     Array.from(queueChoice.children).forEach(ch=>{
@@ -4497,7 +4539,8 @@
     const wins = Math.max(0,parseInt(runWinsInput.value,10)||0);
     const losses = Math.max(0,parseInt(runLossesInput.value,10)||0);
     const colors = Array.from(selectedColorSet).join('');  // Keep input order, don't sort
-    const matchType = matchTypeSelect ? matchTypeSelect.value : 'BO3';
+    const activeMatchType = matchTypeChoice.querySelector('.queue-chip.active');
+    const matchType = activeMatchType ? activeMatchType.dataset.matchType : 'BO3';
 
     // Collect opponent colors from dynamic selectors
     let opponentColorsByGame = []; // Array for BO1, single element for BO3/BO5
