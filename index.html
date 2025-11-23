@@ -2654,8 +2654,15 @@
 
     try{
       console.log('[SAVE] Attempting to save state...');
-      localStorage.setItem('carlo_slot_events', JSON.stringify(state));
+      console.log('[SAVE] Current state:', JSON.stringify(state, null, 2));
+      const serialized = JSON.stringify(state);
+      console.log('[SAVE] Serialized length:', serialized.length, 'bytes');
+      localStorage.setItem('carlo_slot_events', serialized);
       console.log('[SAVE] ✅ localStorage.setItem succeeded');
+
+      // Verify it was actually saved
+      const verification = localStorage.getItem('carlo_slot_events');
+      console.log('[SAVE] Verification read back:', verification ? verification.length : 0, 'bytes');
       console.log('[SAVE] Progress saved:', state.events.length, 'events');
 
       // Update debug display to show success
@@ -2708,9 +2715,12 @@
   }
   function loadAll(){
     try{
+      console.log('[LOAD] Attempting to load from localStorage...');
+      console.log('[LOAD] localStorage keys:', Object.keys(localStorage));
       const raw = localStorage.getItem('carlo_slot_events');
+      console.log('[LOAD] Raw data length:', raw ? raw.length : 0, 'bytes');
       if(!raw){
-        console.log('[LOAD] No saved data found');
+        console.log('[LOAD] ❌ No saved data found');
         const debugText = document.getElementById('debugText');
         if(debugText){
           debugText.innerHTML = '⚠️ No saved data found - Starting fresh';
@@ -2718,6 +2728,7 @@
         }
         return;
       }
+      console.log('[LOAD] Raw data preview:', raw.substring(0, 200));
       const parsed = JSON.parse(raw);
       if(!parsed || typeof parsed !== 'object'){
         console.warn('[LOAD] Invalid saved data');
