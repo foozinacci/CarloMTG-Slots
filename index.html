@@ -2440,6 +2440,10 @@
     </div>
   </div>
 </div>
+<!-- DEBUG STATUS DISPLAY -->
+<div id="debugStatus" style="position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.9);color:#22c55e;font-family:monospace;font-size:10px;padding:4px 8px;z-index:99999;border-top:1px solid #22c55e;">
+  <div id="debugText">Initializing...</div>
+</div>
 <script>
 (function(){
   "use strict";
@@ -2642,6 +2646,14 @@
       localStorage.setItem('carlo_slot_events', JSON.stringify(state));
       console.log('[SAVE] Progress saved:', state.events.length, 'events');
 
+      // Update debug display
+      const debugText = document.getElementById('debugText');
+      if(debugText){
+        const time = new Date().toLocaleTimeString();
+        debugText.innerHTML = `✅ SAVED ${time} | Events: ${state.events.length} | Players: ${currentEvent().players.length}`;
+        debugText.style.color = '#22c55e';
+      }
+
       // Animate bulbs to show save confirmation
       const allBulbs = document.querySelectorAll('.bulb');
       const isWUBRG = selectedColors.size === 5;
@@ -2659,6 +2671,11 @@
       }, 600);
     }catch(e){
       console.error("❌ [SAVE ERROR]", e);
+      const debugText = document.getElementById('debugText');
+      if(debugText){
+        debugText.innerHTML = `❌ SAVE ERROR: ${e.message}`;
+        debugText.style.color = '#ef4444';
+      }
     }
   }
   function loadAll(){
@@ -2666,16 +2683,35 @@
       const raw = localStorage.getItem('carlo_slot_events');
       if(!raw){
         console.log('[LOAD] No saved data found');
+        const debugText = document.getElementById('debugText');
+        if(debugText){
+          debugText.innerHTML = '⚠️ No saved data found - Starting fresh';
+          debugText.style.color = '#facc15';
+        }
         return;
       }
       const parsed = JSON.parse(raw);
       if(!parsed || typeof parsed !== 'object'){
         console.warn('[LOAD] Invalid saved data');
+        const debugText = document.getElementById('debugText');
+        if(debugText){
+          debugText.innerHTML = '⚠️ Invalid saved data';
+          debugText.style.color = '#facc15';
+        }
         return;
       }
       if(parsed.events) state.events = parsed.events;
       if(parsed.currentEventIndex) state.currentEventIndex = parsed.currentEventIndex;
       console.log('[LOAD] Progress loaded:', state.events.length, 'events');
+
+      // Update debug display
+      const debugText = document.getElementById('debugText');
+      if(debugText){
+        const time = new Date().toLocaleTimeString();
+        debugText.innerHTML = `📥 LOADED ${time} | Events: ${state.events.length} | Ready`;
+        debugText.style.color = '#38bdf8';
+      }
+
       for(const evt of state.events){
         if(!evt) continue;
         evt.players = evt.players || [];
