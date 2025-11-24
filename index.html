@@ -3824,7 +3824,7 @@
       const tdName = document.createElement('td');
       // Add deck color identity if available
       let colorIcons = '';
-      if(p.colorIdentity && p.colorIdentity.length > 0){
+      if(Array.isArray(p.colorIdentity) && p.colorIdentity.length > 0){
         const pipUrls = {
           'W': 'https://i.ibb.co/sJpHH9VZ/W.png',
           'U': 'https://i.ibb.co/0bPLHLk/U.png',
@@ -5056,10 +5056,10 @@
     const colors = Array.from(deckImportColorSet).sort((a,b) => {
       const order = ['W','U','B','R','G','C'];
       return order.indexOf(a) - order.indexOf(b);
-    }).join('');
+    });
 
     // Check for duplicate name:color combination
-    const fullName = `${player.baseName}:${colors}`;
+    const fullName = `${player.baseName}:${colors.join('')}`;
     const duplicate = evt.players.find(p =>
       p.id !== player.id && p.name.toLowerCase() === fullName.toLowerCase()
     );
@@ -5075,14 +5075,14 @@
 
     // Create initial deck entry
     player.decks.push({
-      color: colors,
+      color: colors.join(''),
       wins: 0,
       losses: 0,
       matchups: {},
       lastBestOf: 'BO3'
     });
 
-    log(`Imported ${colors} deck for ${player.baseName}`);
+    log(`Imported ${colors.join('')} deck for ${player.baseName}`);
 
     deckImportOverlay.classList.remove('show');
     pendingImportPlayer = null;
