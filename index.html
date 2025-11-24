@@ -6226,23 +6226,19 @@
   }
 
   function applyGradientGlow(){
-    // No colors selected - activate Luna pink gradient mode
+    // No colors selected - activate Luna pink gradient mode (animates to black like mono-colored themes)
     if(selectedColors.size === 0){
-      const lunaColors = ['#fdf2ff', '#fb7185', '#ec4899', '#f973fa'];
-      const lunaGradient = `linear-gradient(90deg, ${lunaColors.join(', ')}, ${lunaColors.join(', ')})`;
-      const lunaShadow = 'linear-gradient(90deg, #fdf2ff, #fb7185, #ec4899, #f973fa, #fdf2ff, #fb7185)';
+      const lunaColor = '#f973fa'; // Luna's signature hot pink
+      const lunaShadowColor = '#e91e8c'; // Darker pink for shadow layer
+      const lunaGradient = `linear-gradient(90deg, ${lunaColor}, ${lunaColor}, #000000, #000000, ${lunaColor}, ${lunaColor})`;
+      const lunaShadow = `linear-gradient(90deg, ${lunaShadowColor}, ${lunaShadowColor}, #000000, #000000, ${lunaShadowColor}, ${lunaShadowColor})`;
+      document.documentElement.style.setProperty('--multi-theme-gradient', lunaGradient);
       document.documentElement.style.setProperty('--gradient-border', lunaGradient);
       document.documentElement.style.setProperty('--gradient-shadow', lunaShadow);
       document.documentElement.style.setProperty('--gradient-border-size', '200%');
-      // Luna conic gradient for logo ring
-      const lunaSegments = lunaColors.map((c, i) => {
-        const start = i * 90;
-        const end = start + 45;
-        return `${c} ${start}deg ${end}deg, transparent ${end}deg ${(i + 1) * 90}deg`;
-      }).join(', ');
-      document.documentElement.style.setProperty('--logo-ring-gradient', `conic-gradient(from 0deg, ${lunaSegments})`);
+      document.documentElement.style.setProperty('--logo-ring-gradient', `conic-gradient(from 0deg, ${lunaColor} 0deg 60deg, transparent 60deg 120deg, ${lunaColor} 120deg 180deg, transparent 180deg 240deg, ${lunaColor} 240deg 300deg, transparent 300deg 360deg)`);
       document.documentElement.style.setProperty('--theme-glow', 'rgba(249, 115, 250, 0.5)');
-      document.documentElement.style.setProperty('--theme-color', '#f973fa');
+      document.documentElement.style.setProperty('--theme-color', lunaColor);
       document.documentElement.style.setProperty('--button-text-color', '#ffffff');
       document.documentElement.style.setProperty('--button-text-is-gradient', '0');
       return;
