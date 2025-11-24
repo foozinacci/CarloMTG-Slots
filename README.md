@@ -74,10 +74,10 @@ The app includes comprehensive testing tools to **simulate many runs** without r
   - Probability distribution validation
 
 **Files:**
-- `comprehensive-simulation.js` - Full simulation suite
-- `run-simulation.js` - Quick simulation runner
-- `simulation-test.html` - Interactive simulation UI
-- `stress-test.js` - Load and performance testing
+- `tests/comprehensive-simulation.js` - Full simulation suite
+- `tests/run-simulation.js` - Quick simulation runner
+- `tests/simulation-test.html` - Interactive simulation UI
+- `tests/stress-test.js` - Load and performance testing
 
 ### Deck & Player Diagnostics
 
@@ -189,12 +189,12 @@ npx http-server -p 8000
 **For running simulations:**
 ```bash
 # Open simulation test UI
-open simulation-test.html
+open tests/simulation-test.html
 
 # Or run command-line simulations
-node run-simulation.js
-node comprehensive-simulation.js
-node stress-test.js
+node tests/run-simulation.js
+node tests/comprehensive-simulation.js
+node tests/stress-test.js
 ```
 
 ---
@@ -206,21 +206,25 @@ node stress-test.js
 ```
 .
 ├── index.html                      # Main application (all-in-one)
-├── simulation-test.html            # Interactive simulation UI
-├── comprehensive-simulation.js     # Full simulation test suite
-├── run-simulation.js              # Quick simulation runner
-├── stress-test.js                 # Performance/load testing
-├── BALANCE_IMPROVEMENTS.md        # Balance analysis and recommendations
-├── LUNA_CARLO_SCALING_ANALYSIS.md # Scaling mechanics documentation
-├── SIMULATION_ANALYSIS.md         # Simulation results and findings
-└── README.md                      # This file
+├── package.json                    # Project metadata and scripts
+├── LICENSE                         # MIT License
+├── README.md                       # This file
+├── docs/                           # Documentation
+│   ├── BALANCE_IMPROVEMENTS.md     # Balance analysis and recommendations
+│   ├── LUNA_CARLO_SCALING_ANALYSIS.md  # Scaling mechanics documentation
+│   └── SIMULATION_ANALYSIS.md      # Simulation results and findings
+└── tests/                          # Test and simulation tools
+    ├── simulation-test.html        # Interactive simulation UI
+    ├── comprehensive-simulation.js # Full simulation test suite
+    ├── run-simulation.js           # Quick simulation runner
+    └── stress-test.js              # Performance/load testing
 ```
 
 ### Tests & Utilities
 
 **Run comprehensive simulation:**
 ```bash
-node comprehensive-simulation.js
+node tests/comprehensive-simulation.js
 ```
 - Tests probability distributions
 - Validates spark/ignition mechanics
@@ -228,14 +232,14 @@ node comprehensive-simulation.js
 
 **Run quick stress test:**
 ```bash
-node stress-test.js
+node tests/stress-test.js
 ```
 - Tests with high player counts
 - Measures performance metrics
 - Identifies bottlenecks
 
 **Interactive simulation:**
-Open `simulation-test.html` in your browser for a visual interface to:
+Open `tests/simulation-test.html` in your browser for a visual interface to:
 - Configure player counts
 - Run multiple iterations
 - View real-time results
@@ -275,10 +279,10 @@ For the new clean repository:
 
 ## Documentation
 
-Additional documentation can be found in:
-- `BALANCE_IMPROVEMENTS.md` - Detailed balance analysis and tuning recommendations
-- `LUNA_CARLO_SCALING_ANALYSIS.md` - Mathematical analysis of scaling mechanics
-- `SIMULATION_ANALYSIS.md` - Comprehensive simulation test results
+Additional documentation can be found in the `docs/` directory:
+- `docs/BALANCE_IMPROVEMENTS.md` - Detailed balance analysis and tuning recommendations
+- `docs/LUNA_CARLO_SCALING_ANALYSIS.md` - Mathematical analysis of scaling mechanics
+- `docs/SIMULATION_ANALYSIS.md` - Comprehensive simulation test results
 
 ---
 

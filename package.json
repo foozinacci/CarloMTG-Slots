@@ -6,10 +6,10 @@
   "scripts": {
     "start": "npx http-server -p 8000 -o",
     "dev": "npx http-server -p 8000 -o",
-    "simulate": "node run-simulation.js",
-    "simulate:comprehensive": "node comprehensive-simulation.js",
-    "stress-test": "node stress-test.js",
-    "test": "node comprehensive-simulation.js && node stress-test.js"
+    "simulate": "node tests/run-simulation.js",
+    "simulate:comprehensive": "node tests/comprehensive-simulation.js",
+    "stress-test": "node tests/stress-test.js",
+    "test": "node tests/comprehensive-simulation.js && node tests/stress-test.js"
   },
   "keywords": [
     "slot-machine",
