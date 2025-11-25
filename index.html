@@ -362,7 +362,7 @@
     }
     .bottom-panels-container{
       display:flex;
-      flex-direction:row;
+      flex-direction:column;
       gap:12px;
       width:100%;
       max-width:100%;
@@ -370,7 +370,8 @@
     }
     .history-panel{
       flex:1 1 auto;
-      max-width:calc(40% - 4px);
+      max-width:100%;
+      width:100%;
       background:radial-gradient(circle at top,var(--panel) 0,var(--bg) 50%,#000 100%);
       border-radius:16px;
       border:3px solid transparent;
@@ -435,11 +436,12 @@
       overflow:hidden;
     }
     .leaderboard-panel{
-      flex:0 0 calc(60% - 8px);
+      flex:1 1 auto;
       display:flex;
       flex-direction:column;
       order:-1;
-      max-width:calc(60% - 8px);
+      max-width:100%;
+      width:100%;
     }
     .slot-panel::before,.leaderboard-panel::before{
       content:'';
@@ -551,6 +553,15 @@
       }
       .slot-panel,.leaderboard-panel{
         padding:8px;
+      }
+      .leaderboard-table td{
+        max-width:120px;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+      }
+      .leaderboard-table td img{
+        vertical-align:middle;
       }
       .lever{
         display:none;
@@ -2212,17 +2223,18 @@
       </section>
       <!-- BOTTOM PANELS (LEADERBOARD + HISTORY) -->
       <div class="bottom-panels-container">
-        <!-- LEADERBOARD PANEL (LEFT - 60%) -->
+        <!-- LEADERBOARD PANEL -->
         <section class="leaderboard-panel">
-          <div class="side-panel-header">
-            <div class="side-panel-section-title">Leaderboard Odds</div>
+          <div class="side-panel-header" id="leaderboardHeader" style="cursor:pointer;user-select:none;">
+            <div class="side-panel-section-title">Leaderboard Odds <span id="leaderboardExpandIcon" style="font-size:10px;margin-left:4px;">▼</span></div>
           </div>
-          <div id="playerCountHeader" style="font-size:10px;color:var(--muted);text-align:center;margin-bottom:8px;"></div>
-          <form class="add-player-form" id="addPlayerForm" autocomplete="off">
-            <input type="text" id="playerNameInput" name="player-name-input" placeholder="Add viewer (name / handle)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-            <button type="submit">Add</button>
-          </form>
-          <div class="leaderboard-wrapper">
+          <div class="leaderboard-content" id="leaderboardContent">
+            <div id="playerCountHeader" style="font-size:10px;color:var(--muted);text-align:center;margin-bottom:8px;"></div>
+            <form class="add-player-form" id="addPlayerForm" autocomplete="off">
+              <input type="text" id="playerNameInput" name="player-name-input" placeholder="Add viewer (name / handle)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+              <button type="submit">Add</button>
+            </form>
+            <div class="leaderboard-wrapper">
             <table class="leaderboard-table">
               <thead>
                 <tr>
@@ -2239,8 +2251,9 @@
               <tbody id="leaderboardBody"></tbody>
             </table>
           </div>
+          </div>
         </section>
-        <!-- HISTORY LOG PANEL (RIGHT - 40%) -->
+        <!-- HISTORY LOG PANEL -->
         <section class="history-panel">
           <div class="history-header" id="historyHeader" style="cursor:pointer;user-select:none;">
             History Log <span id="historyExpandIcon" style="font-size:10px;margin-left:4px;">▼</span>
@@ -2476,7 +2489,7 @@
     <div class="finish-card" style="max-width:500px;">
       <div class="finish-title">Import Deck for <span id="deckImportPlayerName"></span></div>
       <div class="finish-sub">
-        Select deck color identity. Copy your MTG Arena deck list, then click Import.
+        Select deck color identity and paste your MTG Arena deck list below.
       </div>
       <div class="finish-field">
         <div class="finish-label">Deck Color Identity</div>
@@ -2489,8 +2502,12 @@
           <div class="color-chip" data-color="C">C</div>
         </div>
       </div>
+      <div class="finish-field">
+        <div class="finish-label">Deck List (Paste your MTG Arena deck here)</div>
+        <textarea id="deckImportTextarea" placeholder="Paste your deck list here..." style="width:100%;min-height:120px;padding:8px;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:monospace;font-size:12px;resize:vertical;"></textarea>
+      </div>
       <div class="finish-actions">
-        <button id="deckImportSaveBtn" class="finish-save-btn">📋 Import Deck from Clipboard</button>
+        <button id="deckImportSaveBtn" class="finish-save-btn">Import Deck</button>
         <button id="deckImportSkipBtn" class="finish-cancel-btn">Skip (No Deck)</button>
       </div>
     </div>
@@ -2646,6 +2663,9 @@
   const logEl = document.getElementById('log');
   const historyHeader = document.getElementById('historyHeader');
   const historyExpandIcon = document.getElementById('historyExpandIcon');
+  const leaderboardHeader = document.getElementById('leaderboardHeader');
+  const leaderboardContent = document.getElementById('leaderboardContent');
+  const leaderboardExpandIcon = document.getElementById('leaderboardExpandIcon');
   const eventChipsEl = document.getElementById('eventChips');
   const bulbRowTop = document.getElementById('bulbRowTop');
   const bulbRowBottom = document.getElementById('bulbRowBottom');
@@ -2709,6 +2729,7 @@
   const deckImportOverlay = document.getElementById('deckImportOverlay');
   const deckImportPlayerName = document.getElementById('deckImportPlayerName');
   const deckImportColorChips = document.getElementById('deckImportColorChips');
+  const deckImportTextarea = document.getElementById('deckImportTextarea');
   const deckImportSaveBtn = document.getElementById('deckImportSaveBtn');
   const deckImportSkipBtn = document.getElementById('deckImportSkipBtn');
   const helpOverlay = document.getElementById('helpOverlay');
@@ -3136,8 +3157,9 @@
             // Random player
             const p = allPlayers[Math.floor(Math.random() * allPlayers.length)];
             div.className = 'reel-symbol player';
-            div.textContent = p.name;
-            div.innerHTML = p.name;
+            const displayName = p.baseName || p.name;
+            div.textContent = displayName;
+            div.innerHTML = displayName;
           }else if(rand < 0.5){
             // Krark (rare)
             div.className = 'reel-symbol luna';
@@ -3349,6 +3371,9 @@
     // Reset color selection
     deckImportColorSet.clear();
     Array.from(deckImportColorChips.children).forEach(ch => ch.classList.remove('active'));
+
+    // Clear textarea
+    deckImportTextarea.value = '';
 
     deckImportOverlay.classList.add('show');
     console.log('🎴 Overlay shown');
@@ -3614,7 +3639,7 @@
         }else{
           const p = randomWeightedPlayer(evt, i);
           if(p){
-            symbols.push({type:'player', playerId:p.id, name:p.name});
+            symbols.push({type:'player', playerId:p.id, name:p.name, baseName:p.baseName, colorIdentity:p.colorIdentity});
           }else{
             symbols.push({type:'letter', letter:letters[i]});
           }
@@ -3651,7 +3676,7 @@
         const winner = activePlayers[0];
         for(let i=0;i<5;i++){
           if(i < 3){
-            symbols.push({type:'player', playerId:winner.id, name:winner.name});
+            symbols.push({type:'player', playerId:winner.id, name:winner.name, baseName:winner.baseName, colorIdentity:winner.colorIdentity});
           }else{
             symbols.push({type:'letter', letter:letters[i]});
           }
@@ -3677,7 +3702,7 @@
         }else{
           const p = randomWeightedPlayer(evt, i);
           if(p){
-            symbols.push({type:'player', playerId:p.id, name:p.name});
+            symbols.push({type:'player', playerId:p.id, name:p.name, baseName:p.baseName, colorIdentity:p.colorIdentity});
           }else{
             symbols.push({type:'letter', letter:letters[i]});
           }
@@ -3698,9 +3723,28 @@
       const div = document.createElement('div');
       if(sym.type === 'player'){
         div.className = 'reel-symbol player';
-        div.textContent = sym.name;
+        // Use baseName if available, fallback to full name
+        const displayName = sym.baseName || sym.name;
+        div.textContent = displayName;
+
+        // Add color identity icons below name if available
+        if(Array.isArray(sym.colorIdentity) && sym.colorIdentity.length > 0){
+          const pipUrls = {
+            'W': 'https://i.ibb.co/sJpHH9VZ/W.png',
+            'U': 'https://i.ibb.co/0bPLHLk/U.png',
+            'B': 'https://i.ibb.co/nM1ZZz3z/B.png',
+            'R': 'https://i.ibb.co/NnjxnmZv/R.png',
+            'G': 'https://i.ibb.co/tM5Mb1Q0/G.png',
+            'C': 'https://i.ibb.co/xt4Lpn0X/C.png'
+          };
+          const colorIcons = sym.colorIdentity.map(c =>
+            pipUrls[c] ? `<img src="${pipUrls[c]}" style="width:12px;height:12px;display:inline-block;margin:0 1px;" alt="${c}"/>` : ''
+          ).join('');
+          div.innerHTML = `<div style="line-height:1.2;">${displayName}</div><div style="margin-top:2px;">${colorIcons}</div>`;
+        }
+
         // Dynamic name scaling based on length
-        const nameLen = sym.name.length;
+        const nameLen = displayName.length;
         if(nameLen <= 4){
           div.classList.add('name-short');
         }else if(nameLen <= 8){
@@ -3895,7 +3939,9 @@
         ).join('');
         colorIcons = ' ' + colorIcons;
       }
-      tdName.innerHTML = p.name + colorIcons + (p.status!=='active'
+      // Display baseName (without color code) + color icons
+      const displayName = p.baseName || p.name;
+      tdName.innerHTML = displayName + colorIcons + (p.status!=='active'
         ? " <span style='color:var(--red);font-size:10px;'>(AFK)</span>"
         : "");
       tdName.style.cursor = 'pointer';
@@ -4862,6 +4908,12 @@
     historyExpandIcon.textContent = isCurrentlyCollapsed ? '▼' : '▲';
   });
 
+  leaderboardHeader.addEventListener('click', () => {
+    const isCurrentlyCollapsed = leaderboardContent.style.display === 'none';
+    leaderboardContent.style.display = isCurrentlyCollapsed ? '' : 'none';
+    leaderboardExpandIcon.textContent = isCurrentlyCollapsed ? '▼' : '▲';
+  });
+
   // Leaderboard column sorting
   document.querySelectorAll('.sortable-header[data-sort]').forEach(th => {
     th.addEventListener('click', () => {
@@ -5080,7 +5132,7 @@
     }
   });
 
-  // Deck Import - Import from clipboard
+  // Deck Import - Import from textarea
   deckImportSaveBtn.addEventListener('click', async () => {
     if(!pendingImportPlayer) return;
 
@@ -5090,18 +5142,11 @@
       return;
     }
 
-    // Read deck list from clipboard
-    let deckText = '';
-    try {
-      deckText = await navigator.clipboard.readText();
-    } catch(err) {
-      console.error('Failed to read clipboard:', err);
-      alert('Failed to read from clipboard. Please ensure you have copied your deck list.');
-      return;
-    }
+    // Read deck list from textarea
+    let deckText = deckImportTextarea.value.trim();
 
-    if(!deckText || deckText.trim().length === 0){
-      alert('Clipboard is empty. Please copy your MTG Arena deck list first.');
+    if(!deckText || deckText.length === 0){
+      alert('Please paste your MTG Arena deck list in the text area above.');
       return;
     }
 
@@ -6193,7 +6238,7 @@
           symbols.push({type:'letter',letter:letters[i]});
         }else{
           const p = randomPlayer(i,active);
-          symbols.push({type:'player',name:p.name});
+          symbols.push({type:'player',playerId:p.id,name:p.name,baseName:p.baseName,colorIdentity:p.colorIdentity});
         }
       }
       if(symbols.every((s,i)=>s.type==='letter' && s.letter===letters[i])){carlo++;continue;}
@@ -6372,8 +6417,23 @@
     // Get the proper MTG color order for this combination
     const identityKey = getColorIdentityKey(selectedColors);
     const colorOrder = MTG_COLOR_ORDERS[identityKey] || Array.from(selectedColors);
-    const colors = colorOrder.map(code => COLOR_HEX[code]);
-    const shadows = colorOrder.map(code => SHADOW_HEX[code]);
+
+    // Special handling for U+B pairing - boost purple visibility
+    const isUBPair = selectedColors.has('U') && selectedColors.has('B');
+    const colors = colorOrder.map(code => {
+      // Use stronger purple when paired with blue
+      if(code === 'B' && isUBPair && selectedColors.size === 2){
+        return '#b666ff'; // More vibrant purple for U+B pairing
+      }
+      return COLOR_HEX[code];
+    });
+    const shadows = colorOrder.map(code => {
+      // Match shadow adjustment for U+B pairing
+      if(code === 'B' && isUBPair && selectedColors.size === 2){
+        return '#8800ff'; // Darker vibrant purple shadow
+      }
+      return SHADOW_HEX[code];
+    });
 
     // All 5 selected = gold with WUBRG order
     if(selectedColors.size === 5){
