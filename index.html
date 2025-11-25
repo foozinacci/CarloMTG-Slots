@@ -652,6 +652,18 @@
         word-wrap:break-word;
         overflow-wrap:break-word;
       }
+      .footer-bar{
+        position:fixed;
+        z-index:9999;
+        padding:10px 8px;
+      }
+      .footer-buttons{
+        gap:8px;
+      }
+      .footer-buttons button{
+        font-size:9px;
+        padding:6px 10px;
+      }
     }
     .reels-shell{
       position:relative;
@@ -4087,7 +4099,7 @@
     const p = evt.players.find(x=>x.id===playerId);
     if(!p) return;
     currentPlayerCardId = playerId;
-    playerCardName.textContent = p.name;
+    playerCardName.textContent = p.baseName || p.name;
     playerCardStatus.textContent = p.status === 'active' ? 'Active' : 'AFK';
 
     // Render reel probability pie charts
@@ -5315,24 +5327,29 @@
     currentWinnerMeta = {reason,hits};
     winnerLunaSticker.style.display = isLuna ? 'block' : 'none';
 
-    winnerNameEl.textContent = player.name;
+    const displayName = player.baseName || player.name;
+    const colorIcons = Array.isArray(player.colorIdentity) && player.colorIdentity.length > 0
+      ? colorToIcons(player.colorIdentity.join(''))
+      : '';
+
+    winnerNameEl.innerHTML = displayName + (colorIcons ? ' ' + colorIcons : '');
     if(reason==='luna'){
       winnerHeading.textContent = 'KRARK LUCK!';
-      winnerMetaEl.textContent = `${player.name} wins with Krark Luck!`;
+      winnerMetaEl.textContent = `${displayName} wins with Krark Luck!`;
     }else if(reason==='ignited'){
       winnerHeading.textContent = 'IGNITED!';
-      winnerMetaEl.textContent = `${player.name} has ${MAX_SPARKS} sparks & has been Ignited.`;
+      winnerMetaEl.textContent = `${displayName} has ${MAX_SPARKS} sparks & has been Ignited.`;
     }else if(reason==='carlo'){
       winnerHeading.textContent = 'CoAST PICK';
       winnerMetaEl.textContent = `CoAST hit – streamer plays their own deck this round.`;
     }else{
       winnerHeading.textContent = 'WINNER';
       if(hits>=5){
-        winnerMetaEl.textContent = `${player.name} hit 5 symbols – high-odds pick!`;
+        winnerMetaEl.textContent = `${displayName} hit 5 symbols – high-odds pick!`;
       }else if(hits===4){
-        winnerMetaEl.textContent = `${player.name} hit 4 symbols – strong roll.`;
+        winnerMetaEl.textContent = `${displayName} hit 4 symbols – strong roll.`;
       }else{
-        winnerMetaEl.textContent = `${player.name}'s deck is up next.`;
+        winnerMetaEl.textContent = `${displayName}'s deck is up next.`;
       }
     }
     winnerOverlay.classList.add('show');
@@ -5394,26 +5411,48 @@
           chipsDiv.appendChild(chip);
         });
 
-        // Add result selector (Win/Loss)
+        // Add result selector (Win/Loss) with proper button styling
         const resultDiv = document.createElement('div');
-        resultDiv.style.cssText = 'display:flex;gap:6px;justify-content:center;margin-top:4px;';
+        resultDiv.style.cssText = 'display:flex;gap:8px;justify-content:center;margin-top:8px;align-items:center;';
 
-        const winChip = document.createElement('div');
-        winChip.className = 'result-chip';
-        winChip.dataset.result = 'win';
-        winChip.dataset.gameIndex = i;
-        winChip.textContent = '+Win';
-        winChip.style.cssText = 'padding:4px 12px;background:rgba(34,197,94,0.2);border:1px solid rgba(34,197,94,0.5);border-radius:4px;cursor:pointer;font-size:11px;color:#22c55e;';
+        // Win section
+        const winSection = document.createElement('div');
+        winSection.style.cssText = 'display:flex;gap:4px;align-items:center;';
 
-        const lossChip = document.createElement('div');
-        lossChip.className = 'result-chip';
-        lossChip.dataset.result = 'loss';
-        lossChip.dataset.gameIndex = i;
-        lossChip.textContent = '-Loss';
-        lossChip.style.cssText = 'padding:4px 12px;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.5);border-radius:4px;cursor:pointer;font-size:11px;color:#ef4444;';
+        const winLabel = document.createElement('span');
+        winLabel.textContent = 'Win:';
+        winLabel.style.cssText = 'font-size:10px;color:#22c55e;font-weight:600;';
 
-        resultDiv.appendChild(winChip);
-        resultDiv.appendChild(lossChip);
+        const winBtn = document.createElement('button');
+        winBtn.className = 'result-chip adjust-btn';
+        winBtn.dataset.result = 'win';
+        winBtn.dataset.gameIndex = i;
+        winBtn.textContent = '+';
+        winBtn.style.cssText = 'padding:4px 10px;font-size:12px;min-width:auto;';
+
+        winSection.appendChild(winLabel);
+        winSection.appendChild(winBtn);
+
+        // Loss section
+        const lossSection = document.createElement('div');
+        lossSection.style.cssText = 'display:flex;gap:4px;align-items:center;';
+
+        const lossLabel = document.createElement('span');
+        lossLabel.textContent = 'Loss:';
+        lossLabel.style.cssText = 'font-size:10px;color:#ef4444;font-weight:600;';
+
+        const lossBtn = document.createElement('button');
+        lossBtn.className = 'result-chip adjust-btn';
+        lossBtn.dataset.result = 'loss';
+        lossBtn.dataset.gameIndex = i;
+        lossBtn.textContent = '+';
+        lossBtn.style.cssText = 'padding:4px 10px;font-size:12px;min-width:auto;';
+
+        lossSection.appendChild(lossLabel);
+        lossSection.appendChild(lossBtn);
+
+        resultDiv.appendChild(winSection);
+        resultDiv.appendChild(lossSection);
 
         gameDiv.appendChild(gameLabelDiv);
         gameDiv.appendChild(chipsDiv);
@@ -5457,26 +5496,48 @@
           chipsDiv.appendChild(chip);
         });
 
-        // Add result selector (Win/Loss)
+        // Add result selector (Win/Loss) with proper button styling
         const resultDiv = document.createElement('div');
-        resultDiv.style.cssText = 'display:flex;gap:6px;justify-content:center;margin-top:4px;';
+        resultDiv.style.cssText = 'display:flex;gap:8px;justify-content:center;margin-top:8px;align-items:center;';
 
-        const winChip = document.createElement('div');
-        winChip.className = 'result-chip';
-        winChip.dataset.result = 'win';
-        winChip.dataset.gameIndex = i;
-        winChip.textContent = '+Win';
-        winChip.style.cssText = 'padding:4px 12px;background:rgba(34,197,94,0.2);border:1px solid rgba(34,197,94,0.5);border-radius:4px;cursor:pointer;font-size:11px;color:#22c55e;';
+        // Win section
+        const winSection = document.createElement('div');
+        winSection.style.cssText = 'display:flex;gap:4px;align-items:center;';
 
-        const lossChip = document.createElement('div');
-        lossChip.className = 'result-chip';
-        lossChip.dataset.result = 'loss';
-        lossChip.dataset.gameIndex = i;
-        lossChip.textContent = '-Loss';
-        lossChip.style.cssText = 'padding:4px 12px;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.5);border-radius:4px;cursor:pointer;font-size:11px;color:#ef4444;';
+        const winLabel = document.createElement('span');
+        winLabel.textContent = 'Win:';
+        winLabel.style.cssText = 'font-size:10px;color:#22c55e;font-weight:600;';
 
-        resultDiv.appendChild(winChip);
-        resultDiv.appendChild(lossChip);
+        const winBtn = document.createElement('button');
+        winBtn.className = 'result-chip adjust-btn';
+        winBtn.dataset.result = 'win';
+        winBtn.dataset.gameIndex = i;
+        winBtn.textContent = '+';
+        winBtn.style.cssText = 'padding:4px 10px;font-size:12px;min-width:auto;';
+
+        winSection.appendChild(winLabel);
+        winSection.appendChild(winBtn);
+
+        // Loss section
+        const lossSection = document.createElement('div');
+        lossSection.style.cssText = 'display:flex;gap:4px;align-items:center;';
+
+        const lossLabel = document.createElement('span');
+        lossLabel.textContent = 'Loss:';
+        lossLabel.style.cssText = 'font-size:10px;color:#ef4444;font-weight:600;';
+
+        const lossBtn = document.createElement('button');
+        lossBtn.className = 'result-chip adjust-btn';
+        lossBtn.dataset.result = 'loss';
+        lossBtn.dataset.gameIndex = i;
+        lossBtn.textContent = '+';
+        lossBtn.style.cssText = 'padding:4px 10px;font-size:12px;min-width:auto;';
+
+        lossSection.appendChild(lossLabel);
+        lossSection.appendChild(lossBtn);
+
+        resultDiv.appendChild(winSection);
+        resultDiv.appendChild(lossSection);
 
         matchDiv.appendChild(matchLabelDiv);
         matchDiv.appendChild(chipsDiv);
@@ -6051,7 +6112,7 @@
           evt.carloHits++;
           winnerOverlay.classList.add('show');
           winnerHeading.textContent='CoAST!';
-          winnerNameEl.textContent='CoAST';
+          winnerNameEl.innerHTML='CoAST';
           winnerMetaEl.textContent='Streamer plays their own deck this round.';
           winnerLunaSticker.style.display='none';
           pendingWinner=null;
