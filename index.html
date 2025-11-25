@@ -2042,6 +2042,7 @@
     }
     .help-section-title{
       font-size:11px;
+      font-weight:700;
       text-transform:uppercase;
       letter-spacing:.12em;
       color:var(--muted);
@@ -2161,8 +2162,8 @@
       justify-content:center;
     }
     .spark-bulb{
-      width:24px;
-      height:24px;
+      width:32px;
+      height:32px;
       border-radius:50%;
       background:rgba(0,0,0,0.5);
       border:2px solid rgba(148,116,72,.5);
@@ -2188,9 +2189,9 @@
       }
     }
     .spark-overflow-bulb{
-      width:60px;
-      height:20px;
-      border-radius:10px;
+      width:72px;
+      height:24px;
+      border-radius:12px;
       background:rgba(0,0,0,0.5);
       border:2px solid rgba(148,116,72,.5);
       display:flex;
@@ -2217,7 +2218,7 @@
       content:'';
       position:absolute;
       inset:-2px;
-      border-radius:10px;
+      border-radius:12px;
       background:linear-gradient(90deg, #fefce8, #38bdf8, #4b5563, #fb4b4b, #22c55e, #fefce8);
       background-size:200% 100%;
       z-index:1;
@@ -2232,7 +2233,7 @@
       50%{box-shadow:0 0 20px rgba(252,211,77,0.8),0 0 40px rgba(56,189,248,0.6),0 0 20px rgba(239,68,68,0.6);}
     }
     .spark-overflow-label{
-      font-size:8px;
+      font-size:9px;
       font-weight:800;
       letter-spacing:.08em;
       color:rgba(255,255,255,0.4);
@@ -2430,14 +2431,39 @@
   </div>
   <!-- RE-ADD TO QUEUE OVERLAY -->
   <div class="overlay" id="requeueOverlay">
-    <div class="finish-card" style="max-width:400px;">
+    <div class="finish-card" style="max-width:450px;">
       <div class="finish-title">Re-add to Queue?</div>
       <div class="finish-sub">
-        Would you like <span id="requeuePlayerName"></span> to be re-added to the queue?
+        Would you like <span id="requeuePlayerName"></span> <span id="requeuePlayerDeckIdentity"></span> to be re-added to the queue?
       </div>
-      <div class="finish-actions" style="margin-top:16px;">
-        <button type="button" id="requeueYesBtn" class="primary">Yes</button>
-        <button type="button" id="requeueNoBtn">No</button>
+      <div class="finish-field" style="margin-top:16px;">
+        <div class="finish-label" style="margin-bottom:8px;">Deck Options</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button type="button" id="requeueSameDeckBtn" class="primary">Same Deck</button>
+          <button type="button" id="requeueNewDeckBtn">Different Deck</button>
+          <button type="button" id="requeueNoBtn">No</button>
+        </div>
+      </div>
+      <div id="requeueNewDeckFields" style="display:none;margin-top:12px;">
+        <div class="finish-field">
+          <div class="finish-label">New Deck Color Identity</div>
+          <div class="queue-choice" id="requeueColorChoice" style="margin-top:8px;">
+            <div class="color-chip" data-color="W">W</div>
+            <div class="color-chip" data-color="U">U</div>
+            <div class="color-chip" data-color="B">B</div>
+            <div class="color-chip" data-color="R">R</div>
+            <div class="color-chip" data-color="G">G</div>
+            <div class="color-chip" data-color="C">C</div>
+          </div>
+        </div>
+        <div class="finish-field" style="margin-top:12px;">
+          <div class="finish-label">Deck Code (Optional)</div>
+          <input type="text" id="requeueDeckCodeInput" placeholder="Enter deck code..." style="width:100%;padding:8px;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:11px;margin-top:4px;" />
+        </div>
+        <div class="finish-actions" style="margin-top:12px;">
+          <button type="button" id="requeueConfirmNewDeckBtn" class="primary">Confirm</button>
+          <button type="button" id="requeueCancelNewDeckBtn">Cancel</button>
+        </div>
       </div>
     </div>
   </div>
@@ -2783,8 +2809,15 @@
   const finishSaveBtn = document.getElementById('finishSaveBtn');
   const requeueOverlay = document.getElementById('requeueOverlay');
   const requeuePlayerName = document.getElementById('requeuePlayerName');
-  const requeueYesBtn = document.getElementById('requeueYesBtn');
+  const requeuePlayerDeckIdentity = document.getElementById('requeuePlayerDeckIdentity');
+  const requeueSameDeckBtn = document.getElementById('requeueSameDeckBtn');
+  const requeueNewDeckBtn = document.getElementById('requeueNewDeckBtn');
   const requeueNoBtn = document.getElementById('requeueNoBtn');
+  const requeueNewDeckFields = document.getElementById('requeueNewDeckFields');
+  const requeueColorChoice = document.getElementById('requeueColorChoice');
+  const requeueDeckCodeInput = document.getElementById('requeueDeckCodeInput');
+  const requeueConfirmNewDeckBtn = document.getElementById('requeueConfirmNewDeckBtn');
+  const requeueCancelNewDeckBtn = document.getElementById('requeueCancelNewDeckBtn');
   const bonusRewardOverlay = document.getElementById('bonusRewardOverlay');
   const bonusPlayerName = document.getElementById('bonusPlayerName');
   const bonusHitCount = document.getElementById('bonusHitCount');
@@ -3850,12 +3883,19 @@
         // Use baseName if available, fallback to full name
         const displayName = sym.baseName || sym.name;
 
-        // Split name into primary and secondary (if space exists)
-        const nameParts = displayName.trim().split(/\s+/);
-        const primaryName = nameParts[0] || displayName;
-        const secondaryName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+        // Split name at first space only (max 2 lines) and limit to 9 chars per line
+        const spaceIndex = displayName.indexOf(' ');
+        let line1 = '';
+        let line2 = '';
 
-        div.textContent = displayName;
+        if(spaceIndex > 0){
+          // Split at first space
+          line1 = displayName.substring(0, spaceIndex).substring(0, 9);
+          line2 = displayName.substring(spaceIndex + 1).substring(0, 9);
+        } else {
+          // No space, just use the name (up to 9 chars)
+          line1 = displayName.substring(0, 9);
+        }
 
         // Add color identity icons below name if available
         if(Array.isArray(sym.colorIdentity) && sym.colorIdentity.length > 0){
@@ -3871,24 +3911,24 @@
             pipUrls[c] ? `<img src="${pipUrls[c]}" style="width:12px;height:12px;display:inline-block;margin:0 1px;" alt="${c}"/>` : ''
           ).join('');
 
-          // Build HTML with primary name, optional secondary name, and color icons
-          let nameHTML = `<div style="line-height:1.1;font-size:inherit;word-wrap:break-word;">${primaryName}</div>`;
-          if(secondaryName){
-            nameHTML += `<div style="line-height:1.1;font-size:0.85em;margin-top:1px;word-wrap:break-word;">(${secondaryName})</div>`;
+          // Build HTML with line1, optional line2, and color icons on one horizontal line
+          let nameHTML = `<div style="line-height:1.1;font-size:inherit;">${line1}</div>`;
+          if(line2){
+            nameHTML += `<div style="line-height:1.1;font-size:inherit;margin-top:1px;">${line2}</div>`;
           }
-          nameHTML += `<div style="margin-top:2px;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:1px;">${colorIcons}</div>`;
+          nameHTML += `<div style="margin-top:2px;display:flex;justify-content:center;align-items:center;flex-wrap:nowrap;gap:1px;">${colorIcons}</div>`;
           div.innerHTML = nameHTML;
         }else{
-          // No color icons, just show primary and optional secondary name
-          let nameHTML = `<div style="line-height:1.1;font-size:inherit;word-wrap:break-word;">${primaryName}</div>`;
-          if(secondaryName){
-            nameHTML += `<div style="line-height:1.1;font-size:0.85em;margin-top:1px;word-wrap:break-word;">(${secondaryName})</div>`;
+          // No color icons, just show line1 and optional line2
+          let nameHTML = `<div style="line-height:1.1;font-size:inherit;">${line1}</div>`;
+          if(line2){
+            nameHTML += `<div style="line-height:1.1;font-size:inherit;margin-top:1px;">${line2}</div>`;
           }
           div.innerHTML = nameHTML;
         }
 
         // Dynamic name scaling based on primary name length
-        const nameLen = primaryName.length;
+        const nameLen = line1.length;
         if(nameLen <= 4){
           div.classList.add('name-short');
         }else if(nameLen <= 8){
@@ -5464,13 +5504,21 @@
       const activeChips = Array.from(group.querySelectorAll('.color-chip.active'));
       const selectedColors = activeChips.map(chip => chip.dataset.color);
 
-      // Get the result for this game/match
+      // Get the result for this game/match (BO1 uses result-chip, BO3/BO5 uses won/lost inputs)
       const resultChip = opponentColorsContainer.querySelector(`.result-chip.active[data-game-index="${index}"]`);
       const selectedResult = resultChip ? resultChip.dataset.result : null;
 
+      // Get won/lost counts for BO3/BO5
+      const wonInput = opponentColorsContainer.querySelector(`.match-won-input[data-game-index="${index}"]`);
+      const lostInput = opponentColorsContainer.querySelector(`.match-lost-input[data-game-index="${index}"]`);
+      const won = wonInput ? parseInt(wonInput.value, 10) || 0 : 0;
+      const lost = lostInput ? parseInt(lostInput.value, 10) || 0 : 0;
+
       savedSelections.push({
         colors: selectedColors,
-        result: selectedResult
+        result: selectedResult,
+        won: won,
+        lost: lost
       });
     });
 
@@ -5611,7 +5659,7 @@
 
       const helpText = document.createElement('div');
       helpText.style.cssText = 'font-size:10px;color:var(--muted);margin-bottom:8px;text-align:center;';
-      helpText.textContent = 'Click color icons to select opponent colors, then click Win or Loss for each match';
+      helpText.textContent = 'Click color icons to select opponent colors, then enter Won/Lost game counts for each match';
       opponentColorsContainer.appendChild(helpText);
 
       // Create scrollable container for opponent groups
@@ -5644,48 +5692,94 @@
           chipsDiv.appendChild(chip);
         });
 
-        // Add result selector (Win/Loss) with proper button styling
+        // Add result counters (Won/Lost games within the match) with +/- buttons
         const resultDiv = document.createElement('div');
-        resultDiv.style.cssText = 'display:flex;gap:8px;justify-content:center;margin-top:8px;align-items:center;';
+        resultDiv.style.cssText = 'display:flex;gap:12px;justify-content:center;margin-top:8px;align-items:center;';
 
-        // Win section
-        const winSection = document.createElement('div');
-        winSection.style.cssText = 'display:flex;gap:4px;align-items:center;';
+        // Won games counter
+        const wonSection = document.createElement('div');
+        wonSection.style.cssText = 'display:flex;gap:4px;align-items:center;';
 
-        const winLabel = document.createElement('span');
-        winLabel.textContent = 'Win:';
-        winLabel.style.cssText = 'font-size:10px;color:#22c55e;font-weight:600;';
+        const wonLabel = document.createElement('span');
+        wonLabel.textContent = 'Won:';
+        wonLabel.style.cssText = 'font-size:10px;color:#22c55e;font-weight:600;';
 
-        const winBtn = document.createElement('button');
-        winBtn.className = 'result-chip adjust-btn';
-        winBtn.dataset.result = 'win';
-        winBtn.dataset.gameIndex = i;
-        winBtn.textContent = '+';
-        winBtn.style.cssText = 'padding:4px 10px;font-size:12px;min-width:auto;';
+        const wonMinusBtn = document.createElement('button');
+        wonMinusBtn.className = 'adjust-btn';
+        wonMinusBtn.textContent = '−';
+        wonMinusBtn.style.cssText = 'padding:4px 8px;font-size:12px;min-width:auto;';
+        wonMinusBtn.onclick = () => {
+          const input = wonInput;
+          const val = Math.max(0, parseInt(input.value, 10) - 1);
+          input.value = val;
+        };
 
-        winSection.appendChild(winLabel);
-        winSection.appendChild(winBtn);
+        const wonInput = document.createElement('input');
+        wonInput.type = 'number';
+        wonInput.min = '0';
+        wonInput.value = '0';
+        wonInput.className = 'match-won-input';
+        wonInput.dataset.gameIndex = i;
+        wonInput.style.cssText = 'width:40px;text-align:center;padding:4px;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:11px;';
 
-        // Loss section
-        const lossSection = document.createElement('div');
-        lossSection.style.cssText = 'display:flex;gap:4px;align-items:center;';
+        const wonPlusBtn = document.createElement('button');
+        wonPlusBtn.className = 'adjust-btn';
+        wonPlusBtn.textContent = '+';
+        wonPlusBtn.style.cssText = 'padding:4px 8px;font-size:12px;min-width:auto;';
+        wonPlusBtn.onclick = () => {
+          const input = wonInput;
+          const val = Math.max(0, parseInt(input.value, 10) + 1);
+          input.value = val;
+        };
 
-        const lossLabel = document.createElement('span');
-        lossLabel.textContent = 'Loss:';
-        lossLabel.style.cssText = 'font-size:10px;color:#ef4444;font-weight:600;';
+        wonSection.appendChild(wonLabel);
+        wonSection.appendChild(wonMinusBtn);
+        wonSection.appendChild(wonInput);
+        wonSection.appendChild(wonPlusBtn);
 
-        const lossBtn = document.createElement('button');
-        lossBtn.className = 'result-chip adjust-btn';
-        lossBtn.dataset.result = 'loss';
-        lossBtn.dataset.gameIndex = i;
-        lossBtn.textContent = '+';
-        lossBtn.style.cssText = 'padding:4px 10px;font-size:12px;min-width:auto;';
+        // Lost games counter
+        const lostSection = document.createElement('div');
+        lostSection.style.cssText = 'display:flex;gap:4px;align-items:center;';
 
-        lossSection.appendChild(lossLabel);
-        lossSection.appendChild(lossBtn);
+        const lostLabel = document.createElement('span');
+        lostLabel.textContent = 'Lost:';
+        lostLabel.style.cssText = 'font-size:10px;color:#ef4444;font-weight:600;';
 
-        resultDiv.appendChild(winSection);
-        resultDiv.appendChild(lossSection);
+        const lostMinusBtn = document.createElement('button');
+        lostMinusBtn.className = 'adjust-btn';
+        lostMinusBtn.textContent = '−';
+        lostMinusBtn.style.cssText = 'padding:4px 8px;font-size:12px;min-width:auto;';
+        lostMinusBtn.onclick = () => {
+          const input = lostInput;
+          const val = Math.max(0, parseInt(input.value, 10) - 1);
+          input.value = val;
+        };
+
+        const lostInput = document.createElement('input');
+        lostInput.type = 'number';
+        lostInput.min = '0';
+        lostInput.value = '0';
+        lostInput.className = 'match-lost-input';
+        lostInput.dataset.gameIndex = i;
+        lostInput.style.cssText = 'width:40px;text-align:center;padding:4px;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:11px;';
+
+        const lostPlusBtn = document.createElement('button');
+        lostPlusBtn.className = 'adjust-btn';
+        lostPlusBtn.textContent = '+';
+        lostPlusBtn.style.cssText = 'padding:4px 8px;font-size:12px;min-width:auto;';
+        lostPlusBtn.onclick = () => {
+          const input = lostInput;
+          const val = Math.max(0, parseInt(input.value, 10) + 1);
+          input.value = val;
+        };
+
+        lostSection.appendChild(lostLabel);
+        lostSection.appendChild(lostMinusBtn);
+        lostSection.appendChild(lostInput);
+        lostSection.appendChild(lostPlusBtn);
+
+        resultDiv.appendChild(wonSection);
+        resultDiv.appendChild(lostSection);
 
         matchDiv.appendChild(matchLabelDiv);
         matchDiv.appendChild(chipsDiv);
@@ -5705,13 +5799,14 @@
               if(chip) chip.classList.add('active');
             });
           }
-          if(saved.result){
-            const resultChip = opponentColorsContainer.querySelector(`.result-chip[data-result="${saved.result}"][data-game-index="${index}"]`);
-            if(resultChip){
-              resultChip.classList.add('active');
-              resultChip.style.fontWeight = 'bold';
-              resultChip.style.opacity = '1';
-            }
+          // Restore won/lost counts
+          const wonInput = opponentColorsContainer.querySelector(`.match-won-input[data-game-index="${index}"]`);
+          const lostInput = opponentColorsContainer.querySelector(`.match-lost-input[data-game-index="${index}"]`);
+          if(wonInput && saved.won !== undefined){
+            wonInput.value = saved.won;
+          }
+          if(lostInput && saved.lost !== undefined){
+            lostInput.value = saved.lost;
           }
         }
       });
@@ -5860,11 +5955,28 @@
       }
 
       // Get the result for this game/match
-      const resultChip = opponentColorsContainer.querySelector(`.result-chip.active[data-game-index="${index}"]`);
-      if(resultChip){
-        resultsByGame.push(resultChip.dataset.result);
+      if(matchType === 'BO1'){
+        // BO1: Use result chips (win/loss buttons)
+        const resultChip = opponentColorsContainer.querySelector(`.result-chip.active[data-game-index="${index}"]`);
+        if(resultChip){
+          resultsByGame.push(resultChip.dataset.result);
+        } else {
+          resultsByGame.push(null); // No result selected
+        }
       } else {
-        resultsByGame.push(null); // No result selected
+        // BO3/BO5: Use won/lost counters to determine match result
+        const wonInput = opponentColorsContainer.querySelector(`.match-won-input[data-game-index="${index}"]`);
+        const lostInput = opponentColorsContainer.querySelector(`.match-lost-input[data-game-index="${index}"]`);
+        const won = wonInput ? parseInt(wonInput.value, 10) || 0 : 0;
+        const lost = lostInput ? parseInt(lostInput.value, 10) || 0 : 0;
+
+        if(won > lost){
+          resultsByGame.push('win');
+        } else if(lost > won){
+          resultsByGame.push('loss');
+        } else {
+          resultsByGame.push(null); // Tie or no games played
+        }
       }
     });
 
@@ -5877,7 +5989,10 @@
         return;
       }
       if(!resultsByGame[i]){
-        alert(`${matchLabel}: Please select Win or Loss before saving.`);
+        const msg = matchType === 'BO1'
+          ? `${matchLabel}: Please select Win or Loss before saving.`
+          : `${matchLabel}: Please enter Won/Lost game counts (one must be greater than the other).`;
+        alert(msg);
         finishSaveBtn.disabled = false;
         return;
       }
@@ -6064,15 +6179,112 @@
 
     // Show requeue overlay
     requeuePlayerName.textContent = player.name;
+    // Display deck identity as color icons
+    if(player.colorIdentity && player.colorIdentity.length > 0){
+      const deckIdentityIcons = player.colorIdentity.map(c =>
+        pipUrls[c] ? `<img src="${pipUrls[c]}" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin:0 1px;" alt="${c}"/>` : c
+      ).join('');
+      requeuePlayerDeckIdentity.innerHTML = deckIdentityIcons;
+    } else {
+      requeuePlayerDeckIdentity.textContent = '';
+    }
+    // Reset the deck change options
+    requeueNewDeckFields.style.display = 'none';
+    Array.from(requeueColorChoice.children).forEach(chip => chip.classList.remove('active'));
+    requeueDeckCodeInput.value = '';
     requeueOverlay.classList.add('show');
   });
 
   // Requeue overlay handlers
-  requeueYesBtn.addEventListener('click', () => {
+  // Make color chips toggleable for new deck selection
+  requeueColorChoice.addEventListener('click', (e) => {
+    if(e.target.classList.contains('color-chip')){
+      e.target.classList.toggle('active');
+    }
+  });
+
+  // Same Deck button - requeue with same deck
+  requeueSameDeckBtn.addEventListener('click', () => {
     const evt = currentEvent();
     if(!evt.currentRun || !evt.currentRun.player) return;
 
     const player = evt.currentRun.player;
+    const bonusHits = evt.currentRun.bonusHits || 3;
+    requeueOverlay.classList.remove('show');
+
+    // Check if bonus overlay should be shown (4 or 5 symbols)
+    if(bonusHits === 4 || bonusHits === 5){
+      bonusPlayerName.textContent = player.name;
+      bonusHitCount.textContent = bonusHits;
+      bonusRewardOverlay.classList.add('show');
+    } else {
+      // No bonus, just requeue with base tickets
+      for(let i=0;i<5;i++){
+        player.tickets[i] = 1;
+      }
+      player.sparks = 0;
+      player.createdAt = Date.now();
+      clampPlayer(player);
+      log(`${player.name} re-added to queue with 1 ticket per reel.`);
+
+      // When winner re-enters, double all other active players' tickets (patience reward)
+      const isIgnitedWin = currentWinnerMeta && currentWinnerMeta.reason === 'ignited';
+      if(!isIgnitedWin){
+        for(const other of evt.players){
+          if(other.id === player.id) continue;
+          if(other.status !== 'active') continue;
+          doubleTicketsAllReels(other);
+        }
+        log(`All other players' tickets doubled (patience reward).`);
+      }
+
+      evt.currentRun = null;
+      renderLeaderboard();
+      saveAll();
+    }
+  });
+
+  // New Deck button - show new deck input fields
+  requeueNewDeckBtn.addEventListener('click', () => {
+    requeueNewDeckFields.style.display = 'block';
+  });
+
+  // Cancel new deck button - hide new deck input fields
+  requeueCancelNewDeckBtn.addEventListener('click', () => {
+    requeueNewDeckFields.style.display = 'none';
+    Array.from(requeueColorChoice.children).forEach(chip => chip.classList.remove('active'));
+    requeueDeckCodeInput.value = '';
+  });
+
+  // Confirm new deck button - update player's deck and requeue
+  requeueConfirmNewDeckBtn.addEventListener('click', () => {
+    const evt = currentEvent();
+    if(!evt.currentRun || !evt.currentRun.player) return;
+
+    const player = evt.currentRun.player;
+
+    // Get selected colors
+    const activeChips = Array.from(requeueColorChoice.querySelectorAll('.color-chip.active'));
+    const selectedColors = activeChips.map(chip => chip.dataset.color).sort();
+
+    // Validation: At least one color must be selected
+    if(selectedColors.length === 0){
+      alert('Please select at least one color for the deck identity.');
+      return;
+    }
+
+    // Update player's color identity
+    player.colorIdentity = selectedColors;
+
+    // Get deck code (optional)
+    const deckCode = requeueDeckCodeInput.value.trim();
+    if(deckCode){
+      player.deckCode = deckCode;
+    }
+
+    log(`${player.name}'s deck changed to ${colorToIcons(selectedColors.join(''))}`);
+
+    // Proceed with requeue (same logic as "Same Deck")
     const bonusHits = evt.currentRun.bonusHits || 3;
     requeueOverlay.classList.remove('show');
 
