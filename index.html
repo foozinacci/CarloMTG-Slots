@@ -570,6 +570,11 @@
         text-overflow:ellipsis;
         white-space:nowrap;
       }
+      /* Allow name cells to wrap for vertical color identity layout */
+      .leaderboard-table td:nth-child(2){
+        white-space:normal;
+        overflow:visible;
+      }
       .leaderboard-table td img{
         vertical-align:middle;
       }
@@ -1080,6 +1085,11 @@
       padding:4px 6px;
       text-align:center;
       vertical-align:top;
+      white-space:nowrap;
+    }
+    /* Allow name cells (2nd column) to wrap for vertical color identity layout */
+    .leaderboard-table td:nth-child(2){
+      white-space:normal;
     }
     .leaderboard-table th{
       letter-spacing:.12em;
@@ -4035,9 +4045,35 @@
       }
       // Display baseName (without color code) + color icons
       const displayName = p.baseName || p.name;
-      tdName.innerHTML = displayName + colorIcons + (p.status!=='active'
-        ? " <span style='color:var(--red);font-size:10px;'>(AFK)</span>"
-        : "");
+      // Create container for vertical layout (name above, icons below)
+      const nameContainer = document.createElement('div');
+      nameContainer.style.display = 'flex';
+      nameContainer.style.flexDirection = 'column';
+      nameContainer.style.alignItems = 'center';
+      nameContainer.style.gap = '4px';
+
+      // Name element
+      const nameDiv = document.createElement('div');
+      nameDiv.textContent = displayName;
+      if(p.status !== 'active'){
+        const afkSpan = document.createElement('span');
+        afkSpan.style.color = 'var(--red)';
+        afkSpan.style.fontSize = '10px';
+        afkSpan.textContent = ' (AFK)';
+        nameDiv.appendChild(afkSpan);
+      }
+
+      // Color icons element
+      const iconsDiv = document.createElement('div');
+      iconsDiv.innerHTML = colorIcons;
+      iconsDiv.style.display = 'flex';
+      iconsDiv.style.gap = '2px';
+      iconsDiv.style.justifyContent = 'center';
+
+      nameContainer.appendChild(nameDiv);
+      if(colorIcons) nameContainer.appendChild(iconsDiv);
+
+      tdName.appendChild(nameContainer);
       tdName.style.cursor = 'pointer';
       tdName.addEventListener('click',()=>openPlayerCard(p.id));
       const tdOverall = document.createElement('td');
