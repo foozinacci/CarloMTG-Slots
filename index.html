@@ -660,16 +660,25 @@
         overflow-wrap:break-word;
       }
       .footer-bar{
-        position:fixed;
+        position:sticky;
+        bottom:0;
         z-index:9999;
         padding:10px 8px;
+        max-width:100vw;
+        box-sizing:border-box;
       }
       .footer-buttons{
         gap:8px;
+        width:100%;
+        max-width:100%;
+        overflow-x:auto;
+        overflow-y:visible;
+        flex-wrap:wrap;
       }
       .footer-buttons button{
         font-size:9px;
         padding:6px 10px;
+        white-space:nowrap;
       }
     }
     .reels-shell{
@@ -803,6 +812,7 @@
       overflow:hidden;
       line-height:1.2;
       display:flex;
+      flex-direction:column;
       align-items:center;
       justify-content:center;
       word-wrap:break-word;
@@ -821,8 +831,8 @@
       text-shadow:0 0 8px rgba(248,250,252,.7);
     }
     .reel-symbol.player img{
-      width:14px !important;
-      height:14px !important;
+      width:16px !important;
+      height:16px !important;
       display:inline-block !important;
       object-fit:contain !important;
       vertical-align:middle !important;
@@ -1728,6 +1738,8 @@
       align-items:center;
       margin-bottom:6px;
       gap:4px;
+      position:relative;
+      z-index:101;
     }
     .player-card-name{
       font-weight:700;
@@ -1747,6 +1759,8 @@
       gap:6px;
       margin:6px 0;
       flex-wrap:wrap;
+      position:relative;
+      z-index:101;
     }
     .player-card-actions button{
       border-radius:999px;
@@ -1793,6 +1807,8 @@
       margin:12px 0;
       padding:4px 0;
       -webkit-overflow-scrolling:touch;
+      position:relative;
+      z-index:101;
     }
     .reel-charts{
       display:flex;
@@ -1915,6 +1931,8 @@
       overflow-x:auto;
       margin-top:6px;
       -webkit-overflow-scrolling:touch;
+      position:relative;
+      z-index:101;
     }
     .deck-table{
       width:100%;
@@ -2059,6 +2077,8 @@
       margin-top:12px;
       margin-bottom:6px;
       text-align:center;
+      position:relative;
+      z-index:101;
     }
     .help-grid-container{
       width:calc(100% - 20px);
@@ -2165,6 +2185,8 @@
       gap:6px;
       margin:12px 0;
       flex-wrap:wrap;
+      position:relative;
+      z-index:101;
     }
     .spark-bulbs-row{
       display:flex;
@@ -6557,7 +6579,25 @@
         handleWinTickets(evt,winner,symbols,reelPlayers);
         // Color code: amber/chartreuse for Krark wins, green for regular wins
         const winColor = isLunaWin ? '#DFFF00' : '#22c55e';
-        log(`<span style="color:${winColor};font-weight:600;">${winner.name} wins the slot (${reason}, hits=${hits}).</span>`);
+
+        // Display player name with deck identity icons
+        const pipUrls = {
+          'W': 'https://i.ibb.co/sJpHH9VZ/W.png',
+          'U': 'https://i.ibb.co/0bPLHLk/U.png',
+          'B': 'https://i.ibb.co/nM1ZZz3z/B.png',
+          'R': 'https://i.ibb.co/NnjxnmZv/R.png',
+          'G': 'https://i.ibb.co/tM5Mb1Q0/G.png',
+          'C': 'https://i.ibb.co/xt4Lpn0X/C.png'
+        };
+        let deckIdentityDisplay = '';
+        if(winner.colorIdentity && winner.colorIdentity.length > 0){
+          deckIdentityDisplay = winner.colorIdentity.map(c =>
+            pipUrls[c] ? `<img src="${pipUrls[c]}" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin:0 1px;" alt="${c}"/>` : c
+          ).join('');
+        }
+        const playerDisplay = (winner.baseName || winner.name) + (deckIdentityDisplay ? ' ' + deckIdentityDisplay : '');
+
+        log(`<span style="color:${winColor};font-weight:600;">${playerDisplay} wins the slot (${reason}, hits=${hits}).</span>`);
         // Short delay after last reel stops before showing winner banner
         setTimeout(()=>{
           stopBulbsAnimation();
