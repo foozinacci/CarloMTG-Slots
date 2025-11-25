@@ -6966,9 +6966,6 @@
     isFlipping = true;
     lastFlipTime = now;
 
-    // Pause the rotation animation during flip
-    krarkLogo.style.animationPlayState = 'paused';
-
     // 50/50 coin flip
     const result = Math.random() < 0.5 ? 'Heads' : 'Tails';
     const newSrc = result === 'Heads' ? KRARK_HEADS : KRARK_TAILS;
@@ -7003,8 +7000,6 @@
     setTimeout(() => {
       krarkLogo.style.transform = 'rotateY(0deg)';
       krarkLogo.style.transition = 'transform 0.6s ease';
-      // Resume rotation animation
-      krarkLogo.style.animationPlayState = 'running';
       isFlipping = false;
     }, 3000);
   });
