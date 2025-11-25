@@ -1460,6 +1460,19 @@
       transform:scale(1.03);
       box-shadow:0 0 24px var(--theme-glow),inset 0 0 16px var(--theme-glow);
     }
+    .result-chip{
+      opacity:0.7;
+      z-index:101;
+    }
+    .result-chip.active{
+      opacity:1;
+      font-weight:bold;
+      transform:scale(1.05);
+      box-shadow:0 0 20px var(--theme-glow),inset 0 0 20px var(--theme-glow);
+    }
+    .result-chip:hover{
+      opacity:1;
+    }
     .finish-input-row input[type="number"]{
       width:80px;
       border-radius:999px;
@@ -1487,14 +1500,14 @@
     }
     .color-chip{
       border-radius:999px;
-      border:1px solid var(--border);
-      width:26px;
-      height:26px;
+      border:2px solid var(--border);
+      width:28px;
+      height:28px;
       display:flex;
       align-items:center;
       justify-content:center;
       cursor:pointer;
-      background-color:transparent;
+      background-color:rgba(0,0,0,0.3);
       background-repeat:no-repeat;
       background-position:center;
       background-size:contain;
@@ -1502,18 +1515,22 @@
       text-indent:-9999px;
       opacity:.7;
       position:relative;
-      z-index:10;
+      z-index:101;
       transition:all 0.2s ease;
+      box-shadow:0 0 4px rgba(0,0,0,0.5);
     }
     .color-chip:hover{
       opacity:1;
-      transform:scale(1.1);
+      transform:scale(1.15);
       border-color:var(--gold);
+      box-shadow:0 0 12px rgba(250,204,21,.5);
     }
     .color-chip.active{
       opacity:1;
       border-color:var(--gold);
-      box-shadow:0 0 10px rgba(250,204,21,.7);
+      border-width:3px;
+      box-shadow:0 0 16px rgba(250,204,21,.9), inset 0 0 8px rgba(250,204,21,.3);
+      transform:scale(1.05);
     }
     .color-chip[data-color="W"]{background-image:url("https://i.ibb.co/sJpHH9VZ/W.png");}
     .color-chip[data-color="U"]{background-image:url("https://i.ibb.co/0bPLHLk/U.png");}
@@ -2366,8 +2383,8 @@
           <button type="button" class="adjust-btn" id="addMatchBtn">+</button>
         </div>
       </div>
-      <div class="finish-field" style="display:none;">
-        <div class="finish-label">Wins and Losses</div>
+      <div class="finish-field" id="globalWinsLossesSection" style="display:none;">
+        <div class="finish-label">Overall Run Wins and Losses</div>
         <div style="display:flex;gap:12px;justify-content:center;align-items:center;margin-top:8px;">
           <div style="text-align:center;">
             <div style="font-size:10px;color:var(--muted);margin-bottom:4px;">Wins</div>
@@ -2386,6 +2403,7 @@
             </div>
           </div>
         </div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;text-align:center;">Note: Per-match results are selected below.</div>
       </div>
       <div class="finish-field" id="opponentColorsContainer">
         <!-- Dynamically populated based on match type and matches played -->
@@ -5444,8 +5462,13 @@
 
       const labelDiv = document.createElement('div');
       labelDiv.className = 'finish-label';
-      labelDiv.textContent = 'Opponent Colors (Required - one per game)';
+      labelDiv.textContent = 'Opponent Colors & Results (Required)';
       opponentColorsContainer.appendChild(labelDiv);
+
+      const helpText = document.createElement('div');
+      helpText.style.cssText = 'font-size:10px;color:var(--muted);margin-bottom:8px;text-align:center;';
+      helpText.textContent = 'Click color icons to select opponent colors, then click Win or Loss for each game';
+      opponentColorsContainer.appendChild(helpText);
 
       // Create scrollable container for opponent groups
       const scrollContainer = document.createElement('div');
@@ -5550,8 +5573,13 @@
       // BO3/BO5: One opponent color selector per match
       const labelDiv = document.createElement('div');
       labelDiv.className = 'finish-label';
-      labelDiv.textContent = 'Opponent Colors (Required - one per match)';
+      labelDiv.textContent = 'Opponent Colors & Results (Required)';
       opponentColorsContainer.appendChild(labelDiv);
+
+      const helpText = document.createElement('div');
+      helpText.style.cssText = 'font-size:10px;color:var(--muted);margin-bottom:8px;text-align:center;';
+      helpText.textContent = 'Click color icons to select opponent colors, then click Win or Loss for each match';
+      opponentColorsContainer.appendChild(helpText);
 
       // Create scrollable container for opponent groups
       const scrollContainer = document.createElement('div');
