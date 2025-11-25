@@ -2264,8 +2264,8 @@
 <div id="app">
   <header>
     <div class="header-top">
-      <div class="logo">
-        <img src="https://i.ibb.co/217nYbnD/ei-1764070131751-removebg-preview.png" alt="CoAST"/>
+      <div class="logo" id="logoContainer" style="cursor:pointer;">
+        <img id="krarkLogo" src="https://i.ibb.co/217nYbnD/ei-1764070131751-removebg-preview.png" alt="CoAST" style="transition:transform 0.6s ease;"/>
       </div>
       <div class="title-block">
         <div class="title">Viewer Roulette</div>
@@ -2436,13 +2436,10 @@
       <div class="finish-sub">
         Would you like <span id="requeuePlayerName"></span> <span id="requeuePlayerDeckIdentity"></span> to be re-added to the queue?
       </div>
-      <div class="finish-field" style="margin-top:16px;">
-        <div class="finish-label" style="margin-bottom:8px;">Deck Options</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <button type="button" id="requeueSameDeckBtn" class="primary">Same Deck</button>
-          <button type="button" id="requeueNewDeckBtn">Different Deck</button>
-          <button type="button" id="requeueNoBtn">No</button>
-        </div>
+      <div class="finish-actions" style="margin-top:16px;">
+        <button type="button" id="requeueSameDeckBtn" class="primary">Same Deck</button>
+        <button type="button" id="requeueNewDeckBtn">Different Deck</button>
+        <button type="button" id="requeueNoBtn">Don't Re-add</button>
       </div>
       <div id="requeueNewDeckFields" style="display:none;margin-top:12px;">
         <div class="finish-field">
@@ -2491,6 +2488,25 @@
         <div class="player-card-name" id="playerCardName"></div>
         <div class="player-card-status" id="playerCardStatus"></div>
       </div>
+      <div class="help-section-title deck-section-header" id="deckSectionHeader" style="cursor:pointer;user-select:none;">
+        Decks (by color identity) <span id="deckExpandIcon" style="font-size:10px;">▼</span>
+      </div>
+      <div class="deck-table-wrapper" id="deckTableWrapper">
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th class="sortable-header" data-deck-sort="colors">Colors <span class="sort-indicator"></span></th>
+              <th class="sortable-header" data-deck-sort="matches">Matches <span class="sort-indicator"></span></th>
+              <th class="sortable-header" data-deck-sort="wl">W/L <span class="sort-indicator"></span></th>
+              <th class="sortable-header" data-deck-sort="winRate">Win% <span class="sort-indicator"></span></th>
+              <th style="cursor:default;">Matchups</th>
+              <th class="sortable-header" data-deck-sort="last">Last <span class="sort-indicator"></span></th>
+              <th style="cursor:default;text-align:center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="deckTableBody"></tbody>
+        </table>
+      </div>
       <div class="help-section-title">Reel Probabilities</div>
       <div class="reel-charts-wrapper">
         <div class="reel-charts" id="reelCharts"></div>
@@ -2517,25 +2533,6 @@
         <div class="spark-overflow-bulb ignition" data-spark="12">
           <div class="spark-overflow-label">IGNITED</div>
         </div>
-      </div>
-      <div class="help-section-title deck-section-header" id="deckSectionHeader" style="cursor:pointer;user-select:none;">
-        Decks (by color identity) <span id="deckExpandIcon" style="font-size:10px;">▼</span>
-      </div>
-      <div class="deck-table-wrapper" id="deckTableWrapper">
-        <table class="deck-table">
-          <thead>
-            <tr>
-              <th class="sortable-header" data-deck-sort="colors">Colors <span class="sort-indicator"></span></th>
-              <th class="sortable-header" data-deck-sort="matches">Matches <span class="sort-indicator"></span></th>
-              <th class="sortable-header" data-deck-sort="wl">W/L <span class="sort-indicator"></span></th>
-              <th class="sortable-header" data-deck-sort="winRate">Win% <span class="sort-indicator"></span></th>
-              <th style="cursor:default;">Matchups</th>
-              <th class="sortable-header" data-deck-sort="last">Last <span class="sort-indicator"></span></th>
-              <th style="cursor:default;text-align:center;">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="deckTableBody"></tbody>
-        </table>
       </div>
       <div class="player-card-actions" style="margin-top:12px;">
         <button id="exportPlayerDeckBtn" style="display:none;">📋 Export Deck</button>
@@ -2768,6 +2765,8 @@
   const spinBtn = document.getElementById('spinBtn');
   const leverEl = document.getElementById('lever');
   const smallStatus = document.getElementById('smallStatus');
+  const logoContainer = document.getElementById('logoContainer');
+  const krarkLogo = document.getElementById('krarkLogo');
   const statusText = document.getElementById('statusText');
   const spinCountEl = document.getElementById('spinCount');
   const deadStreakEl = document.getElementById('deadStreak');
@@ -4136,11 +4135,11 @@
       const nameDiv = document.createElement('div');
       nameDiv.textContent = displayName;
       if(p.status !== 'active'){
-        const afkSpan = document.createElement('span');
-        afkSpan.style.color = 'var(--red)';
-        afkSpan.style.fontSize = '10px';
-        afkSpan.textContent = ' (AFK)';
-        nameDiv.appendChild(afkSpan);
+        const statusSpan = document.createElement('span');
+        statusSpan.style.color = 'var(--red)';
+        statusSpan.style.fontSize = '10px';
+        statusSpan.textContent = p.status === 'removed' ? ' (REMOVED)' : ' (AFK)';
+        nameDiv.appendChild(statusSpan);
       }
 
       // Color icons element
@@ -4205,8 +4204,12 @@
     const playerCountHeader = document.getElementById('playerCountHeader');
     if(playerCountHeader){
       const activePlayers = evt.players.filter(p => p.status === 'active');
-      const afkPlayers = evt.players.filter(p => p.status !== 'active');
-      playerCountHeader.textContent = `${activePlayers.length} Active${afkPlayers.length > 0 ? ` | ${afkPlayers.length} AFK` : ''}`;
+      const afkPlayers = evt.players.filter(p => p.status === 'afk');
+      const removedPlayers = evt.players.filter(p => p.status === 'removed');
+      let statusText = `${activePlayers.length} Active`;
+      if(afkPlayers.length > 0) statusText += ` | ${afkPlayers.length} AFK`;
+      if(removedPlayers.length > 0) statusText += ` | ${removedPlayers.length} REMOVED`;
+      playerCountHeader.textContent = statusText;
     }
   }
 
@@ -6327,8 +6330,8 @@
     const player = evt.currentRun.player;
     requeueOverlay.classList.remove('show');
 
-    player.status = 'afk';
-    log(`${player.name} marked as AFK.`);
+    player.status = 'removed';
+    log(`${player.name} removed from queue.`);
 
     evt.currentRun = null;
     renderLeaderboard();
@@ -6567,6 +6570,36 @@
 
   spinBtn.addEventListener('click',performSpin);
   leverEl.addEventListener('click',performSpin);
+
+  // Krark logo flip - 50/50 chance heads or tails
+  const KRARK_HEADS = 'https://i.ibb.co/zW2p2fSy/ei-1764090573462-removebg-preview.png';
+  const KRARK_TAILS = 'https://i.ibb.co/1YSpJ0SQ/ei-1764090558119-removebg-preview.png';
+  let isFlipping = false;
+
+  logoContainer.addEventListener('click', () => {
+    if(isFlipping) return; // Prevent multiple clicks during animation
+    isFlipping = true;
+
+    // 50/50 coin flip
+    const result = Math.random() < 0.5 ? 'Heads' : 'Tails';
+    const newSrc = result === 'Heads' ? KRARK_HEADS : KRARK_TAILS;
+
+    // Rotate animation
+    krarkLogo.style.transform = 'rotateY(180deg)';
+
+    // Change image at halfway point
+    setTimeout(() => {
+      krarkLogo.src = newSrc;
+      krarkLogo.style.transform = 'rotateY(360deg)';
+    }, 300);
+
+    // Reset rotation and log result
+    setTimeout(() => {
+      krarkLogo.style.transform = 'rotateY(0deg)';
+      log(`Krark flipped ${result}!`);
+      isFlipping = false;
+    }, 600);
+  });
 
   addPlayerForm.addEventListener('submit',e=>{
     e.preventDefault();
