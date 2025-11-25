@@ -288,6 +288,7 @@
       align-items:center;
       gap:6px;
       flex:1;
+      margin-left:90px; /* Offset by logo width to center above A reel */
     }
     .title{
       font-size:22px;
@@ -521,6 +522,9 @@
       .header-top{
         flex-direction:column;
         align-items:center;
+      }
+      .title-block{
+        margin-left:0; /* Reset centering offset on mobile */
       }
       .header-spin-controls{
         width:100%;
@@ -1277,6 +1281,8 @@
       width:96px;
       height:96px;
       opacity:.95;
+      z-index:100;
+      pointer-events:none;
     }
     .winner-luna-sticker img{
       width:100%;
@@ -1454,6 +1460,12 @@
       opacity:.7;
       position:relative;
       z-index:10;
+      transition:all 0.2s ease;
+    }
+    .color-chip:hover{
+      opacity:1;
+      transform:scale(1.1);
+      border-color:var(--gold);
     }
     .color-chip.active{
       opacity:1;
@@ -3069,8 +3081,17 @@
 
     let t = 0;
     const trailLength = 8; // Number of bulbs to light up in the trail
+    const totalRotations = 3; // Make 3 full rotations
+    const maxSteps = all.length * totalRotations; // 3 complete rotations around the slot machine
+
     bulbsTimer = setInterval(()=>{
-      // For Krark wins: use pink colors. For others: randomly cycle all non-pink colors
+      // Stop after 3 full rotations
+      if(t >= maxSteps){
+        stopBulbsAnimation();
+        return;
+      }
+
+      // For Krark wins: use warm amber/chartreuse colors. For others: randomly cycle all colors
       const availableColors = isLunaWin ? BULB_LUNA_COLORS : BULB_COLORS;
 
       // Turn off all bulbs first
@@ -3080,19 +3101,19 @@
         b.style.color = '#4b5563';
       });
 
-      // Light up trailing bulbs with random color cycling
+      // Light up trailing bulbs with random color cycling and brighter opacity
       for(let i = 0; i < trailLength; i++){
         const idx = (t - i + all.length) % all.length;
         const bulb = all[idx];
         // Random color from available palette
         const c = availableColors[Math.floor(Math.random() * availableColors.length)];
-        const opacity = 1 - (i / trailLength) * 0.7; // Fade trail
+        const opacity = 1 - (i / trailLength) * 0.4; // Brighter fade trail (was 0.7, now 0.4)
         bulb.style.color = c;
         bulb.style.background = c;
         bulb.style.opacity = opacity;
         bulb.classList.add('active');
       }
-      t = (t + 1) % all.length;
+      t = t + 1;
     },80);
   }
   function stopBulbsAnimation(){
@@ -5515,6 +5536,13 @@
     const activeMatchType = matchTypeChoice.querySelector('.queue-chip.active');
     const matchType = activeMatchType ? activeMatchType.dataset.matchType : 'BO3';
 
+    // Validation: Ensure at least one match was played
+    if(matchesPlayed === 0){
+      alert('Please add at least one match played before saving results.');
+      finishSaveBtn.disabled = false;
+      return;
+    }
+
     // Collect opponent colors and results from dynamic selectors
     let opponentColorsByGame = []; // Array for BO1, single element for BO3/BO5
     let resultsByGame = []; // Array of 'win'/'loss' results per game
@@ -5524,6 +5552,8 @@
       const gameColors = activeChips.map(chip => chip.dataset.color).sort().join('');
       if(gameColors){
         opponentColorsByGame.push(gameColors);
+      } else {
+        opponentColorsByGame.push(''); // No colors selected
       }
 
       // Get the result for this game/match
@@ -5534,6 +5564,21 @@
         resultsByGame.push(null); // No result selected
       }
     });
+
+    // Validation: Check that ALL matches have opponent colors selected AND win/loss result
+    for(let i = 0; i < matchesPlayed; i++){
+      const matchLabel = matchType === 'BO1' ? `Game ${i + 1}` : `Match ${i + 1}`;
+      if(!opponentColorsByGame[i] || opponentColorsByGame[i] === ''){
+        alert(`${matchLabel}: Please select at least one opponent color before saving.`);
+        finishSaveBtn.disabled = false;
+        return;
+      }
+      if(!resultsByGame[i]){
+        alert(`${matchLabel}: Please select Win or Loss before saving.`);
+        finishSaveBtn.disabled = false;
+        return;
+      }
+    }
 
     // Calculate total wins and losses from result chips
     const wins = resultsByGame.filter(r => r === 'win').length;
@@ -5687,7 +5732,9 @@
     }
     const themeName = colors ? getColorThemeName(colors) : '';
     const themeDisplay = themeName ? ` (Theme ${themeName})` : '';
-    log(`Reported run for ${player.name}: ${wins}W/${losses}L (${matchesPlayed} matches), ${colorDisplay}${themeDisplay}${opponentDisplay}, type=${matchType}`);
+    // Use baseName with color icons instead of full name
+    const playerDisplay = (player.baseName || player.name) + (colorDisplay !== 'none' ? ':' + colorDisplay : '');
+    log(`Reported run for ${playerDisplay}: ${wins}W/${losses}L (${matchesPlayed} matches)${themeDisplay}${opponentDisplay}, type=${matchType}`);
 
     // Store player info for requeue and bonus overlays
     evt.currentRun.player = player;
@@ -5969,8 +6016,8 @@
       if(winner){
         // Winner found: Bulbs already running, handle tickets then show banner
         handleWinTickets(evt,winner,symbols,reelPlayers);
-        // Color code: pink for Krark wins, green for regular wins
-        const winColor = isLunaWin ? '#f973fa' : '#22c55e';
+        // Color code: amber/chartreuse for Krark wins, green for regular wins
+        const winColor = isLunaWin ? '#DFFF00' : '#22c55e';
         log(`<span style="color:${winColor};font-weight:600;">${winner.name} wins the slot (${reason}, hits=${hits}).</span>`);
         // Short delay after last reel stops before showing winner banner
         setTimeout(()=>{
