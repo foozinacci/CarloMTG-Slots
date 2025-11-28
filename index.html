@@ -2733,7 +2733,7 @@
       </div>
       <div class="player-card-actions" style="margin-top:12px;">
         <button id="exportPlayerDeckBtn" style="display:none;">📋 Export Deck</button>
-        <button id="toggleAfkBtn">Toggle AFK</button>
+        <button id="toggleAfkBtn">Toggle Status</button>
         <button id="removePlayerBtn">Remove Player</button>
         <button id="closePlayerCardBtn">Close</button>
       </div>
@@ -4590,6 +4590,10 @@
   }
 
   function renderSpinResult(symbols){
+    // Check if this is a jackpot (CoAST) - if so, show coin heads instead of letters
+    const isJackpot = detectCarlo(symbols);
+    const COIN_HEADS = 'https://i.ibb.co/hFJzL926/ei-1764090573462-removebg-preview-ezgif-com-resize-removebg-preview.png';
+
     reelsEl.innerHTML = '';
     symbols.forEach(sym=>{
       const reel = document.createElement('div');
@@ -4662,8 +4666,14 @@
       }else if(sym.type === 'letter'){
         div.className = 'reel-symbol letter';
         const img = document.createElement('img');
-        img.src = LETTER_IMAGES[sym.letter] || '';
-        img.alt = sym.letter;
+        // If this is a jackpot, show coin heads instead of COAST letters
+        if(isJackpot){
+          img.src = COIN_HEADS;
+          img.alt = 'Heads';
+        } else {
+          img.src = LETTER_IMAGES[sym.letter] || '';
+          img.alt = sym.letter;
+        }
         div.appendChild(img);
       }else if(sym.type === 'luna'){
         div.className = 'reel-symbol luna';
@@ -5686,7 +5696,8 @@
     // Set title and subtitle
     matchupDetailTitle.textContent = 'Match History';
     const colorStr = deck.color || 'Colorless';
-    matchupDetailSubtitle.textContent = `${player.name} - ${colorStr} Deck`;
+    const displayName = player.baseName || player.name;
+    matchupDetailSubtitle.textContent = `${displayName} - ${colorStr} Deck`;
 
     // Clear previous content
     matchupDetailContent.innerHTML = '';
@@ -5739,16 +5750,21 @@
       const oppMatches = groupedByOpponent[oppColors];
       const stats = deck.matchups[oppColors];
 
+      // Skip if no stats available for this opponent
+      if(!stats || !oppColors) continue;
+
       // Opponent group header
       const groupHeader = document.createElement('div');
       groupHeader.style.cssText = 'font-weight:600;margin-bottom:4px;color:var(--text);margin-top:10px;';
       let colorPips = '';
-      for(const letter of oppColors){
-        if(pipUrls[letter]){
-          colorPips += `<img src="${pipUrls[letter]}" style="width:12px;height:12px;vertical-align:middle;margin:0 1px;" alt="${letter}"/>`;
+      if(oppColors && typeof oppColors === 'string'){
+        for(const letter of oppColors){
+          if(pipUrls[letter]){
+            colorPips += `<img src="${pipUrls[letter]}" style="width:12px;height:12px;vertical-align:middle;margin:0 1px;" alt="${letter}"/>`;
+          }
         }
       }
-      const matchupTotal = stats.wins + stats.losses;
+      const matchupTotal = (stats.wins || 0) + (stats.losses || 0);
       const matchupWinRate = matchupTotal > 0 ? ((stats.wins / matchupTotal) * 100).toFixed(0) : 0;
       groupHeader.innerHTML = `vs. ${colorPips}`;
       matchupDetailContent.appendChild(groupHeader);
@@ -5804,14 +5820,22 @@
         e.stopPropagation();
         if(stats.wins > 0) {
           stats.wins--;
-          openMatchupDetail(player, deck);
+          winsSpan.textContent = stats.wins;
+          const newTotal = (stats.wins || 0) + (stats.losses || 0);
+          const newWinRate = newTotal > 0 ? ((stats.wins / newTotal) * 100).toFixed(0) : 0;
+          winRateSpan.textContent = newWinRate + '%';
+          totalSpan.textContent = newTotal;
           saveAll();
         }
       };
       winsPlusBtn.onclick = (e) => {
         e.stopPropagation();
         stats.wins++;
-        openMatchupDetail(player, deck);
+        winsSpan.textContent = stats.wins;
+        const newTotal = (stats.wins || 0) + (stats.losses || 0);
+        const newWinRate = newTotal > 0 ? ((stats.wins / newTotal) * 100).toFixed(0) : 0;
+        winRateSpan.textContent = newWinRate + '%';
+        totalSpan.textContent = newTotal;
         saveAll();
       };
 
@@ -5836,14 +5860,22 @@
         e.stopPropagation();
         if(stats.losses > 0) {
           stats.losses--;
-          openMatchupDetail(player, deck);
+          lossesSpan.textContent = stats.losses;
+          const newTotal = (stats.wins || 0) + (stats.losses || 0);
+          const newWinRate = newTotal > 0 ? ((stats.wins / newTotal) * 100).toFixed(0) : 0;
+          winRateSpan.textContent = newWinRate + '%';
+          totalSpan.textContent = newTotal;
           saveAll();
         }
       };
       lossesPlusBtn.onclick = (e) => {
         e.stopPropagation();
         stats.losses++;
-        openMatchupDetail(player, deck);
+        lossesSpan.textContent = stats.losses;
+        const newTotal = (stats.wins || 0) + (stats.losses || 0);
+        const newWinRate = newTotal > 0 ? ((stats.wins / newTotal) * 100).toFixed(0) : 0;
+        winRateSpan.textContent = newWinRate + '%';
+        totalSpan.textContent = newTotal;
         saveAll();
       };
 
@@ -5862,7 +5894,7 @@
       editOppBtn.style.cssText = 'font-size:9px;padding:2px 6px;background:var(--theme-color);border:none;border-radius:3px;color:#000;cursor:pointer;font-weight:600;white-space:nowrap;';
       editOppBtn.onclick = (e) => {
         e.stopPropagation();
-        matchupDetailOverlay.classList.remove('show');
+        // Don't close matchup detail overlay - keep it open while editing
         openOpponentColorEditDialog(player, deck, oppColors, stats);
       };
 
@@ -6191,6 +6223,9 @@
             });
           }
         }
+        // Reset tickets to default when re-activating removed player
+        duplicate.tickets = [1,1,1,1,1];
+        duplicate.sparks = 0;
         duplicate.status = 'active';
         duplicate.createdAt = Date.now();
         const colorIcons = colorToIcons(colors.join(''));
