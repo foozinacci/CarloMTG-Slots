@@ -2856,8 +2856,8 @@
           <div class="help-box-text">Wild card that helps complete wins. Max 1 per spin.</div>
         </div>
         <div class="help-box">
-          <div class="help-box-title">Coin Flip</div>
-          <div class="help-box-text">Heads result! All 5 reels align. Streamer plays their deck.</div>
+          <div class="help-box-title">Jackpot</div>
+          <div class="help-box-text">Heads-side coin flip! All 5 reels align. Streamer plays their deck.</div>
         </div>
         <div class="help-box">
           <div class="help-box-title">Meta-Tracking</div>
@@ -4590,6 +4590,10 @@
   }
 
   function renderSpinResult(symbols){
+    // Check if this is a jackpot (CoAST) - if so, show coin heads instead of letters
+    const isJackpot = detectCarlo(symbols);
+    const COIN_HEADS = 'https://i.ibb.co/hFJzL926/ei-1764090573462-removebg-preview-ezgif-com-resize-removebg-preview.png';
+
     reelsEl.innerHTML = '';
     symbols.forEach(sym=>{
       const reel = document.createElement('div');
@@ -4662,8 +4666,14 @@
       }else if(sym.type === 'letter'){
         div.className = 'reel-symbol letter';
         const img = document.createElement('img');
-        img.src = LETTER_IMAGES[sym.letter] || '';
-        img.alt = sym.letter;
+        // If this is a jackpot, show coin heads instead of COAST letters
+        if(isJackpot){
+          img.src = COIN_HEADS;
+          img.alt = 'Heads';
+        } else {
+          img.src = LETTER_IMAGES[sym.letter] || '';
+          img.alt = sym.letter;
+        }
         div.appendChild(img);
       }else if(sym.type === 'luna'){
         div.className = 'reel-symbol luna';
@@ -6327,8 +6337,8 @@
       winnerHeading.textContent = 'IGNITED!';
       winnerMetaEl.textContent = `${displayName} has ${MAX_SPARKS} sparks & has been Ignited.`;
     }else if(reason==='carlo'){
-      winnerHeading.textContent = 'HEADS - COIN FLIP!';
-      winnerMetaEl.textContent = `Coin landed heads – streamer plays their own deck this round.`;
+      winnerHeading.textContent = 'JACKPOT!';
+      winnerMetaEl.textContent = `Heads-side coin flip – streamer plays their own deck this round.`;
     }else{
       winnerHeading.textContent = 'WINNER';
       if(hits>=5){
@@ -7414,14 +7424,14 @@
       let reason='normal';
       let hits=3;
       if(isCarlo){
-        // Coin flip result: Bulbs already running, wait a bit more then show banner
+        // Jackpot: Bulbs already running, wait a bit more then show banner
         setTimeout(()=>{
           stopBulbsAnimation();
           evt.carloHits++;
           winnerOverlay.classList.add('show');
-          winnerHeading.textContent='HEADS - COIN FLIP!';
-          winnerNameEl.innerHTML='HEADS';
-          winnerMetaEl.textContent='Coin landed heads – Streamer plays their own deck this round.';
+          winnerHeading.textContent='JACKPOT!';
+          winnerNameEl.innerHTML='JACKPOT';
+          winnerMetaEl.textContent='Heads-side coin flip – Streamer plays their own deck this round.';
           winnerLunaSticker.style.display='none';
           pendingWinner=null;
           currentWinnerMeta={reason:'carlo',hits:0};
