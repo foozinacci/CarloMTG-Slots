@@ -4130,7 +4130,7 @@
   function showDeckImportDialog(player){
     console.log('🎴 showDeckImportDialog called for:', player.name);
     pendingImportPlayer = player;
-    deckImportPlayerName.textContent = player.name;
+    deckImportPlayerName.textContent = player.baseName || player.name;
 
     // Reset color selection
     deckImportColorSet.clear();
@@ -5028,6 +5028,23 @@
         detailDiv.style.marginTop = '8px';
         detailDiv.style.paddingTop = '8px';
         detailDiv.style.borderTop = '1px solid rgba(255,255,255,0.1)';
+        detailDiv.style.background = 'rgba(0,0,0,0.3)';
+        detailDiv.style.padding = '12px';
+        detailDiv.style.borderRadius = '6px';
+        detailDiv.style.maxHeight = '400px';
+        detailDiv.style.overflowY = 'auto';
+        detailDiv.style.position = 'relative';
+
+        // Add close button at the top
+        const closeBtn = document.createElement('button');
+        closeBtn.innerHTML = '✕ Close Match History';
+        closeBtn.style.cssText = 'position:sticky;top:0;width:100%;background:var(--theme-color);color:var(--bg);border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;margin-bottom:8px;z-index:10;';
+        closeBtn.onclick = (e) => {
+          e.stopPropagation();
+          detailDiv.style.display = 'none';
+          summaryDiv.querySelector('span').textContent = '▼';
+        };
+        detailDiv.appendChild(closeBtn);
 
         // Collect all match history across all opponents
         const allMatches = [];
@@ -5294,9 +5311,16 @@
 
         tdMatchups.appendChild(detailDiv);
 
+        // Prevent clicks inside detail view from closing it
+        detailDiv.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+
         // Toggle expansion on click
         tdMatchups.addEventListener('click', (e) => {
-          if(e.target.tagName === 'BUTTON') return; // Don't toggle if clicking edit button
+          // Only toggle if clicking on summary (not buttons or detail div)
+          if(e.target.tagName === 'BUTTON') return;
+          if(detailDiv.contains(e.target)) return;
           const isExpanded = detailDiv.style.display !== 'none';
           detailDiv.style.display = isExpanded ? 'none' : 'block';
           summaryDiv.querySelector('span').textContent = isExpanded ? '▼' : '▲';
@@ -5693,7 +5717,18 @@
     const evt = currentEvent();
     const p = evt.players.find(x=>x.id===currentPlayerCardId);
     if(!p) return;
-    p.status = (p.status==='active' ? 'afk' : 'active');
+
+    const newStatus = (p.status==='active' ? 'afk' : 'active');
+
+    // Check if player has a deck when setting to active/afk
+    if((newStatus === 'active' || newStatus === 'afk') && (!p.colorIdentity || p.colorIdentity.length === 0)){
+      // No deck set, show import dialog
+      playerOverlay.classList.remove('show');
+      setTimeout(() => showDeckImportDialog(p), 100);
+      return;
+    }
+
+    p.status = newStatus;
     const displayName = p.baseName || p.name;
     const colorIcons = Array.isArray(p.colorIdentity) && p.colorIdentity.length > 0
       ? ' ' + colorToIcons(p.colorIdentity.join(''))
@@ -5706,14 +5741,14 @@
   removePlayerBtn.addEventListener('click',()=>{
     if(currentPlayerCardId===null) return;
     const evt = currentEvent();
-    const idx = evt.players.findIndex(x=>x.id===currentPlayerCardId);
-    if(idx>=0){
-      const removed = evt.players.splice(idx,1)[0];
-      const displayName = removed.baseName || removed.name;
-      const colorIcons = Array.isArray(removed.colorIdentity) && removed.colorIdentity.length > 0
-        ? ' ' + colorToIcons(removed.colorIdentity.join(''))
+    const player = evt.players.find(x=>x.id===currentPlayerCardId);
+    if(player){
+      player.status = 'removed';
+      const displayName = player.baseName || player.name;
+      const colorIcons = Array.isArray(player.colorIdentity) && player.colorIdentity.length > 0
+        ? ' ' + colorToIcons(player.colorIdentity.join(''))
         : '';
-      log(`Removed ${displayName}${colorIcons} from the session.`);
+      log(`Set ${displayName}${colorIcons} status to removed.`);
     }
     playerOverlay.classList.remove('show');
     currentPlayerCardId = null;
@@ -6026,6 +6061,42 @@
       p.id !== player.id && p.name.toLowerCase() === fullName.toLowerCase()
     );
     if(duplicate){
+      // If the duplicate player is removed, re-activate them instead of blocking
+      if(duplicate.status === 'removed'){
+        // Check if they need a deck assigned
+        if(!duplicate.colorIdentity || duplicate.colorIdentity.length === 0){
+          // Assign new deck colors
+          duplicate.colorIdentity = colors;
+          duplicate.deckList = deckText.trim();
+          // Create initial deck entry if they don't have one
+          if(!duplicate.decks || duplicate.decks.length === 0){
+            duplicate.decks = [];
+            duplicate.decks.push({
+              color: colors.join(''),
+              wins: 0,
+              losses: 0,
+              matchups: {},
+              lastBestOf: 'BO3'
+            });
+          }
+        }
+        duplicate.status = 'active';
+        duplicate.createdAt = Date.now();
+        const colorIcons = colorToIcons(colors.join(''));
+        log(`Re-activated ${fullName} ${colorIcons} (was previously removed)`);
+        deckImportOverlay.classList.remove('show');
+        pendingImportPlayer = null;
+        renderLeaderboard();
+        saveAll();
+        return;
+      }
+      // If already active or afk, just nullify (do nothing)
+      else if(duplicate.status === 'active' || duplicate.status === 'afk'){
+        deckImportOverlay.classList.remove('show');
+        pendingImportPlayer = null;
+        return;
+      }
+      // Otherwise block
       alert(`${fullName} is already in the queue. Please use a different color identity or player name.`);
       return;
     }
@@ -6057,14 +6128,14 @@
     saveAll();
   });
 
-  // Deck Import - Skip (removes player from queue)
+  // Deck Import - Skip (sets player status to removed)
   deckImportSkipBtn.addEventListener('click', () => {
     if(pendingImportPlayer){
       const evt = currentEvent();
-      const idx = evt.players.findIndex(p => p.id === pendingImportPlayer.id);
-      if(idx >= 0){
-        const removed = evt.players.splice(idx, 1)[0];
-        log(`${removed.baseName || removed.name} skipped deck import and was removed.`);
+      const player = evt.players.find(p => p.id === pendingImportPlayer.id);
+      if(player){
+        player.status = 'removed';
+        log(`${player.baseName || player.name} skipped deck import and was set to removed status.`);
       }
     }
     deckImportOverlay.classList.remove('show');
@@ -6858,7 +6929,7 @@
     saveAll();
 
     // Show requeue overlay
-    requeuePlayerName.textContent = player.name;
+    requeuePlayerName.textContent = player.baseName || player.name;
     // Display deck identity as color icons
     if(player.colorIdentity && player.colorIdentity.length > 0){
       const deckIdentityIcons = player.colorIdentity.map(c =>
@@ -6894,7 +6965,7 @@
 
     // Check if bonus overlay should be shown (4 or 5 symbols)
     if(bonusHits === 4 || bonusHits === 5){
-      bonusPlayerName.textContent = player.name;
+      bonusPlayerName.textContent = player.baseName || player.name;
       bonusHitCount.textContent = bonusHits;
       bonusRewardOverlay.classList.add('show');
     } else {
@@ -6976,7 +7047,7 @@
 
     // Check if bonus overlay should be shown (4 or 5 symbols)
     if(bonusHits === 4 || bonusHits === 5){
-      bonusPlayerName.textContent = player.name;
+      bonusPlayerName.textContent = player.baseName || player.name;
       bonusHitCount.textContent = bonusHits;
       bonusRewardOverlay.classList.add('show');
     } else {
