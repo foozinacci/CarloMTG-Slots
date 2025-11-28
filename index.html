@@ -5751,7 +5751,7 @@
       const stats = deck.matchups[oppColors];
 
       // Skip if no stats available for this opponent
-      if(!stats || !oppColors) continue;
+      if(!stats || !oppColors) return;
 
       // Opponent group header
       const groupHeader = document.createElement('div');
